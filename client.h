@@ -1,40 +1,51 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <QAbstractItemModel>
 #include<Qstring>
-#include <QDateTime>
-class Client : public QAbstractItemModel
+#include <QDate>
+#include<QSqlQueryModel>
+#include<QSqlQuery>
+class Client
 {
-    Q_OBJECT
-
 private:
     int ID_client;
-    QString nom_complet;
-    QString pays;
-    QDate date ;
-    int telephone;
-    QString demande;
+    QString nom;
+    QString prenom;
+    QDate date_naissance ;
+    QString demande_special;
     QString statut ;
+    QString pays;
+    int telephone;
     int total_points;
 
 public:
     Client();
-    Client(int,QString,QDate,QString,int,QString,QString,int);
+    Client(int,QString,QString,QDate,QString,QString,QString,int,int);
 
     int getID_client(){return ID_client ;}
     void setID_client(int newID){ID_client=newID;}
-    QString getnom_complet(){return nom_complet ;}
-    void setnom_complet(QString newnom){nom_complet=newnom;}
-    QString getdemande(){return demande ;}
-    void setdemande(QString newdemande){demande=newdemande;}
+    QString getnom(){return nom ;}
+    void setnom(QString newnom){nom=newnom;}
+    QString getprenom(){return prenom ;}
+    void setprenom(QString newprenom){prenom=newprenom;}
+    QDate getdate_naissance(){return date_naissance ;}
+    void setdate_naissance(QDate newdate){date_naissance=newdate;}
+    QString getdemande_special(){return demande_special ;}
+    void setdemande_special(QString newdemande){demande_special=newdemande;}
     QString getstatut(){return statut ;}
     void setstatut(QString newstatut){statut=newstatut;}
+    QString getpays(){return pays ;}
+    void setpays(QString newpays){pays=newpays;}
+    int gettelephone(){return telephone ;}
+    void settelephone(int newtele){telephone=newtele;}
     int gettotal_points(){return total_points;}
     void settotal_points(int newtotal){total_points=newtotal;}
 
     bool ajouter();
-    void afficher();
+    QSqlQueryModel *afficher();
+    bool supprimer (int id);
+    bool modifier(int,QString &,QString &,QDate &,QString &,QString &,QString &,int &,int &);
+    Client chercher(int id);
 
 };
 
