@@ -1,0 +1,34 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>acceuil_image-removebg-preview.png</file>
+        <file>cal image1.png</file>
+        <file>cal image2.png</file>
+        <file>cal image3.png</file>
+        <file>calcul_salaire_image-removebg-preview.png</file>
+        <file>couleur_slim-removebg-preview.png</file>
+        <file>employe_image-removebg-preview.png</file>
+        <file>employe2_image-removebg-preview.png</file>
+        <file>exportation_image-removebg-preview.png</file>
+        <file>historique image.jpg</file>
+        <file>historique image.png</file>
+        <file>icone client.png</file>
+        <file>icone reservation.png</file>
+        <file>logo.png</file>
+        <file>logo1.png</file>
+        <file>maintenance icone.png</file>
+        <file>recherche_image-removebg-preview.png</file>
+        <file>salaire_image-removebg-preview.png</file>
+        <file>sms.jpg.png</file>
+        <file>sms2_image-removebg-preview.png</file>
+        <file>stat cerculaire.png</file>
+        <file>stat malek.png</file>
+        <file>stat_rami-removebg-preview.png</file>
+        <file>stat_slim-removebg-preview.png</file>
+        <file>stat2_image-removebg-preview.png</file>
+        <file>stat3_image-removebg-preview.png</file>
+        <file>stat5_image-removebg-preview.png</file>
+        <file>statistique_image-removebg-preview.png</file>
+        <file>stock_slim-removebg-preview.png</file>
+        <file>tri_image-removebg-preview.png</file>
+    </qresource>
+</RCC>
