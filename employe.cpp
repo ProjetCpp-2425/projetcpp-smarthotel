@@ -1,5 +1,6 @@
 #include "employe.h"
 #include<QSqlError>
+#include <QMessageBox>
 Employe::Employe() {
 
     ID_EMPLOYE=0;
@@ -48,6 +49,23 @@ bool Employe::ajouter() {
     QSqlQuery query;
     query.prepare("INSERT INTO EMPLOYES (ID_EMPLOYE, NOM, PRENOM , SALAIRE , POSTE , TELEPHONE , PRESENCES , D_DATE , F_DATE) "
                   "VALUES  (:ID_EMPLOYE, :NOM, :PRENOM , :SALAIRE , :POSTE , :TELEPHONE , :PRESENCES , :D_DATE , :F_DATE) ");
+    if (ID_EMPLOYE>9999 || ID_EMPLOYE<1000 ) {
+        QMessageBox::warning(nullptr, "Erreur", "L'ID de l'employé doit être composer de 4 chiffres.");
+        return false;
+    }
+    if (TELEPHONE>99999999 || TELEPHONE<10000000 ) {
+        QMessageBox::warning(nullptr, "Erreur", "Le num doit être composer de 8 chiffres.");
+        return false;
+    }
+    if (SALAIRE<1000 || SALAIRE>10000 ) {
+        QMessageBox::warning(nullptr, "Erreur", "Le salaire doit être entre 1000 et 10000.");
+        return false;
+    }
+
+
+    // Contrôle de saisie pour MONTANT
+
+
     query.bindValue(":ID_EMPLOYE", ID_EMPLOYE);
     query.bindValue(":NOM", NOM);
     query.bindValue(":PRENOM", PRENOM );
@@ -70,6 +88,23 @@ bool Employe::modifier(int ID_EMPLOYE, QString NOM, QString PRENOM, float SALAIR
     QSqlQuery query;
     query.prepare("UPDATE employes SET NOM=:NOM, PRENOM=:PRENOM, SALAIRE=:SALAIRE, POSTE=:POSTE, TELEPHONE=:TELEPHONE, PRESENCES=:PRESENCES , D_DATE=:D_DATE, F_DATE=:F_DATE "
                   "WHERE ID_EMPLOYE=:ID_EMPLOYE");
+    if (ID_EMPLOYE>9999 || ID_EMPLOYE<1000 ) {
+        QMessageBox::warning(nullptr, "Erreur", "L'ID de l'employé doit être composer de 4 chiffres.");
+        return false;
+    }
+    if (TELEPHONE>99999999 || TELEPHONE<10000000 ) {
+        QMessageBox::warning(nullptr, "Erreur", "Le num doit être composer de 8 chiffres.");
+        return false;
+    }
+    if (SALAIRE>10000 || SALAIRE<1000 ) {
+        QMessageBox::warning(nullptr, "Erreur", "Le salaire doit être entre 1000 et 10000.");
+        return false;
+    }
+
+
+    // Contrôle de saisie pour MONTANT
+
+
     query.bindValue(":ID_EMPLOYE", ID_EMPLOYE);
     query.bindValue(":NOM", NOM);
     query.bindValue(":PRENOM", PRENOM );
