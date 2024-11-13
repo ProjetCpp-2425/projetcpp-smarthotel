@@ -4,6 +4,13 @@
 #include <QDebug>
 #include <QSqlQuery>
 #include "produit.h"
+#include <QFileDialog>
+#include <QPrinter>
+#include <QTextDocument>
+#include <QDebug>
+#include <QFile>
+#include <QMessageBox>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -136,6 +143,86 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
 void MainWindow::on_stackedWidget_currentChanged(int arg1)
 {
-
+    Q_UNUSED(arg1);
 }
 
+
+
+
+void MainWindow::on_pushButton_22_clicked() {
+    try {
+        // Étape 1 : Choisir le chemin du fichier
+        QString filePath = QFileDialog::getSaveFileName(this, "Enregistrer le fichier HTML", QDir::homePath(), "Documents (*.html)");
+
+        // Vérifier si l'utilisateur a annulé l'opération
+        if (filePath.isEmpty()) {
+            QMessageBox::warning(this, "Exportation annulée", "Aucun fichier sélectionné.");
+            return;
+        }
+
+        // Forcer l'ajout de l'extension .html si elle est manquante
+        if (!filePath.endsWith(".html", Qt::CaseInsensitive)) {
+            filePath += ".html";
+        }
+
+        qDebug() << "Chemin sélectionné pour le fichier HTML:" << filePath;
+
+        // Vérifier l'initialisation de tableWidget_2
+        if (!ui->tableWidget_2) {
+            QMessageBox::critical(this, "Erreur", "Tableau non initialisé.");
+            return;
+        }
+
+        // Étape 2 : Préparer le contenu HTML
+        QString html = "<html><head><meta charset='utf-8'><title>Liste des Produits</title></head><body>";
+        html += "<h2 style='text-align: center;'>Liste des Produits</h2>";
+        html += "<table border='1' cellspacing='0' cellpadding='4' style='width: 100%; text-align: center;'>";
+        html += "<tr>";
+
+        // Ajouter les en-têtes
+        for (int col = 0; col < ui->tableWidget_2->columnCount(); ++col) {
+            QTableWidgetItem* headerItem = ui->tableWidget_2->horizontalHeaderItem(col);
+            if (!headerItem) {
+                qDebug() << "En-tête vide pour la colonne" << col;
+                html += "<th></th>";
+            } else {
+                html += "<th>" + headerItem->text() + "</th>";
+            }
+        }
+        html += "</tr>";
+
+        // Ajouter les lignes de données
+        for (int row = 0; row < ui->tableWidget_2->rowCount(); ++row) {
+            html += "<tr>";
+            for (int col = 0; col < ui->tableWidget_2->columnCount(); ++col) {
+                QTableWidgetItem *item = ui->tableWidget_2->item(row, col);
+                html += "<td>" + (item ? item->text() : "") + "</td>";
+            }
+            html += "</tr>";
+        }
+        html += "</table></body></html>";
+
+        // Étape 3 : Écrire dans le fichier HTML
+        QFile file(filePath);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QMessageBox::critical(this, "Erreur d'accès", "Impossible d'écrire dans le fichier sélectionné : " + file.errorString());
+            return;
+        }
+
+        QTextStream out(&file);
+        out << html;
+        file.close();
+
+        // Étape 4 : Vérification si le fichier a bien été créé
+        if (QFile::exists(filePath)) {
+            QMessageBox::information(this, "Exportation réussie", "Le fichier HTML a été enregistré avec succès :\n" + filePath);
+        } else {
+            QMessageBox::critical(this, "Erreur", "Le fichier HTML n'a pas été créé.");
+        }
+
+    } catch (std::exception& e) {
+        QMessageBox::critical(this, "Exception", "Une erreur inattendue est survenue : " + QString::fromStdString(e.what()));
+    } catch (...) {
+        QMessageBox::critical(this, "Erreur inconnue", "Une erreur inconnue est survenue.");
+    }
+}

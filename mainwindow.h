@@ -28,6 +28,8 @@ private slots:
     void on_pushButton_26_clicked();
     void on_pushButton_21_clicked();
     void on_pushButton_24_clicked();
+    void on_pushButton_22_clicked(); // Slot pour exporter en PDF
+
     // Ajouter d'autres slots si nécessaire
 
     void on_stackedWidget_currentChanged(int arg1);
