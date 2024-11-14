@@ -1,5 +1,9 @@
 QT       += core gui sql
 QT       += core gui
+QT += widgets printsupport
+QT += widgets charts
+QT += network
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,11 +17,13 @@ SOURCES += \
     connection.cpp \
     main.cpp \
     mainwindow.cpp \
+    pdf.cpp \
     reservation.cpp
 
 HEADERS += \
     connection.h \
     mainwindow.h \
+    pdf.h \
     reservation.h
 
 FORMS += \

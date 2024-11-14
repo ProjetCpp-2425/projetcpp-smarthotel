@@ -41,6 +41,8 @@ public:
     void setStatutReservation(const QString &statut_reservation);
     void setModePaiment(const QString &mode_paiment);
     void setMontant(float montant);
+    QSqlQueryModel* trierPar(const QString &critere);
+    QMap<QString, int> obtenirStatistiquesTypeChambre();
 
 private:
     int ID_RESERVATION;

@@ -2,6 +2,10 @@
 #include "connection.h"
 #include <QMessageBox>
 #include <QtWidgets>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QFileDialog>
+
 Reservation::Reservation() {}
 
 Reservation::Reservation(int ID_RESERVATION, QDate DATE_RESERVATION, QDate DATE_ARRIVE,
@@ -149,4 +153,28 @@ bool Reservation::rechercher(int ID_RESERVATION) {
         return true;
     }
     return false;
+}
+QSqlQueryModel* Reservation::trierPar(const QString &critere) {
+    QSqlQueryModel *model = new QSqlQueryModel();
+    QString query = QString("SELECT * FROM reservations ORDER BY %1").arg(critere);
+    model->setQuery(query);
+
+    if (model->lastError().isValid()) {
+        qDebug() << "Erreur lors du tri :" << model->lastError();
+        return nullptr;
+    }
+
+    return model;
+}
+QMap<QString, int> Reservation::obtenirStatistiquesTypeChambre() {
+    QMap<QString, int> statistiques;
+    QSqlQuery query("SELECT TYPE_CHAMBRE, COUNT(*) FROM reservations GROUP BY TYPE_CHAMBRE");
+
+    while (query.next()) {
+        QString typeChambre = query.value(0).toString();
+        int count = query.value(1).toInt();
+        statistiques[typeChambre] = count;
+    }
+
+    return statistiques;
 }

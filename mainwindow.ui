@@ -9008,6 +9008,11 @@ color: rgb(255, 255, 255);</string>
          <string>Single</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>suite</string>
+        </property>
+       </item>
       </widget>
       <widget class="QLabel" name="label_634">
        <property name="geometry">
@@ -9386,7 +9391,7 @@ color: rgb(0, 0, 0);
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_31">
        <widget class="QGraphicsView" name="graphicsView_122">

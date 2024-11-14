@@ -44,21 +44,27 @@ static constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers:
     "",
     "on_supprimerButton_clicked",
     "on_modifierButton_clicked",
+    "on_exporter_clicked",
     "on_searchLineEdit_textChanged",
     "text",
-    "afficher"
+    "afficher",
+    "on_triComboBox_currentIndexChanged",
+    "index"
 );
 #else  // !QT_MOC_HAS_STRING_DATA
 struct qt_meta_stringdata_CLASSMainWindowENDCLASS_t {
-    uint offsetsAndSizes[16];
+    uint offsetsAndSizes[22];
     char stringdata0[11];
     char stringdata1[25];
     char stringdata2[1];
     char stringdata3[27];
     char stringdata4[26];
-    char stringdata5[30];
-    char stringdata6[5];
-    char stringdata7[9];
+    char stringdata5[20];
+    char stringdata6[30];
+    char stringdata7[5];
+    char stringdata8[9];
+    char stringdata9[35];
+    char stringdata10[6];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_CLASSMainWindowENDCLASS_t::offsetsAndSizes) + ofs), len 
@@ -69,18 +75,24 @@ Q_CONSTINIT static const qt_meta_stringdata_CLASSMainWindowENDCLASS_t qt_meta_st
         QT_MOC_LITERAL(36, 0),  // ""
         QT_MOC_LITERAL(37, 26),  // "on_supprimerButton_clicked"
         QT_MOC_LITERAL(64, 25),  // "on_modifierButton_clicked"
-        QT_MOC_LITERAL(90, 29),  // "on_searchLineEdit_textChanged"
-        QT_MOC_LITERAL(120, 4),  // "text"
-        QT_MOC_LITERAL(125, 8)   // "afficher"
+        QT_MOC_LITERAL(90, 19),  // "on_exporter_clicked"
+        QT_MOC_LITERAL(110, 29),  // "on_searchLineEdit_textChanged"
+        QT_MOC_LITERAL(140, 4),  // "text"
+        QT_MOC_LITERAL(145, 8),  // "afficher"
+        QT_MOC_LITERAL(154, 34),  // "on_triComboBox_currentIndexCh..."
+        QT_MOC_LITERAL(189, 5)   // "index"
     },
     "MainWindow",
     "on_validerButton_clicked",
     "",
     "on_supprimerButton_clicked",
     "on_modifierButton_clicked",
+    "on_exporter_clicked",
     "on_searchLineEdit_textChanged",
     "text",
-    "afficher"
+    "afficher",
+    "on_triComboBox_currentIndexChanged",
+    "index"
 };
 #undef QT_MOC_LITERAL
 #endif // !QT_MOC_HAS_STRING_DATA
@@ -92,7 +104,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
       11,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -100,18 +112,22 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   44,    2, 0x08,    1 /* Private */,
-       3,    0,   45,    2, 0x08,    2 /* Private */,
-       4,    0,   46,    2, 0x08,    3 /* Private */,
-       5,    1,   47,    2, 0x08,    4 /* Private */,
-       7,    0,   50,    2, 0x08,    6 /* Private */,
+       1,    0,   56,    2, 0x08,    1 /* Private */,
+       3,    0,   57,    2, 0x08,    2 /* Private */,
+       4,    0,   58,    2, 0x08,    3 /* Private */,
+       5,    0,   59,    2, 0x08,    4 /* Private */,
+       6,    1,   60,    2, 0x08,    5 /* Private */,
+       8,    0,   63,    2, 0x08,    7 /* Private */,
+       9,    1,   64,    2, 0x08,    8 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,    6,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    7,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   10,
 
        0        // eod
 };
@@ -131,11 +147,16 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_modifierButton_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_exporter_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_searchLineEdit_textChanged'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
         // method 'afficher'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_triComboBox_currentIndexChanged'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>
     >,
     nullptr
 } };
@@ -149,8 +170,10 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->on_validerButton_clicked(); break;
         case 1: _t->on_supprimerButton_clicked(); break;
         case 2: _t->on_modifierButton_clicked(); break;
-        case 3: _t->on_searchLineEdit_textChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 4: _t->afficher(); break;
+        case 3: _t->on_exporter_clicked(); break;
+        case 4: _t->on_searchLineEdit_textChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 5: _t->afficher(); break;
+        case 6: _t->on_triComboBox_currentIndexChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         default: ;
         }
     }
@@ -175,13 +198,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 7;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 7)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 7;
     }
     return _id;
 }

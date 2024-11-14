@@ -6347,6 +6347,7 @@ public:
         type->addItem(QString());
         type->addItem(QString());
         type->addItem(QString());
+        type->addItem(QString());
         type->setObjectName("type");
         type->setGeometry(QRect(130, 230, 131, 28));
         type->setStyleSheet(QString::fromUtf8("background:rgb(0, 0, 80);\n"
@@ -22541,7 +22542,7 @@ public:
         stackedWidget->setCurrentIndex(7);
         stackedWidget_3->setCurrentIndex(0);
         stackedWidget_4->setCurrentIndex(2);
-        stackedWidget_5->setCurrentIndex(1);
+        stackedWidget_5->setCurrentIndex(0);
         stackedWidget_6->setCurrentIndex(0);
         stackedWidget_7->setCurrentIndex(2);
         stackedWidget_8->setCurrentIndex(2);
@@ -23026,6 +23027,7 @@ public:
         type->setItemText(0, QCoreApplication::translate("MainWindow", "Type", nullptr));
         type->setItemText(1, QCoreApplication::translate("MainWindow", "Double", nullptr));
         type->setItemText(2, QCoreApplication::translate("MainWindow", "Single", nullptr));
+        type->setItemText(3, QCoreApplication::translate("MainWindow", "suite", nullptr));
 
         label_634->setText(QCoreApplication::translate("MainWindow", "Date depart :", nullptr));
         label_36->setText(QCoreApplication::translate("MainWindow", "Date d'arriv\303\251 :", nullptr));
