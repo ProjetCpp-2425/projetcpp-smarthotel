@@ -7,28 +7,40 @@
 #include <QFileDialog>
 #include <QPrinter>
 #include <QTextDocument>
-#include <QDebug>
 #include <QFile>
-#include <QMessageBox>
-#include <QPrinter>
-#include <QPainter>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QDebug>
 #include <QTableWidgetItem>
-#include <QTextDocument>
+// stat
+#include <QtCharts>
+#include <QChartView>
+#include <QPieSeries>
+#include <QPieSlice>
+#include <stdexcept>
+//tri
+#include <QSqlQueryModel>
+#include <QSqlError>
 
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+// Constructeur
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    tri(new QSqlQueryModel())  // Initialisation ici
 {
     ui->setupUi(this);
+
+    // Connexion du signal du comboBox pour le tri
+    connect(ui->sortComboBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(on_sortComboBox_currentIndexChanged(int)));
 }
+
+// Destructeur
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete ui;  // Libère l'interface utilisateur
+    delete tri; // Libère le modèle SQL trié
 }
+
+// Le slot pour gérer le changement de tri dans le comboBox
+
 void MainWindow::on_pushButton_21_clicked() {
     afficherProduitsDansTable();
 }
@@ -134,7 +146,7 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
 }
 
 
-
+//pdf
 
 void MainWindow::on_pushButton_22_clicked() {
     try {
@@ -165,6 +177,10 @@ void MainWindow::on_pushButton_22_clicked() {
         printer.setOutputFormat(QPrinter::PdfFormat);
         printer.setOutputFileName(filePath);
 
+        // Créer un QPageLayout pour définir l'orientation en paysage
+        QPageLayout pageLayout(QPageSize::A4, QPageLayout::Landscape, QMarginsF(0, 0, 0, 0));
+        printer.setPageLayout(pageLayout);
+
         // Créer un QPainter pour dessiner sur le PDF
         QPainter painter;
         if (!painter.begin(&printer)) {
@@ -173,11 +189,11 @@ void MainWindow::on_pushButton_22_clicked() {
         }
 
         // Étape 3 : Dessiner le contenu du tableau sur le PDF
-        const int tableMargin = 10;        // Marge autour du tableau
-        const int rowHeight = 1000;         // Hauteur des lignes
-        const int colWidth = 2000;         // Largeur des colonnes
-        const int titleSpacing = 2000;      // Espace après le titre
-        const int lineThickness = 10;      // Épaisseur des lignes
+        const int tableMargin = 20;        // Marge autour du tableau
+        const int rowHeight = 500;         // Hauteur des lignes
+        const int colWidth = 2500;         // Largeur des colonnes
+        const int titleSpacing = 1500;      // Espace après le titre
+        const int lineThickness = 1;      // Épaisseur des lignes
 
         int currentY = tableMargin;
 
@@ -253,4 +269,226 @@ void MainWindow::on_pushButton_22_clicked() {
     } catch (...) {
         QMessageBox::critical(this, "Erreur inconnue", "Une erreur inconnue est survenue.");
     }
+}
+//stat
+
+
+
+void MainWindow::on_pushButton_27_clicked()
+{
+    try {
+        // 1. Vérification des en-têtes de colonne
+        qDebug() << "Vérification des en-têtes de colonne...";
+        for (int i = 0; i < ui->tableWidget_2->columnCount(); ++i) {
+            QString columnName = ui->tableWidget_2->horizontalHeaderItem(i)->text();
+            qDebug() << "Nom de la colonne " << i << ":" << columnName;
+        }
+
+        // 2. Créer une série pour le graphique en camembert
+        qDebug() << "Création de la série QPieSeries...";
+        QPieSeries *series = new QPieSeries();
+        if (!series) {
+            throw std::runtime_error("Erreur lors de la création de la série.");
+        }
+
+        // 3. Vérification du nombre de lignes dans le tableau
+        int rowCount = ui->tableWidget_2->rowCount();
+        qDebug() << "Nombre de lignes dans le tableau:" << rowCount;
+
+        bool dataFound = false; // Indicateur pour vérifier si des données valides ont été trouvées
+
+        // 4. Vérification des indices des colonnes "Nom de produit" et "Quantité disponible"
+        int productNameCol = -1;
+        int quantityCol = -1;
+
+        qDebug() << "Recherche des colonnes 'Nom de produit' et 'Quantité disponible'...";
+        for (int i = 0; i < ui->tableWidget_2->columnCount(); ++i) {
+            QString columnName = ui->tableWidget_2->horizontalHeaderItem(i)->text();
+            qDebug() << "Colonne" << i << ":" << columnName;
+            if (columnName == "Nom de produit") {
+                productNameCol = i;
+            }
+            if (columnName == "Quantité disponible") {
+                quantityCol = i;
+            }
+        }
+
+        // Si l'une des colonnes n'est pas trouvée, afficher un message d'erreur et arrêter la fonction
+        if (productNameCol == -1 || quantityCol == -1) {
+            throw std::runtime_error("Les colonnes 'Nom de produit' ou 'Quantité disponible' n'ont pas été trouvées.");
+        }
+
+        // 5. Parcourir les lignes pour extraire les données
+        for (int i = 0; i < rowCount; ++i) {
+            QTableWidgetItem *productItem = ui->tableWidget_2->item(i, productNameCol);
+            QTableWidgetItem *quantityItem = ui->tableWidget_2->item(i, quantityCol);
+
+            // Vérifier si les éléments sont valides
+            if (!productItem || !quantityItem) {
+                qDebug() << "Données manquantes à la ligne" << i;
+                continue; // Ignorer cette ligne si les données sont manquantes
+            }
+
+            QString productName = productItem->text();
+            QString quantityText = quantityItem->text();
+
+            // 6. Convertir la quantité en entier
+            bool ok;
+            int quantity = quantityText.toInt(&ok);
+            qDebug() << "Nom du produit:" << productName << ", Quantité text:" << quantityText;
+
+            if (!ok) {
+                qDebug() << "Erreur de conversion à la ligne" << i;
+                continue; // Ignorer cette ligne si la conversion échoue
+            }
+
+            // Si la quantité est positive, ajouter à la série
+            if (quantity > 0) {
+                series->append(productName, quantity);
+                dataFound = true;
+            }
+        }
+
+        // Si aucune donnée valide n'a été trouvée, afficher un message d'avertissement
+        if (!dataFound) {
+            qDebug() << "Aucune donnée valide trouvée.";
+            QMessageBox::warning(this, "Attention", "Aucune donnée valide trouvée pour le graphique.");
+            return;
+        }
+
+        // 7. Créer le graphique
+        qDebug() << "Création du graphique...";
+        QChart *chart = new QChart();
+        chart->addSeries(series);
+        chart->setTitle("Répartition des quantités");
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+
+        // 8. Créer une vue pour le graphique
+        qDebug() << "Création de la vue du graphique...";
+        QChartView *chartView = new QChartView(chart);
+        chartView->setRenderHint(QPainter::Antialiasing);
+
+        // 9. Afficher le graphique dans une nouvelle fenêtre
+        qDebug() << "Affichage du graphique...";
+        QMainWindow *chartWindow = new QMainWindow();
+        chartWindow->setCentralWidget(chartView);
+        chartWindow->resize(600, 400);
+        chartWindow->show();
+
+    } catch (const std::exception &e) {
+        // Afficher l'exception si une erreur se produit
+        qDebug() << "Erreur capturée : " << e.what();
+        QMessageBox::critical(this, "Erreur", e.what());
+    }
+}
+
+
+
+// Définition du slot on_pushButton_28_clicked()
+void MainWindow::on_pushButton_28_clicked()
+{
+    // Récupérer l'ID de produit depuis le QLineEdit
+    QString searchID = ui->lineEdit_7->text();  // lineEdit_7 contient l'ID du produit
+
+    // Vérifier si l'ID est vide
+    if (searchID.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer un ID de produit.");
+        return;
+    }
+
+    // Appeler la méthode Rechercher avec l'ID de produit
+    Rechercher(searchID);
+}
+
+// Définition de la fonction Rechercher
+void MainWindow::Rechercher(const QString &searchID)
+{
+    int rowCount = ui->tableWidget_2->rowCount();
+    bool productFound = false;  // Indicateur pour vérifier si le produit a été trouvé
+
+    // Parcourir chaque ligne du tableau pour chercher l'ID du produit
+    for (int i = 0; i < rowCount; ++i) {
+        QTableWidgetItem *idItem = ui->tableWidget_2->item(i, 0);  // Supposons que l'ID du produit est dans la 1ère colonne (index 0)
+
+        // Vérifier si l'élément d'ID est valide et correspond à l'ID recherché
+        if (idItem && idItem->text() == searchID) {
+            productFound = true;
+
+            // Sélectionner la ligne correspondante
+            ui->tableWidget_2->selectRow(i);
+
+            // Afficher les détails du produit trouvé
+            QString productName = ui->tableWidget_2->item(i, 1)->text();  // Nom du produit dans la 2ème colonne (index 1)
+            QString quantity = ui->tableWidget_2->item(i, 2)->text();  // Quantité dans la 3ème colonne (index 2)
+            QString deliveryDate = ui->tableWidget_2->item(i, 3)->text();  // Date de livraison dans la 4ème colonne (index 3)
+            QString restockDate = ui->tableWidget_2->item(i, 4)->text();  // Date de réapprovisionnement dans la 5ème colonne (index 4)
+
+            QMessageBox::information(this, "Produit trouvé",
+                                     "ID: " + searchID + "\nNom: " + productName +
+                                     "\nQuantité disponible: " + quantity +
+                                     "\nDate de livraison: " + deliveryDate +
+                                     "\nDate de réapprovisionnement: " + restockDate);
+            return;
+        }
+    }
+
+    // Si le produit n'a pas été trouvé, afficher un message d'erreur
+    if (!productFound) {
+        QMessageBox::warning(this, "Produit introuvable", "Aucun produit trouvé avec l'ID " + searchID);
+    }
+}
+void MainWindow::on_sortComboBox_currentIndexChanged(int index)
+{
+    QString queryStr;
+
+    // Déterminer si l'ordre de tri est ascendant ou descendant
+    bool isAscendant = (index == 0);  // 0 : Ascendant, 1 : Descendant
+
+    // Créer la requête SQL selon l'option choisie
+    if (isAscendant) {
+        // Tri Ascendant par Quantité disponible
+        queryStr = "SELECT ID_PRODUIT, NOM_PRODUIT, QUANTITE_DISPONIBLE, DATE_LIVRAISON, DATE_REAPPROVISIONNEMENT "
+                   "FROM PRODUITS ORDER BY QUANTITE_DISPONIBLE ASC";
+    } else {
+        // Tri Descendant par Quantité disponible
+        queryStr = "SELECT ID_PRODUIT, NOM_PRODUIT, QUANTITE_DISPONIBLE, DATE_LIVRAISON, DATE_REAPPROVISIONNEMENT "
+                   "FROM PRODUITS ORDER BY QUANTITE_DISPONIBLE DESC";
+    }
+
+    // Log de la requête SQL pour vérification
+    qDebug() << "Requête SQL : " << queryStr;
+
+    // Exécuter la requête sur le modèle
+    tri->setQuery(queryStr);
+
+    // Vérifier si une erreur est survenue lors de l'exécution de la requête
+    if (tri->lastError().isValid()) {
+        qDebug() << "Erreur lors de l'exécution de la requête : " << tri->lastError().text();
+        return;
+    }
+
+    // Si aucun résultat n'est retourné
+    if (tri->rowCount() == 0) {
+        qDebug() << "Aucun résultat trouvé";
+        return;
+    }
+
+    // Mettre à jour le nombre de lignes et de colonnes dans le QTableWidget
+    ui->tableWidget_2->setRowCount(tri->rowCount());  // Met à jour le nombre de lignes
+    ui->tableWidget_2->setColumnCount(tri->columnCount());  // Met à jour le nombre de colonnes
+
+    // Définir les en-têtes de colonnes pour le tableau
+    ui->tableWidget_2->setHorizontalHeaderLabels({"ID Produit", "Nom de produit", "Quantité disponible", "Date de livraison", "Date de réapprovisionnement"});
+
+    // Remplir le QTableWidget avec les données
+    for (int row = 0; row < tri->rowCount(); ++row) {
+        for (int col = 0; col < tri->columnCount(); ++col) {
+            QString data = tri->index(row, col).data().toString();
+            qDebug() << "Ligne " << row << " Col " << col << ": " << data;  // Afficher chaque donnée pour débogage
+            ui->tableWidget_2->setItem(row, col, new QTableWidgetItem(data));  // Met à jour la cellule du tableau
+        }
+    }
+
+    // Forcer la mise à jour de l'affichage
+    ui->tableWidget_2->repaint();
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1445</width>
-    <height>736</height>
+    <width>1429</width>
+    <height>743</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -249,31 +249,7 @@ font: 700 10pt &quot;Segoe UI&quot;;</string>
        <string>            Recherche d'un article par ID</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_20">
-      <property name="geometry">
-       <rect>
-        <x>830</x>
-        <y>60</y>
-        <width>93</width>
-        <height>29</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"> background-color: rgb(172, 44, 103);
-border-radius:10px;
-color: rgb(255, 255, 255);
- 
-font: 700 10pt &quot;Segoe UI&quot;;
-text-decoration: underline;</string>
-      </property>
-      <property name="text">
-       <string>Modifier</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_21">
+     <widget class="QPushButton" name="pushButton_28">
       <property name="geometry">
        <rect>
         <x>540</x>
@@ -290,7 +266,7 @@ text-decoration: underline;</string>
         <normaloff>../../Desktop/10947920.png</normaloff>../../Desktop/10947920.png</iconset>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="sortComboBox">
       <property name="geometry">
        <rect>
         <x>320</x>
@@ -307,12 +283,12 @@ font: 700 10pt &quot;Segoe UI&quot;;</string>
       </property>
       <item>
        <property name="text">
-        <string>   Tri Descendant</string>
+        <string>Tri Descendant</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>   Tri Ascendant</string>
+        <string>Tri Ascendant</string>
        </property>
       </item>
      </widget>
@@ -455,8 +431,8 @@ text-decoration: underline;</string>
      <widget class="QPushButton" name="pushButton_24">
       <property name="geometry">
        <rect>
-        <x>970</x>
-        <y>60</y>
+        <x>850</x>
+        <y>70</y>
         <width>93</width>
         <height>29</height>
        </rect>
@@ -540,7 +516,7 @@ border-radius:10px;</string>
        <rect>
         <x>320</x>
         <y>110</y>
-        <width>241</width>
+        <width>651</width>
         <height>311</height>
        </rect>
       </property>
@@ -607,6 +583,23 @@ color: rgb(0, 0, 0);
         <string/>
        </property>
       </item>
+     </widget>
+     <widget class="QPushButton" name="pushButton_21">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>500</y>
+        <width>101</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(209, 196, 233);
+font: 700 9pt &quot;Segoe UI&quot;;</string>
+      </property>
+      <property name="text">
+       <string>Refresh</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_4">
@@ -813,6 +806,25 @@ font: 700 10pt &quot;Segoe UI&quot;;
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_27">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>410</y>
+        <width>141</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 74, 113);
+background-color: rgb(170, 0, 0);
+font: 700 10pt &quot;Segoe UI&quot;;
+</string>
+      </property>
+      <property name="text">
+       <string>staaa</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="widget" native="true">
@@ -992,7 +1004,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1445</width>
+     <width>1429</width>
      <height>26</height>
     </rect>
    </property>
