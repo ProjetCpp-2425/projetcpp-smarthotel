@@ -1,5 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+#include <QStandardItemModel>
 
 #include<Qstring>
 #include <QDate>
@@ -44,8 +45,13 @@ public:
     bool ajouter();
     QSqlQueryModel *afficher();
     bool supprimer (int id);
-    bool modifier(int,QString &,QString &,QDate &,QString &,QString &,QString &,int &,int &);
-    Client chercher(int id);
+    bool modifier(const int,const QString &,const QString &,const QDate &,const QString &,const QString &,const QString &,const int &,const int &);
+    Client chercher(const QString& critere, const QVariant& valeurRecherche);
+    QSqlQueryModel*trier(const QString& critere);
+    QMap<QString, int> statistiquesParPays();
+    QSqlQueryModel* his_reservation();
+    Client afficherClientPlusFidele();
+
 
 };
 

@@ -30,8 +30,8 @@
      <widget class="QLabel" name="label_18">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>160</y>
+        <x>200</x>
+        <y>140</y>
         <width>181</width>
         <height>16</height>
        </rect>
@@ -49,8 +49,8 @@ background-color:transparent;</string>
      <widget class="QPushButton" name="modifier">
       <property name="geometry">
        <rect>
-        <x>750</x>
-        <y>130</y>
+        <x>710</x>
+        <y>140</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -69,7 +69,7 @@ font: 700 10pt &quot;Segoe UI&quot;;
       <property name="geometry">
        <rect>
         <x>870</x>
-        <y>130</y>
+        <y>140</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -100,8 +100,8 @@ border-radius:10px;</string>
      <widget class="QLineEdit" name="lineEdit_chercher">
       <property name="geometry">
        <rect>
-        <x>510</x>
-        <y>130</y>
+        <x>650</x>
+        <y>110</y>
         <width>131</width>
         <height>21</height>
        </rect>
@@ -114,8 +114,8 @@ background-color: rgb(179, 170, 255);</string>
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>130</y>
+        <x>200</x>
+        <y>110</y>
         <width>281</width>
         <height>20</height>
        </rect>
@@ -777,11 +777,11 @@ border-radius:10px;</string>
        <string>statistique</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_2">
+     <widget class="QComboBox" name="tri">
       <property name="geometry">
        <rect>
-        <x>410</x>
-        <y>160</y>
+        <x>390</x>
+        <y>140</y>
         <width>121</width>
         <height>21</height>
        </rect>
@@ -794,12 +794,12 @@ color: rgb(255, 255, 255);
       </property>
       <item>
        <property name="text">
-        <string>date de naissance</string>
+        <string>date_de_naissance</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>total points</string>
+        <string>total_points</string>
        </property>
       </item>
       <item>
@@ -830,7 +830,7 @@ border-radius:10px;</string>
        <string>historique</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="buttonexporter">
+     <widget class="QPushButton" name="pdf">
       <property name="geometry">
        <rect>
         <x>300</x>
@@ -855,10 +855,10 @@ border-radius:10px;</string>
      <widget class="QTableView" name="tableclient">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>190</y>
-        <width>721</width>
-        <height>261</height>
+        <x>230</x>
+        <y>210</y>
+        <width>691</width>
+        <height>251</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -870,8 +870,8 @@ border-radius:10px;</string>
      <widget class="QPushButton" name="chercher">
       <property name="geometry">
        <rect>
-        <x>650</x>
-        <y>130</y>
+        <x>800</x>
+        <y>110</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -886,21 +886,72 @@ font: 700 10pt &quot;Segoe UI&quot;;
        <string>chercher</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="pageStat">
-     <widget class="QGraphicsView" name="graphicsView_6">
+     <widget class="QPushButton" name="trier">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>120</y>
-        <width>621</width>
-        <height>441</height>
+        <x>530</x>
+        <y>140</y>
+        <width>91</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-image: url(:/Cream_Blue_Clean___Professional_Pie_Charts_Election_Social_Issues_Instagram_Post-removebg-preview.png);</string>
+       <string notr="true">background-color: rgb(172, 44, 103);
+border-radius:10px;
+font: 700 10pt &quot;Segoe UI&quot;;
+</string>
+      </property>
+      <property name="text">
+       <string>trier</string>
       </property>
      </widget>
+     <widget class="QComboBox" name="recherche">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>110</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(179, 170, 255);
+
+color: rgb(255, 255, 255);
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>id</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>nom</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="client_fidele">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>180</y>
+        <width>171</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(172, 44, 103);
+border-radius:10px;
+font: 700 10pt &quot;Segoe UI&quot;;
+</string>
+      </property>
+      <property name="text">
+       <string>client le plus fidele  :</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="pageStat">
      <widget class="QPushButton" name="accueilbutton">
       <property name="geometry">
        <rect>
@@ -1150,6 +1201,19 @@ border-radius:10px;
       </property>
       <property name="styleSheet">
        <string notr="true">border-image: url(:/home-removebg-preview.png);</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="stat" native="true">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>100</y>
+        <width>711</width>
+        <height>461</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent </string>
       </property>
      </widget>
     </widget>
@@ -1432,10 +1496,10 @@ color: rgb(0, 0, 0);
        <string>RECHERCHER UN CLIENT PAR ID CLIENT :</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_15">
+     <widget class="QLineEdit" name="lineEdit_chercher2">
       <property name="geometry">
        <rect>
-        <x>370</x>
+        <x>520</x>
         <y>120</y>
         <width>131</width>
         <height>21</height>
@@ -1444,41 +1508,6 @@ color: rgb(0, 0, 0);
       <property name="styleSheet">
        <string notr="true"> 
 background-color: rgb(179, 170, 255);</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="buttonexporter_2">
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>500</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 9pt &quot;Segoe UI&quot;;
-color: rgb(0, 0, 80);
-font: 700 10pt &quot;Segoe UI&quot;;
-background-color: rgb(179, 170, 255);
- 
- 
-border-radius:10px;</string>
-      </property>
-      <property name="text">
-       <string>exporter en PDF</string>
-      </property>
-     </widget>
-     <widget class="QGraphicsView" name="graphicsView_11">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>450</y>
-        <width>71</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-image: url(:/461186877_2244204025964463_8596233747044438081_n.png);</string>
       </property>
      </widget>
      <widget class="QGraphicsView" name="graphicsView_15">
@@ -1494,7 +1523,7 @@ border-radius:10px;</string>
        <string notr="true">border-image: url(:/home-removebg-preview.png);</string>
       </property>
      </widget>
-     <widget class="QTableView" name="tableclient_2">
+     <widget class="QTableView" name="tableHistorique">
       <property name="geometry">
        <rect>
         <x>120</x>
@@ -1507,6 +1536,70 @@ border-radius:10px;</string>
        <string notr="true">background-color: rgb(209, 196, 233);
 
 </string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="chercher_2">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>120</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(172, 44, 103);
+border-radius:10px;
+font: 700 10pt &quot;Segoe UI&quot;;
+</string>
+      </property>
+      <property name="text">
+       <string>chercher</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="recherche_2">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>120</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(179, 170, 255);
+
+color: rgb(255, 255, 255);
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>id</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>nom</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="retour">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>150</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(172, 44, 103);
+border-radius:10px;
+font: 700 10pt &quot;Segoe UI&quot;;
+</string>
+      </property>
+      <property name="text">
+       <string>retour</string>
       </property>
      </widget>
     </widget>
