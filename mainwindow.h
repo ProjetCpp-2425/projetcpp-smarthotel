@@ -5,6 +5,12 @@
 #include <QTableWidgetItem>
 #include <QMessageBox>
 #include <QSqlQueryModel>  // Ajoutez ceci si vous utilisez des modèles SQL
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QPieSlice>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +28,7 @@ protected:
     void paintEvent(QPaintEvent *event) override; // Ajout de `override`
 
 private slots:
+    void afficherStatistiques();
     void afficherProduitsDansTable();
     void on_pushButton_3_clicked();
     void on_pushButton_clicked();
@@ -39,7 +46,7 @@ private slots:
     void on_pushButton_28_clicked();  // Slot pour la recherche du produit
 
     // Déclaration du slot pour gérer le changement d'index du QComboBox
-    void on_sortComboBox_currentIndexChanged(int index);  // <- Ajoutez cette ligne ici
+    void on_sortComboBox_currentIndexChanged();  // <- Ajoutez cette ligne ici
 
 private:
     Ui::MainWindow *ui;

@@ -3,6 +3,10 @@ QT += widgets
 QT += printsupport
 QT += core gui
 QT += charts
+QT += core gui charts widgets
+
+
+
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

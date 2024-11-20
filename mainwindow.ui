@@ -711,47 +711,6 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
        </property>
       </item>
      </widget>
-     <widget class="QLabel" name="label_17">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>381</width>
-        <height>401</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color:transparent;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../Desktop/Screenshot 2024-10-07 012125.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>380</x>
-        <y>0</y>
-        <width>271</width>
-        <height>251</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../Downloads/att.ANMxkzK0WCKS87J4fqKwz6KQjWGT1qwwbfxnh3Fa_u4-removebg-preview.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
@@ -806,23 +765,35 @@ font: 700 10pt &quot;Segoe UI&quot;;
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_27">
+     <widget class="QWidget" name="widget_3" native="true">
       <property name="geometry">
        <rect>
-        <x>520</x>
-        <y>410</y>
-        <width>141</width>
-        <height>41</height>
+        <x>720</x>
+        <y>230</y>
+        <width>321</width>
+        <height>241</height>
        </rect>
       </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 74, 113);
-background-color: rgb(170, 0, 0);
-font: 700 10pt &quot;Segoe UI&quot;;
-</string>
-      </property>
-      <property name="text">
-       <string>staaa</string>
+      <widget class="QWidget" name="verticalLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>10</y>
+         <width>301</width>
+         <height>171</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout"/>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="stat" native="true">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>10</y>
+        <width>711</width>
+        <height>511</height>
+       </rect>
       </property>
      </widget>
     </widget>

@@ -25,11 +25,13 @@ bool Produit::supprimer(int id) {
     return query.exec();
 }
 
-QSqlQueryModel* Produit::afficher() {
+QSqlQueryModel* Produit::afficher(const QString& orderBy) {
     QSqlQueryModel* model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM stocks");
+    QString query = QString("SELECT * FROM stocks %1").arg(orderBy);
+    model->setQuery(query);
     return model;
 }
+
 
 bool Produit::modifier(int id) {
     QSqlQuery query;

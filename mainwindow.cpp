@@ -15,9 +15,20 @@
 #include <QPieSeries>
 #include <QPieSlice>
 #include <stdexcept>
+
 //tri
 #include <QSqlQueryModel>
 #include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QMessageBox>
+#include <QVBoxLayout>
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QPieSlice>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
 
 // Constructeur
 MainWindow::MainWindow(QWidget *parent) :
@@ -26,10 +37,11 @@ MainWindow::MainWindow(QWidget *parent) :
     tri(new QSqlQueryModel())  // Initialisation ici
 {
     ui->setupUi(this);
+    ui->stackedWidget->setCurrentIndex(0);
 
     // Connexion du signal du comboBox pour le tri
-    connect(ui->sortComboBox, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(on_sortComboBox_currentIndexChanged(int)));
+    connect(ui->sortComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(on_sortComboBox_currentIndexChanged(int)));
+
 }
 
 // Destructeur
@@ -40,24 +52,66 @@ MainWindow::~MainWindow()
 }
 
 // Le slot pour gérer le changement de tri dans le comboBox
+void MainWindow::on_sortComboBox_currentIndexChanged() {
+    afficherProduitsDansTable(); // Refresh table when sorting changes
+}
 
 void MainWindow::on_pushButton_21_clicked() {
     afficherProduitsDansTable();
 }
 void MainWindow::afficherProduitsDansTable() {
+    // Determine sort order from sortComboBox
+    int sortIndex = ui->sortComboBox->currentIndex();
+    QString sortOrder = (sortIndex == 0) ? "ORDER BY quantiteDispo DESC" : "ORDER BY quantiteDispo ASC";
+
+    // Fetch sorted data from Produit::afficher
     Produit produit(0, "", 0, QDate::currentDate(), QDate::currentDate());
-    QSqlQueryModel* model = produit.afficher();
+    QSqlQueryModel* model = produit.afficher(sortOrder);
+
+    // Update table widget
     ui->tableWidget_2->setRowCount(model->rowCount());
     ui->tableWidget_2->setColumnCount(model->columnCount());
-    // Définir les en-têtes des colonnes, si besoin
+
+    // Define headers
     ui->tableWidget_2->setHorizontalHeaderLabels({"ID", "Nom du Produit", "Quantité", "Date de Livraison", "Date de Réapprovisionnement"});
+
+    // Track alert conditions
+    bool hasCriticalAlerts = false;
+    bool hasLowStockNotifications = false;
+    QString criticalProducts;
+    QString lowStockProducts;
+
+    // Populate table with data and check alerts
     for (int row = 0; row < model->rowCount(); ++row) {
         for (int col = 0; col < model->columnCount(); ++col) {
             QString data = model->index(row, col).data().toString();
             ui->tableWidget_2->setItem(row, col, new QTableWidgetItem(data));
         }
+
+        // Check stock quantity for alerts
+        int quantity = model->index(row, 2).data().toInt(); // Assuming "Quantité" is in the 3rd column
+        QString productName = model->index(row, 1).data().toString(); // Assuming "Nom du Produit" is in the 2nd column
+
+        if (quantity == 0) {
+            hasCriticalAlerts = true;
+            criticalProducts += productName + "\n";
+        } else if (quantity < 10) {
+            hasLowStockNotifications = true;
+            lowStockProducts += productName + "\n";
+        }
     }
+
+    // Display alerts
+    if (hasCriticalAlerts) {
+        QMessageBox::critical(this, "Alertes Critiques", "Les produits suivants sont en rupture de stock :\n" + criticalProducts);
+    }
+    if (hasLowStockNotifications) {
+        QMessageBox::warning(this, "Stock Faible", "Les produits suivants ont un stock inférieur à 10 :\n" + lowStockProducts);
+    }
+
+    delete model; // Free memory
 }
+
 void MainWindow::on_pushButton_23_clicked()
 {
     // Get input values from UI
@@ -120,6 +174,8 @@ void MainWindow::on_pushButton_3_clicked()
 void MainWindow::on_pushButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(1);
+    afficherStatistiques();               // Display statistics
+
 }
 void MainWindow::on_pushButton_19_clicked()
 {
@@ -270,118 +326,7 @@ void MainWindow::on_pushButton_22_clicked() {
         QMessageBox::critical(this, "Erreur inconnue", "Une erreur inconnue est survenue.");
     }
 }
-//stat
-
-
-
-void MainWindow::on_pushButton_27_clicked()
-{
-    try {
-        // 1. Vérification des en-têtes de colonne
-        qDebug() << "Vérification des en-têtes de colonne...";
-        for (int i = 0; i < ui->tableWidget_2->columnCount(); ++i) {
-            QString columnName = ui->tableWidget_2->horizontalHeaderItem(i)->text();
-            qDebug() << "Nom de la colonne " << i << ":" << columnName;
-        }
-
-        // 2. Créer une série pour le graphique en camembert
-        qDebug() << "Création de la série QPieSeries...";
-        QPieSeries *series = new QPieSeries();
-        if (!series) {
-            throw std::runtime_error("Erreur lors de la création de la série.");
-        }
-
-        // 3. Vérification du nombre de lignes dans le tableau
-        int rowCount = ui->tableWidget_2->rowCount();
-        qDebug() << "Nombre de lignes dans le tableau:" << rowCount;
-
-        bool dataFound = false; // Indicateur pour vérifier si des données valides ont été trouvées
-
-        // 4. Vérification des indices des colonnes "Nom de produit" et "Quantité disponible"
-        int productNameCol = -1;
-        int quantityCol = -1;
-
-        qDebug() << "Recherche des colonnes 'Nom de produit' et 'Quantité disponible'...";
-        for (int i = 0; i < ui->tableWidget_2->columnCount(); ++i) {
-            QString columnName = ui->tableWidget_2->horizontalHeaderItem(i)->text();
-            qDebug() << "Colonne" << i << ":" << columnName;
-            if (columnName == "Nom de produit") {
-                productNameCol = i;
-            }
-            if (columnName == "Quantité disponible") {
-                quantityCol = i;
-            }
-        }
-
-        // Si l'une des colonnes n'est pas trouvée, afficher un message d'erreur et arrêter la fonction
-        if (productNameCol == -1 || quantityCol == -1) {
-            throw std::runtime_error("Les colonnes 'Nom de produit' ou 'Quantité disponible' n'ont pas été trouvées.");
-        }
-
-        // 5. Parcourir les lignes pour extraire les données
-        for (int i = 0; i < rowCount; ++i) {
-            QTableWidgetItem *productItem = ui->tableWidget_2->item(i, productNameCol);
-            QTableWidgetItem *quantityItem = ui->tableWidget_2->item(i, quantityCol);
-
-            // Vérifier si les éléments sont valides
-            if (!productItem || !quantityItem) {
-                qDebug() << "Données manquantes à la ligne" << i;
-                continue; // Ignorer cette ligne si les données sont manquantes
-            }
-
-            QString productName = productItem->text();
-            QString quantityText = quantityItem->text();
-
-            // 6. Convertir la quantité en entier
-            bool ok;
-            int quantity = quantityText.toInt(&ok);
-            qDebug() << "Nom du produit:" << productName << ", Quantité text:" << quantityText;
-
-            if (!ok) {
-                qDebug() << "Erreur de conversion à la ligne" << i;
-                continue; // Ignorer cette ligne si la conversion échoue
-            }
-
-            // Si la quantité est positive, ajouter à la série
-            if (quantity > 0) {
-                series->append(productName, quantity);
-                dataFound = true;
-            }
-        }
-
-        // Si aucune donnée valide n'a été trouvée, afficher un message d'avertissement
-        if (!dataFound) {
-            qDebug() << "Aucune donnée valide trouvée.";
-            QMessageBox::warning(this, "Attention", "Aucune donnée valide trouvée pour le graphique.");
-            return;
-        }
-
-        // 7. Créer le graphique
-        qDebug() << "Création du graphique...";
-        QChart *chart = new QChart();
-        chart->addSeries(series);
-        chart->setTitle("Répartition des quantités");
-        chart->setAnimationOptions(QChart::SeriesAnimations);
-
-        // 8. Créer une vue pour le graphique
-        qDebug() << "Création de la vue du graphique...";
-        QChartView *chartView = new QChartView(chart);
-        chartView->setRenderHint(QPainter::Antialiasing);
-
-        // 9. Afficher le graphique dans une nouvelle fenêtre
-        qDebug() << "Affichage du graphique...";
-        QMainWindow *chartWindow = new QMainWindow();
-        chartWindow->setCentralWidget(chartView);
-        chartWindow->resize(600, 400);
-        chartWindow->show();
-
-    } catch (const std::exception &e) {
-        // Afficher l'exception si une erreur se produit
-        qDebug() << "Erreur capturée : " << e.what();
-        QMessageBox::critical(this, "Erreur", e.what());
-    }
-}
-
+//recherche
 
 
 // Définition du slot on_pushButton_28_clicked()
@@ -437,58 +382,92 @@ void MainWindow::Rechercher(const QString &searchID)
         QMessageBox::warning(this, "Produit introuvable", "Aucun produit trouvé avec l'ID " + searchID);
     }
 }
-void MainWindow::on_sortComboBox_currentIndexChanged(int index)
+
+//stat
+void MainWindow::on_pushButton_27_clicked()
 {
-    QString queryStr;
-
-    // Déterminer si l'ordre de tri est ascendant ou descendant
-    bool isAscendant = (index == 0);  // 0 : Ascendant, 1 : Descendant
-
-    // Créer la requête SQL selon l'option choisie
-    if (isAscendant) {
-        // Tri Ascendant par Quantité disponible
-        queryStr = "SELECT ID_PRODUIT, NOM_PRODUIT, QUANTITE_DISPONIBLE, DATE_LIVRAISON, DATE_REAPPROVISIONNEMENT "
-                   "FROM PRODUITS ORDER BY QUANTITE_DISPONIBLE ASC";
-    } else {
-        // Tri Descendant par Quantité disponible
-        queryStr = "SELECT ID_PRODUIT, NOM_PRODUIT, QUANTITE_DISPONIBLE, DATE_LIVRAISON, DATE_REAPPROVISIONNEMENT "
-                   "FROM PRODUITS ORDER BY QUANTITE_DISPONIBLE DESC";
-    }
-
-    // Log de la requête SQL pour vérification
-    qDebug() << "Requête SQL : " << queryStr;
-
-    // Exécuter la requête sur le modèle
-    tri->setQuery(queryStr);
-
-    // Vérifier si une erreur est survenue lors de l'exécution de la requête
-    if (tri->lastError().isValid()) {
-        qDebug() << "Erreur lors de l'exécution de la requête : " << tri->lastError().text();
+    // Récupérer les données de la base de données
+    QSqlQuery query;
+    query.prepare("SELECT nom_produit, quantite_disponible FROM ma_table");  // Adapte cette requête à ta table
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec de la récupération des données : " + query.lastError().text());
         return;
     }
 
-    // Si aucun résultat n'est retourné
-    if (tri->rowCount() == 0) {
-        qDebug() << "Aucun résultat trouvé";
-        return;
-    }
-
-    // Mettre à jour le nombre de lignes et de colonnes dans le QTableWidget
-    ui->tableWidget_2->setRowCount(tri->rowCount());  // Met à jour le nombre de lignes
-    ui->tableWidget_2->setColumnCount(tri->columnCount());  // Met à jour le nombre de colonnes
-
-    // Définir les en-têtes de colonnes pour le tableau
-    ui->tableWidget_2->setHorizontalHeaderLabels({"ID Produit", "Nom de produit", "Quantité disponible", "Date de livraison", "Date de réapprovisionnement"});
-
-    // Remplir le QTableWidget avec les données
-    for (int row = 0; row < tri->rowCount(); ++row) {
-        for (int col = 0; col < tri->columnCount(); ++col) {
-            QString data = tri->index(row, col).data().toString();
-            qDebug() << "Ligne " << row << " Col " << col << ": " << data;  // Afficher chaque donnée pour débogage
-            ui->tableWidget_2->setItem(row, col, new QTableWidgetItem(data));  // Met à jour la cellule du tableau
-        }
-    }
-
-    // Forcer la mise à jour de l'affichage
-    ui->tableWidget_2->repaint();
+    // Mettre à jour les données du graphique
 }
+
+void MainWindow::afficherStatistiques()
+{
+    QSqlQuery query;
+    query.prepare("SELECT nomProduit, quantiteDispo FROM stocks");
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec de la récupération des données : " + query.lastError().text());
+        return;
+    }
+
+    QPieSeries *series = new QPieSeries(this);
+    while (query.next()) {
+        QString nomProduit = query.value(0).toString();
+        int quantiteDispo = query.value(1).toInt();
+        series->append(nomProduit, quantiteDispo);
+    }
+
+    if (series->slices().isEmpty()) {
+        QMessageBox::warning(this, "Avertissement", "Aucune donnée disponible pour les statistiques.");
+        delete series; // Prevent memory leak
+        return;
+    }
+
+    // Customize colors
+    QList<QColor> customColors = {
+        QColor("#ff6f61"), // Warm red
+        QColor("#6a9fb5"), // Soft blue
+        QColor("#77dd77"), // Light green
+        QColor("#fdfd96"), // Yellow
+        QColor("#ffb347"), // Orange
+        QColor("#836953"), // Brown
+        QColor("#b19cd9"), // Lavender
+        QColor("#ff6961"), // Pastel red
+        QColor("#aec6cf"), // Pastel blue
+        QColor("#f49ac2")  // Pastel pink
+    };
+
+    int colorIndex = 0;
+    for (auto slice : series->slices()) {
+        slice->setBrush(customColors[colorIndex % customColors.size()]);
+        colorIndex++;
+        slice->setLabel(QString("%1 (%2)").arg(slice->label()).arg(slice->value())); // Set slice labels
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Statistiques des Produits");
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView = new QChartView(chart, this);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QWidget *statsPage = ui->stat;
+    if (!statsPage) {
+        QMessageBox::critical(this, "Erreur", "Le widget 'stat' n'est pas initialisé.");
+        return;
+    }
+
+    if (statsPage->layout()) {
+        QLayout *oldLayout = statsPage->layout();
+        QLayoutItem *item;
+        while ((item = oldLayout->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        delete oldLayout;
+    }
+
+    QVBoxLayout *layout = new QVBoxLayout(statsPage);
+    layout->addWidget(chartView);
+    statsPage->setLayout(layout);
+}
+
+
+

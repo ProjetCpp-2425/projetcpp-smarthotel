@@ -19,7 +19,7 @@ public:
     Produit(int id, QString nom, int quantite, QDate livraison, QDate reapprovisionnement);
     bool ajouter();   // Create
     bool supprimer(int id);  // Delete
-    static QSqlQueryModel* afficher();  // Read
+    static QSqlQueryModel* afficher(const QString& orderBy);  // Read
     bool modifier(int id);  // Update
 
     // Getters and setters as needed
