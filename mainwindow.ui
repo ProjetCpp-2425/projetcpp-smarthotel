@@ -18,17 +18,24 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>-10</y>
+      <y>0</y>
       <width>1301</width>
       <height>731</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true"> 
-background-color: rgb(255, 255, 255);</string>
+     <string notr="true">QWidget {
+    background: qlineargradient(
+        spread:pad, 
+        x1:0.7, y1:1, x2:0.1, y2:0, 
+        stop:0 #3533cd, 
+        stop:1 #000000
+    );
+} 
+</string>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page_61">
      <widget class="QLineEdit" name="lineEdit_nom">
@@ -575,8 +582,8 @@ color: rgb(209, 196, 233);</string>
      <widget class="QLabel" name="label_614">
       <property name="geometry">
        <rect>
-        <x>580</x>
-        <y>250</y>
+        <x>840</x>
+        <y>270</y>
         <width>141</width>
         <height>20</height>
        </rect>
@@ -588,10 +595,10 @@ font: 9pt &quot;Segoe UI&quot;;
 color: rgb(209, 196, 233);</string>
       </property>
       <property name="text">
-       <string>Nouv.mot de passe</string>
+       <string>code</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="identifiant_3">
+     <widget class="QLineEdit" name="oub">
       <property name="geometry">
        <rect>
         <x>550</x>
@@ -654,6 +661,91 @@ color: rgb(209, 196, 233);</string>
       <property name="styleSheet">
        <string notr="true">border-image: url(:/new/prefix1/logo1.png);
 background-color:transparent;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="con">
+      <property name="geometry">
+       <rect>
+        <x>820</x>
+        <y>370</y>
+        <width>141</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(0, 0, 0);
+font: 700 11pt &quot;Segoe UI&quot;;
+color: rgb(209, 196, 233);</string>
+      </property>
+      <property name="text">
+       <string>confirmer</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="mp">
+      <property name="geometry">
+       <rect>
+        <x>820</x>
+        <y>300</y>
+        <width>171</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(209, 196, 233);
+color: rgb(0, 0, 0);</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_132">
+     <widget class="QPushButton" name="confirmer">
+      <property name="geometry">
+       <rect>
+        <x>800</x>
+        <y>400</y>
+        <width>161</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(0, 0, 0);
+font: 700 11pt &quot;Segoe UI&quot;;
+color: rgb(209, 196, 233);</string>
+      </property>
+      <property name="text">
+       <string>Confirmer</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="smsmdp">
+      <property name="geometry">
+       <rect>
+        <x>770</x>
+        <y>290</y>
+        <width>211</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(209, 196, 233);
+color: rgb(0, 0, 0);</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_635">
+      <property name="geometry">
+       <rect>
+        <x>830</x>
+        <y>220</y>
+        <width>181</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+ 
+font: 9pt &quot;Segoe UI&quot;;
+color: rgb(209, 196, 233);</string>
+      </property>
+      <property name="text">
+       <string>Confirmer</string>
       </property>
      </widget>
     </widget>
@@ -8736,12 +8828,17 @@ color: rgb(255, 255, 255);</string>
       </property>
       <item>
        <property name="text">
+        <string>espèce</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>chèque</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>espèce</string>
+        <string>en attente</string>
        </property>
       </item>
      </widget>
@@ -9346,6 +9443,37 @@ color: rgb(0, 0, 0);
 </string>
       </property>
      </widget>
+     <widget class="QWidget" name="omar" native="true">
+      <property name="geometry">
+       <rect>
+        <x>830</x>
+        <y>240</y>
+        <width>361</width>
+        <height>211</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="mail">
+      <property name="geometry">
+       <rect>
+        <x>660</x>
+        <y>600</y>
+        <width>191</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(179, 170, 255);
+border-radius:10px;
+color: rgb(0, 0, 80);
+ 
+font: 700 10pt &quot;Segoe UI&quot;;
+text-decoration: underline;</string>
+      </property>
+      <property name="text">
+       <string>mail</string>
+      </property>
+     </widget>
      <zorder>widget_19</zorder>
      <zorder>widget_8</zorder>
      <zorder>graphicsView_20</zorder>
@@ -9376,7 +9504,10 @@ color: rgb(0, 0, 0);
      <zorder>id_12</zorder>
      <zorder>sedeconnecter5</zorder>
      <zorder>tab</zorder>
+     <zorder>omar</zorder>
+     <zorder>mail</zorder>
     </widget>
+    <widget class="QWidget" name="page_131"/>
     <widget class="QWidget" name="page_10">
      <widget class="QStackedWidget" name="stackedWidget_5">
       <property name="geometry">
@@ -9391,7 +9522,7 @@ color: rgb(0, 0, 0);
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="page_31">
        <widget class="QGraphicsView" name="graphicsView_122">
@@ -10193,7 +10324,7 @@ background-color:transparent;</string>
          <string notr="true">background-color: rgb(255, 255, 255);</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="page_33">
          <widget class="QGraphicsView" name="graphicsView_130">
@@ -12922,7 +13053,7 @@ background-color:transparent;</string>
            <string notr="true">background-color: rgb(255, 255, 255);</string>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page_40">
            <widget class="QGraphicsView" name="graphicsView_155">
@@ -21723,7 +21854,7 @@ background-color:transparent;</string>
 background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="page_65">
        <widget class="QLineEdit" name="lineEdit_nom_2">
@@ -30632,7 +30763,7 @@ color: rgb(255, 255, 255);</string>
          <string notr="true">background-color: rgb(255, 255, 255);</string>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="page_87">
          <widget class="QGraphicsView" name="graphicsView_339">
@@ -31434,7 +31565,7 @@ background-color:transparent;</string>
            <string notr="true">background-color: rgb(255, 255, 255);</string>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>6</number>
           </property>
           <widget class="QWidget" name="page_89">
            <widget class="QGraphicsView" name="graphicsView_347">
@@ -47117,7 +47248,7 @@ background-color:transparent;</string>
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="page_16">
        <widget class="QGraphicsView" name="graphicsView_23">

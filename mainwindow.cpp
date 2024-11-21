@@ -10,8 +10,25 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
-
+#include <QTcpSocket>
+#include <QHttpMultiPart>
+#include <QHttpPart>
+#include <QTextStream>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QUrl>
+#include <QRandomGenerator>
+#include <QSslSocket>
+#include <QUrlQuery>
+#include <QtCore>
+#include <QByteArray>
+#include <QUrlQuery>
+#include <QDebug>
 #include "pdf.h"
+#include "email.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -43,7 +60,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(modifierButton, &QPushButton::clicked, this, &MainWindow::on_modifierButton_clicked);
     connect(exporterPdf, &QPushButton::clicked, this, &MainWindow::on_exporter_clicked);
     connect(ui->comboBox_5, SIGNAL(currentIndexChanged(int)), this, SLOT(on_triComboBox_currentIndexChanged(int)));
-   // connect(ui->boutonstatres, &QPushButton::clicked, this, &MainWindow::afficherStatistiquesTypeChambre);
+    connect(ui->boutonstatres, &QPushButton::clicked, this, &MainWindow::afficherStatistiquesTypeChambre);
+    networkManager = new QNetworkAccessManager(this);
+    connect(ui->mail, &QPushButton::clicked, this, &MainWindow::on_email_clicked);
+    connect(ui->envoi, &QPushButton::clicked, this, &MainWindow::on_sendVerificationButton_clicked);
+    connect(ui->con,&QPushButton::clicked,this,&MainWindow::on_verifyCodeButton_clicked);
+
 
 
 }
@@ -184,34 +206,212 @@ void MainWindow::on_triComboBox_currentIndexChanged(int index) {
         qDebug() << "Erreur : Le tri n'a pas pu être appliqué.";
     }
 }
-//void MainWindow::afficherStatistiquesTypeChambre() {
-  //  QtCharts::QPieSeries *series = new QtCharts::QPieSeries();
+void MainWindow::afficherStatistiquesTypeChambre() {
+    QPieSeries *series = new QPieSeries();
 
-    // Exemples de données. Remplace par des données de ta base de données.
-   // int simpleCount = 30; // Nombre de chambres simples
-    //int doubleCount = 50; // Nombre de chambres doubles
-    //int suiteCount = 20;  // Nombre de suites
+    // Exemple de données issues de la base
+    int simpleCount = 30, doubleCount = 50, suiteCount = 20;
 
-    // Ajout des données dans le graphique
-    //series->append("Simple", simpleCount);
-    //series->append("Double", doubleCount);
-    //series->append("Suite", suiteCount);
+    series->append("Simple", simpleCount);
+    series->append("Double", doubleCount);
+    series->append("Suite", suiteCount);
 
-    // Rendre les parts interactives
-    //for (auto slice : series->slices()) {
-      //  slice->setLabelVisible(true);
-        //slice->setExploded();
-    //}
+    for (auto slice : series->slices()) {
+        slice->setLabelVisible(true);
+        slice->setExploded();
+    }
 
-    // Création du graphique
-    //QtCharts::QChart *chart = new QtCharts::QChart();
-    //chart->addSeries(series);
-    //chart->setTitle("Répartition des Types de Chambres");
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Répartition des Types de Chambres");
 
-    // Affichage dans un QChartView
-    //QtCharts::QChartView *chartView = new QtCharts::QChartView(chart);
-    //chartView->setRenderHint(QPainter::Antialiasing);
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
 
-    // Ajouter le graphique à l'interface (par exemple, dans un layout)
-    //ui->->addWidget(chartView); // Assure-toi que tu as un layout nommé 'layoutStatistiques' dans ton fichier .ui
-//}
+
+    chartView->setParent(ui->omar);
+    chartView->resize(ui->omar->size());
+    chartView->show();
+}
+void MainWindow::on_email_clicked()
+{
+
+    QString destinataire = "ramysnoussi@gmail.com";
+    QString objet = "Confirmation de votre réservation";
+    QString corps = "Bonjour Rami,\n\nVotre réservation est confirmée.\n\nMerci de votre confiance.";
+
+
+
+
+    envoyerEmail(destinataire, objet, corps);
+
+
+    QMessageBox::information(this, "Succès", "Email envoyé avec succès.");
+}
+
+void MainWindow::envoyerEmail(const QString& destinataire, const QString& sujet, const QString& message) {
+    QString smtpServer = "smtp.gmail.com";
+    int smtpPort = 465;
+    QString from = "aziz228nasri@gmail.com";
+    QString password = "paqd yivs yzja uyxa";
+
+    QString emailBody = "From: " + from + "\r\n" +
+                        "To: " + destinataire + "\r\n" +
+                        "Subject: " + sujet + "\r\n\r\n" +
+                        message;
+
+    QSslSocket socket;
+    socket.connectToHostEncrypted(smtpServer, smtpPort);
+    if (!socket.waitForConnected()) {
+        qDebug() << "Erreur de connexion au serveur SMTP:" << socket.errorString();
+        return;
+    }
+    qDebug() << "Connexion réussie au serveur SMTP.";
+
+
+    if (!socket.waitForReadyRead()) {
+        qDebug() << "Erreur lecture du serveur SMTP:" << socket.errorString();
+        return;
+    }
+    qDebug() << "Réponse du serveur:" << socket.readAll();
+
+
+    socket.write("EHLO localhost\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse EHLO:" << socket.readAll();
+
+    socket.write("AUTH LOGIN\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse AUTH LOGIN:" << socket.readAll();
+
+    socket.write(QByteArray().append(from.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse email (AUTH):" << socket.readAll();
+
+    socket.write(QByteArray().append(password.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse mot de passe (AUTH):" << socket.readAll();
+
+    socket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse MAIL FROM:" << socket.readAll();
+
+    socket.write("RCPT TO:<" + destinataire.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse RCPT TO:" << socket.readAll();
+
+    socket.write("DATA\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse DATA:" << socket.readAll();
+
+    socket.write(emailBody.toUtf8() + "\r\n.\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse après envoi du contenu:" << socket.readAll();
+
+    socket.write("QUIT\r\n");
+    socket.waitForBytesWritten();
+    qDebug() << "Fermeture de la connexion.";
+
+    socket.close();
+    qDebug() << "E-mail envoyé avec succès.";
+}
+void MainWindow::on_sendVerificationButton_clicked() {
+    QString userEmail = ui->oub->text(); // Lire l'adresse e-mail saisie
+
+    if (userEmail.isEmpty() || !userEmail.contains("@")) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer une adresse e-mail valide.");
+        return;
+    }
+
+    // Générer un code aléatoire
+    QString verificationCode = QString::number(QRandomGenerator::global()->bounded(100000, 999999)); // Code à 6 chiffres
+
+    // Préparer le sujet et le contenu de l'e-mail
+    QString subject = "Votre code de vérification";
+    QString body = QString("Bonjour,\n\nVoici votre code de vérification : %1.\n\nMerci.").arg(verificationCode);
+
+    // Appeler la fonction pour envoyer l'e-mail
+    if (envoyerVerificationEmail(userEmail, subject, body)) {
+        QMessageBox::information(this, "Succès", "Un e-mail avec un code de vérification a été envoyé.");
+        qDebug() << "Code envoyé à l'utilisateur : " << verificationCode; // Affiche le code dans la console pour vérification (optionnel)
+    } else {
+        QMessageBox::warning(this, "Erreur", "Échec de l'envoi de l'e-mail.");
+    }
+}
+bool MainWindow::envoyerVerificationEmail(const QString &recipient, const QString &subject, const QString &body) {
+    QString smtpServer = "smtp.gmail.com";
+    int smtpPort = 465; // Port SSL
+    QString senderEmail = "aziz228nasri@gmail.com"; // Remplacez par votre adresse e-mail
+    QString appPassword = "paqd yivs yzja uyxa"; // Remplacez par votre mot de passe d'application
+
+    QSslSocket socket;
+    socket.connectToHostEncrypted(smtpServer, smtpPort);
+    if (!socket.waitForConnected(5000)) {
+        qDebug() << "Erreur de connexion au serveur SMTP:" << socket.errorString();
+        return false;
+    }
+
+    socket.write("EHLO localhost\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("AUTH LOGIN\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write(QByteArray().append(senderEmail.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write(QByteArray().append(appPassword.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("MAIL FROM:<" + senderEmail.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("RCPT TO:<" + recipient.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("DATA\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    QString emailBody = "From: " + senderEmail + "\r\n"
+                                                 "To: " + recipient + "\r\n"
+                                      "Subject: " + subject + "\r\n\r\n" +
+                        body + "\r\n.\r\n";
+
+    socket.write(emailBody.toUtf8());
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("QUIT\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.close();
+    return true;
+}
+void MainWindow::on_verifyCodeButton_clicked() {
+    QString enteredCode = ui->mp->text();
+
+    if (enteredCode == verificationCode) {
+        QMessageBox::information(this, "Vérification réussie", "Code vérifié avec succès !");
+        ui->stackedWidget->setCurrentIndex(10);
+    } else {
+        ui->stackedWidget->setCurrentIndex(10);
+    }
+}
+
+

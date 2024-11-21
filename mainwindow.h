@@ -6,6 +6,9 @@
 #include <QPushButton>
 #include <QDateEdit>
 #include <QComboBox>
+#include <QNetworkAccessManager>
+#include <QRandomGenerator>
+#include <QNetworkReply>
 #include <QVector>
 #include "reservation.h"
 
@@ -29,8 +32,15 @@ private slots:
     void on_searchLineEdit_textChanged(const QString &text); // Fonction de recherche
     void afficher();
     void on_triComboBox_currentIndexChanged(int index);
-    //void afficherStatistiquesTypeChambre();
+    void afficherStatistiquesTypeChambre();
+    void envoyerEmail(const QString& destinataire, const QString& sujet, const QString& message);
+    void on_email_clicked();
+    void on_sendVerificationButton_clicked();
+    bool envoyerVerificationEmail(const QString &recipient, const QString &subject, const QString &body);
+    void on_verifyCodeButton_clicked();
         // Fonction pour afficher les réservations
+
+
 
 private:
     Ui::MainWindow *ui;
@@ -53,6 +63,9 @@ private:
     QPushButton *supprimerButton;
     QPushButton *modifierButton;
     QPushButton *exporterPdf;
+    QNetworkAccessManager *networkManager;
+    QString verificationCode;
 };
-
 #endif // MAINWINDOW_H
+
+

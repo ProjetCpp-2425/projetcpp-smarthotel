@@ -68,10 +68,16 @@ public:
     QLabel *label_610;
     QLabel *label_611;
     QLabel *label_614;
-    QLineEdit *identifiant_3;
+    QLineEdit *oub;
     QLabel *label_615;
     QPushButton *envoi;
     QGraphicsView *graphicsView_505;
+    QPushButton *con;
+    QLineEdit *mp;
+    QWidget *page_132;
+    QPushButton *confirmer;
+    QLineEdit *smsmdp;
+    QLabel *label_635;
     QWidget *page_11;
     QGraphicsView *graphicsView_19;
     QWidget *widget_7;
@@ -555,6 +561,9 @@ public:
     QLineEdit *id_12;
     QPushButton *sedeconnecter5;
     QTableView *tab;
+    QWidget *omar;
+    QPushButton *mail;
+    QWidget *page_131;
     QWidget *page_10;
     QStackedWidget *stackedWidget_5;
     QWidget *page_31;
@@ -2903,9 +2912,16 @@ public:
         centralwidget->setObjectName("centralwidget");
         stackedWidget = new QStackedWidget(centralwidget);
         stackedWidget->setObjectName("stackedWidget");
-        stackedWidget->setGeometry(QRect(0, -10, 1301, 731));
-        stackedWidget->setStyleSheet(QString::fromUtf8(" \n"
-"background-color: rgb(255, 255, 255);"));
+        stackedWidget->setGeometry(QRect(0, 0, 1301, 731));
+        stackedWidget->setStyleSheet(QString::fromUtf8("QWidget {\n"
+"    background: qlineargradient(\n"
+"        spread:pad, \n"
+"        x1:0.7, y1:1, x2:0.1, y2:0, \n"
+"        stop:0 #3533cd, \n"
+"        stop:1 #000000\n"
+"    );\n"
+"} \n"
+""));
         page_61 = new QWidget();
         page_61->setObjectName("page_61");
         lineEdit_nom = new QLineEdit(page_61);
@@ -3132,15 +3148,15 @@ public:
 "color: rgb(209, 196, 233);"));
         label_614 = new QLabel(page_128);
         label_614->setObjectName("label_614");
-        label_614->setGeometry(QRect(580, 250, 141, 20));
+        label_614->setGeometry(QRect(840, 270, 141, 20));
         label_614->setStyleSheet(QString::fromUtf8("background-color:transparent;\n"
 " \n"
 "font: 9pt \"Segoe UI\";\n"
 "color: rgb(209, 196, 233);"));
-        identifiant_3 = new QLineEdit(page_128);
-        identifiant_3->setObjectName("identifiant_3");
-        identifiant_3->setGeometry(QRect(550, 310, 181, 41));
-        identifiant_3->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        oub = new QLineEdit(page_128);
+        oub->setObjectName("oub");
+        oub->setGeometry(QRect(550, 310, 181, 41));
+        oub->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "color: rgb(0, 0, 0);"));
         label_615 = new QLabel(page_128);
         label_615->setObjectName("label_615");
@@ -3160,7 +3176,39 @@ public:
         graphicsView_505->setGeometry(QRect(40, 160, 371, 391));
         graphicsView_505->setStyleSheet(QString::fromUtf8("border-image: url(:/new/prefix1/logo1.png);\n"
 "background-color:transparent;"));
+        con = new QPushButton(page_128);
+        con->setObjectName("con");
+        con->setGeometry(QRect(820, 370, 141, 41));
+        con->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);\n"
+"font: 700 11pt \"Segoe UI\";\n"
+"color: rgb(209, 196, 233);"));
+        mp = new QLineEdit(page_128);
+        mp->setObjectName("mp");
+        mp->setGeometry(QRect(820, 300, 171, 51));
+        mp->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+"color: rgb(0, 0, 0);"));
         stackedWidget->addWidget(page_128);
+        page_132 = new QWidget();
+        page_132->setObjectName("page_132");
+        confirmer = new QPushButton(page_132);
+        confirmer->setObjectName("confirmer");
+        confirmer->setGeometry(QRect(800, 400, 161, 61));
+        confirmer->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);\n"
+"font: 700 11pt \"Segoe UI\";\n"
+"color: rgb(209, 196, 233);"));
+        smsmdp = new QLineEdit(page_132);
+        smsmdp->setObjectName("smsmdp");
+        smsmdp->setGeometry(QRect(770, 290, 211, 71));
+        smsmdp->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+"color: rgb(0, 0, 0);"));
+        label_635 = new QLabel(page_132);
+        label_635->setObjectName("label_635");
+        label_635->setGeometry(QRect(830, 220, 181, 51));
+        label_635->setStyleSheet(QString::fromUtf8("background-color:transparent;\n"
+" \n"
+"font: 9pt \"Segoe UI\";\n"
+"color: rgb(209, 196, 233);"));
+        stackedWidget->addWidget(page_132);
         page_11 = new QWidget();
         page_11->setObjectName("page_11");
         graphicsView_19 = new QGraphicsView(page_11);
@@ -6257,6 +6305,7 @@ public:
         mode = new QComboBox(page_13);
         mode->addItem(QString());
         mode->addItem(QString());
+        mode->addItem(QString());
         mode->setObjectName("mode");
         mode->setGeometry(QRect(150, 470, 131, 28));
         mode->setStyleSheet(QString::fromUtf8("background:rgb(0, 0, 80);\n"
@@ -6477,6 +6526,18 @@ public:
 "color: rgb(0, 0, 0);\n"
 "\n"
 ""));
+        omar = new QWidget(page_13);
+        omar->setObjectName("omar");
+        omar->setGeometry(QRect(830, 240, 361, 211));
+        mail = new QPushButton(page_13);
+        mail->setObjectName("mail");
+        mail->setGeometry(QRect(660, 600, 191, 31));
+        mail->setStyleSheet(QString::fromUtf8("background-color: rgb(179, 170, 255);\n"
+"border-radius:10px;\n"
+"color: rgb(0, 0, 80);\n"
+" \n"
+"font: 700 10pt \"Segoe UI\";\n"
+"text-decoration: underline;"));
         stackedWidget->addWidget(page_13);
         widget_19->raise();
         widget_8->raise();
@@ -6508,6 +6569,11 @@ public:
         id_12->raise();
         sedeconnecter5->raise();
         tab->raise();
+        omar->raise();
+        mail->raise();
+        page_131 = new QWidget();
+        page_131->setObjectName("page_131");
+        stackedWidget->addWidget(page_131);
         page_10 = new QWidget();
         page_10->setObjectName("page_10");
         stackedWidget_5 = new QStackedWidget(page_10);
@@ -22539,24 +22605,24 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidget->setCurrentIndex(7);
+        stackedWidget->setCurrentIndex(2);
         stackedWidget_3->setCurrentIndex(0);
         stackedWidget_4->setCurrentIndex(2);
-        stackedWidget_5->setCurrentIndex(0);
-        stackedWidget_6->setCurrentIndex(0);
-        stackedWidget_7->setCurrentIndex(2);
+        stackedWidget_5->setCurrentIndex(7);
+        stackedWidget_6->setCurrentIndex(6);
+        stackedWidget_7->setCurrentIndex(1);
         stackedWidget_8->setCurrentIndex(2);
         stackedWidget_9->setCurrentIndex(0);
-        stackedWidget_10->setCurrentIndex(8);
+        stackedWidget_10->setCurrentIndex(7);
         stackedWidget_11->setCurrentIndex(0);
         stackedWidget_12->setCurrentIndex(2);
-        stackedWidget_13->setCurrentIndex(1);
-        stackedWidget_14->setCurrentIndex(0);
+        stackedWidget_13->setCurrentIndex(0);
+        stackedWidget_14->setCurrentIndex(6);
         stackedWidget_15->setCurrentIndex(2);
         stackedWidget_16->setCurrentIndex(2);
         stackedWidget_17->setCurrentIndex(1);
         stackedWidget_18->setCurrentIndex(2);
-        stackedWidget_2->setCurrentIndex(2);
+        stackedWidget_2->setCurrentIndex(6);
         stackedWidget_19->setCurrentIndex(2);
 
 
@@ -22586,9 +22652,12 @@ public:
         label_286->setText(QString());
         label_610->setText(QString());
         label_611->setText(QCoreApplication::translate("MainWindow", "MOT DE PASSE", nullptr));
-        label_614->setText(QCoreApplication::translate("MainWindow", "Nouv.mot de passe", nullptr));
+        label_614->setText(QCoreApplication::translate("MainWindow", "code", nullptr));
         label_615->setText(QCoreApplication::translate("MainWindow", "E-MAIL", nullptr));
         envoi->setText(QCoreApplication::translate("MainWindow", "ENVOI", nullptr));
+        con->setText(QCoreApplication::translate("MainWindow", "confirmer", nullptr));
+        confirmer->setText(QCoreApplication::translate("MainWindow", "Confirmer", nullptr));
+        label_635->setText(QCoreApplication::translate("MainWindow", "Confirmer", nullptr));
         client->setText(QCoreApplication::translate("MainWindow", "client", nullptr));
         employeclient->setText(QCoreApplication::translate("MainWindow", "employ\303\251", nullptr));
         reservationclient->setText(QCoreApplication::translate("MainWindow", "reservation", nullptr));
@@ -23009,8 +23078,9 @@ public:
         maintenanceres->setText(QCoreApplication::translate("MainWindow", "maintenance", nullptr));
         label_38->setText(QCoreApplication::translate("MainWindow", "Mode paiement :", nullptr));
         ajou->setText(QCoreApplication::translate("MainWindow", "Ajouter une r\303\251servation", nullptr));
-        mode->setItemText(0, QCoreApplication::translate("MainWindow", "ch\303\250que", nullptr));
-        mode->setItemText(1, QCoreApplication::translate("MainWindow", "esp\303\250ce", nullptr));
+        mode->setItemText(0, QCoreApplication::translate("MainWindow", "esp\303\250ce", nullptr));
+        mode->setItemText(1, QCoreApplication::translate("MainWindow", "ch\303\250que", nullptr));
+        mode->setItemText(2, QCoreApplication::translate("MainWindow", "en attente", nullptr));
 
         label_28->setText(QCoreApplication::translate("MainWindow", "Statut r\303\251servation :", nullptr));
         label_32->setText(QCoreApplication::translate("MainWindow", "Date R\303\251servation :", nullptr));
@@ -23041,6 +23111,7 @@ public:
         pdf_16->setText(QCoreApplication::translate("MainWindow", "exporter en PDF", nullptr));
         boutonstatres->setText(QCoreApplication::translate("MainWindow", "statistique", nullptr));
         sedeconnecter5->setText(QCoreApplication::translate("MainWindow", "se d\303\251connecter", nullptr));
+        mail->setText(QCoreApplication::translate("MainWindow", "mail", nullptr));
         label_74->setText(QCoreApplication::translate("MainWindow", "se deconnecter ", nullptr));
         client_5->setText(QCoreApplication::translate("MainWindow", "client", nullptr));
         employeclient_5->setText(QCoreApplication::translate("MainWindow", "employ\303\251", nullptr));
