@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     Connection c;
      bool test=c.createconnection();
     MainWindow w;
+
     if(test)
     {
         w.show();

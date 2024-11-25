@@ -2,9 +2,13 @@
 #include <QString>
 #include <QSqlError>
 #include <QDebug>
+#include <QSqlQuery>
+#include <QTextCharFormat>
+#include <QColor>
 
-Maintenance::Maintenance(int ID_MAINTENANCE ,int NUM_CHAMBRE_CONCERNEE, QString TYPE_MAINTENANCE, QDate DATE_DEBUT, QDate DATE_FIN, QString ETAT_MAINTENANCE,QString PRIORITE){
+Maintenance::Maintenance(int ID_MAINTENANCE , QString ID_EMPLOYE, int NUM_CHAMBRE_CONCERNEE, QString TYPE_MAINTENANCE, QDate DATE_DEBUT, QDate DATE_FIN, QString ETAT_MAINTENANCE, QString PRIORITE){
     this->ID_MAINTENANCE = ID_MAINTENANCE;
+    this-> ID_EMPLOYE= ID_EMPLOYE;
     this-> NUM_CHAMBRE_CONCERNEE=NUM_CHAMBRE_CONCERNEE;
     this-> TYPE_MAINTENANCE= TYPE_MAINTENANCE;
     this-> DATE_DEBUT =  DATE_DEBUT;
@@ -13,26 +17,22 @@ Maintenance::Maintenance(int ID_MAINTENANCE ,int NUM_CHAMBRE_CONCERNEE, QString 
     this->PRIORITE=PRIORITE ;
 
 }
-    bool Maintenance::ajouter() {
-        QSqlQuery query;
-        query.prepare("INSERT INTO MAINTENANCES (ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE,PRIORITE) "
-                      "VALUES (:ID_MAINTENANCE, :NUM_CHAMBRE_CONCERNEE, :TYPE_MAINTENANCE, :DATE_DEBUT, :DATE_FIN, :ETAT_MAINTENANCE, :PRIORITE)");
+bool Maintenance::ajouter() {
+    QSqlQuery query;
+    query.prepare("INSERT INTO MAINTENANCES (ID_MAINTENANCE, ID_EMPLOYE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE) "
+                  "VALUES (:id_maintenance, :id_employe, :num_chambre, :type_maintenance, :date_debut, :date_fin, :etat_maintenance, :priorite)");
+    query.bindValue(":id_maintenance", ID_MAINTENANCE);
+    query.bindValue(":id_employe", ID_EMPLOYE);
+    query.bindValue(":num_chambre", NUM_CHAMBRE_CONCERNEE);
+    query.bindValue(":type_maintenance", TYPE_MAINTENANCE);
+    query.bindValue(":date_debut", DATE_DEBUT); // Conversion en chaîne
+    query.bindValue(":date_fin", DATE_FIN);      // Conversion en chaîne
+    query.bindValue(":etat_maintenance", ETAT_MAINTENANCE);
+    query.bindValue(":priorite", PRIORITE);
 
-        query.bindValue(":ID_MAINTENANCE", ID_MAINTENANCE);
-        query.bindValue(":NUM_CHAMBRE_CONCERNEE",NUM_CHAMBRE_CONCERNEE );
-        query.bindValue(":TYPE_MAINTENANCE", TYPE_MAINTENANCE);
-        query.bindValue(":DATE_DEBUT",DATE_DEBUT);
-        query.bindValue(":DATE_FIN", DATE_FIN);
-        query.bindValue(":ETAT_MAINTENANCE", ETAT_MAINTENANCE);
-        query.bindValue(":PRIORITE", PRIORITE);
+    return query.exec();
+}
 
-        if (query.exec()) {
-            return true;
-        } else {
-            qDebug() << "Erreur SQL : " << query.lastError().text();
-            return false;
-        }
-    }
 
     QSqlQueryModel* Maintenance::afficher() {
         QSqlQueryModel* model = new QSqlQueryModel();
@@ -46,12 +46,14 @@ Maintenance::Maintenance(int ID_MAINTENANCE ,int NUM_CHAMBRE_CONCERNEE, QString 
         }
 
         model->setHeaderData(0, Qt::Horizontal, QObject::tr("id_maintenance"));
-        model->setHeaderData(1, Qt::Horizontal, QObject::tr("num_chambre_concernee"));
-        model->setHeaderData(2, Qt::Horizontal, QObject::tr("type_maintenance"));
-        model->setHeaderData(3, Qt::Horizontal, QObject::tr("date_debut"));
-        model->setHeaderData(4, Qt::Horizontal, QObject::tr("date_fin"));
-        model->setHeaderData(5, Qt::Horizontal, QObject::tr("etat_maintenance"));
-        model->setHeaderData(6, Qt::Horizontal, QObject::tr("Priorite"));
+        model->setHeaderData(1, Qt::Horizontal, QObject::tr("id_employe"));
+
+        model->setHeaderData(2, Qt::Horizontal, QObject::tr("num_chambre_concernee"));
+        model->setHeaderData(3, Qt::Horizontal, QObject::tr("type_maintenance"));
+        model->setHeaderData(4, Qt::Horizontal, QObject::tr("date_debut"));
+        model->setHeaderData(5, Qt::Horizontal, QObject::tr("date_fin"));
+        model->setHeaderData(6, Qt::Horizontal, QObject::tr("etat_maintenance"));
+        model->setHeaderData(7, Qt::Horizontal, QObject::tr("Priorite"));
 
         return model;
     }
@@ -65,10 +67,23 @@ bool Maintenance::supprimer(int id_maintenance) {
     return query.exec();
 }
 
+bool Maintenance::existe(int id) {
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM MAINTENANCES WHERE ID_MAINTENANCE = :id");
+    query.bindValue(":id", id);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt() > 0;
+    }
+    return false;
+}
 
 bool Maintenance::modifier() {
     QSqlQuery query;
+
+    // Préparer la requête SQL pour modifier les informations d'une maintenance spécifique
     query.prepare("UPDATE MAINTENANCES SET "
+                  "ID_EMPLOYE = :ID_EMPLOYE, "
                   "NUM_CHAMBRE_CONCERNEE = :NUM_CHAMBRE_CONCERNEE, "
                   "TYPE_MAINTENANCE = :TYPE_MAINTENANCE, "
                   "DATE_DEBUT = :DATE_DEBUT, "
@@ -76,19 +91,26 @@ bool Maintenance::modifier() {
                   "ETAT_MAINTENANCE = :ETAT_MAINTENANCE, "
                   "PRIORITE = :PRIORITE "
                   "WHERE ID_MAINTENANCE = :ID_MAINTENANCE");
-    query.bindValue(":ID_MAINTENANCE", ID_MAINTENANCE);
-    query.bindValue(":NUM_CHAMBRE_CONCERNEE",NUM_CHAMBRE_CONCERNEE );
+
+    // Lier les nouvelles valeurs aux placeholders dans la requête
+    query.bindValue(":ID_MAINTENANCE", ID_MAINTENANCE);  // ID de la maintenance à modifier
+    query.bindValue(":ID_EMPLOYE", ID_EMPLOYE);
+    query.bindValue(":NUM_CHAMBRE_CONCERNEE", NUM_CHAMBRE_CONCERNEE);
     query.bindValue(":TYPE_MAINTENANCE", TYPE_MAINTENANCE);
-    query.bindValue(":DATE_DEBUT",DATE_DEBUT);
+    query.bindValue(":DATE_DEBUT", DATE_DEBUT);
     query.bindValue(":DATE_FIN", DATE_FIN);
     query.bindValue(":ETAT_MAINTENANCE", ETAT_MAINTENANCE);
+    query.bindValue(":PRIORITE", PRIORITE);
 
+    // Exécuter la requête
     if (!query.exec()) {
         qDebug() << "Erreur lors de la modification de la maintenance:" << query.lastError().text();
-        return false;
+        return false;  // Retourner false si une erreur se produit
     }
-    return true;
+
+    return true;  // Retourner true si la mise à jour a réussi
 }
+
 
 
 
@@ -118,7 +140,6 @@ QSqlQueryModel* Maintenance::rechercherParID(int ID_MAINTENANCE)
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQuery query;
 
-    // Préparer la requête SQL pour chercher par ID_MAINTENANCE
     query.prepare("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE "
                   "FROM MAINTENANCES WHERE ID_MAINTENANCE = :id_maintenance");
     query.bindValue(":id_maintenance", ID_MAINTENANCE);
@@ -132,4 +153,5 @@ QSqlQueryModel* Maintenance::rechercherParID(int ID_MAINTENANCE)
 
     return model;  // Retourner le modèle avec les résultats
 }
+
 
