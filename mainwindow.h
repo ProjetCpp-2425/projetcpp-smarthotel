@@ -49,13 +49,24 @@ private slots:
     //void computeMaintenanceStats();
     //void on_pushButton_44_clicked();
     void on_pushButton_stat_clicked();
-
+    void chargerMaintenancesDansCalendrier();
+    //void verifierRappels();  // Vérifie les rappels programmés
+    //void afficherNotification(const QString &titre, const QString &message); // Affiche une notification
+    void chargerRappelsDansTableau();    // QDateTime obtenirDateTime(const QDateTime &dateParDefaut);
+    void ajouterOuModifierRappel(int idMaintenance); // Ajoute ou modifie
+    void afficherRappelsPourDate(const QDate &date);
+    //void afficherMaintenancesPourDate(const QDate &date, QTableWidget *table);
 private:
     Ui::MainWindow *ui;
     Maintenance Mtmp;
     void loadMaintenanceData();
     QStandardItemModel *model;
-    QTimer *timer;  // Pour la mise à jour automatique
+    QTimer *timer;
+    QTimer *timerRappels;
+    QTableWidget *tableRappels;
+
+    // Pour la mise à jour automatique
+   // QList<Maintenance> obtenirMaintenancesPourDate(const QDate &date);
 
     //void setupComboBoxes();                    // Initialise les ComboBox
    // void updateComboBoxes();                   // Met à jour les jours dans la ComboBoxDay
@@ -69,8 +80,7 @@ private:
     //void updateCalendarFromComboBoxes(); // Synchronise les ComboBox avec le calendrier
     //void testStaticHighlight();
     void afficherMaintenancesPourDate(const QDate &date);
-    void mettreAJourStatutsMaintenances();
-    void chargerMaintenancesDansCalendrier();
+    //void mettreAJourStatutsMaintenances();
     void configurerMiseAJourAutomatique();
 
 
