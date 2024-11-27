@@ -17,9 +17,9 @@
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
 #include <QtCharts/QLineSeries>
-#include <QtMath> // Pour les calculs mathématiques (ex. sinus)
-#include <QtSql/QSqlQuery> // Pour exécuter des requêtes SQL
-#include <QVBoxLayout> // Pour les layouts dynamiques
+#include <QtMath>
+#include <QtSql/QSqlQuery>
+#include <QVBoxLayout>
 #include <QtCharts>
 #include <QCalendarWidget>
 #include <QSqlRecord>
@@ -47,15 +47,17 @@
 #include <QColor>
 #include <QTextCharFormat>  // Pour personnaliser les dates (arrière-plan, texte)
 #include<QSqlTableModel>
+#include <QPainter>
 #include <QTimer>
 
+#include<QSqlQueryModel>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
     ui->tableView_2->setModel(Mtmp.afficher());
-    // Connexion du signal du QComboBox pour appliquer le tri
     connect(ui->comboBox_34, SIGNAL(currentTextChanged(QString)), this, SLOT(onComboBoxPriorityChanged(QString)));
     this->setStyleSheet("QLineEdit { color : white; }");
     connect(ui->pushButton_43,SIGNAL(clicked()), this, SLOT(on_pushButton_43_clicked()));
@@ -67,25 +69,31 @@ MainWindow::MainWindow(QWidget *parent) :
                                                              << "État Maintenance");
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    //connect(ui->pushButton_stat, &QPushButton::clicked, this, &MainWindow::on_pushButton_stat_clicked);
-    // Connectez le bouton pour afficher les statistiques
-   // connect(ui->pushButton_stat, SIGNAL(clicked()), this, SLOT(on_pushButton_stat_clicked()));
     connect(ui->pushButton_stat, &QPushButton::clicked, this, &MainWindow::on_pushButton_stat_clicked);
     ui->stackedWidget->setCurrentWidget(ui->page_395);  // Montrez la page contenant le graphique
     model = new QStandardItemModel(0, 3, this); // 3 columns (Date, State, Priority)
     model->setHorizontalHeaderLabels({"Date", "State", "Priority"});
     ui->tableView_2->setModel(model);
-    // setupComboBoxes();
-   // highlightDatesFromTableView(); // Applique les couleurs aux dates dès le lancement
-    //connect(ui->comboBoxYear, &QComboBox::currentIndexChanged, this, &MainWindow::updateCalendarFromComboBoxes);
-    //connect(ui->comboBoxMonth, &QComboBox::currentIndexChanged, this, &MainWindow::updateCalendarFromComboBoxes);
-    //connect(ui->comboBoxDay, &QComboBox::currentIndexChanged, this, &MainWindow::updateCalendarFromComboBoxes);
-    //testStaticHighlight();
-    loadMaintenanceData();
-    connect(ui->pushButtonAfficherMaintenances, &QPushButton::clicked, [this]() {
+    connect(ui->btnAjouterRappel, &QPushButton::clicked, this, &MainWindow::ajouterOuModifierRappel);
+    chargerMaintenancesDansCalendrier();
+    QDate firstVisibleDate = ui->calendarWidget->selectedDate().addMonths(-1);
+    QDate lastVisibleDate = ui->calendarWidget->selectedDate().addMonths(1);
+    connect(ui->calendarWidget, &QCalendarWidget::selectionChanged, [=]() {
+        afficherRappelsPourDate(ui->calendarWidget->selectedDate());
+    });
+    qDebug() << "Plage des dates visibles : " << firstVisibleDate.toString("yyyy-MM-dd") << " - " << lastVisibleDate.toString("yyyy-MM-dd");
+
+    for (QDate date = firstVisibleDate; date <= lastVisibleDate; date = date.addDays(1)) {
+        qDebug() << "Réinitialiser le format pour la date: " << date.toString("yyyy-MM-dd");
+        ui->calendarWidget->setDateTextFormat(date, QTextCharFormat());
+    }
+
+
+    connect(ui->pushButtonAfficherMaintenances_2, &QPushButton::clicked, [this]() {
         QDate selectedDate = ui->calendarWidget->selectedDate();
         afficherMaintenancesPourDate(selectedDate);
     });
+
 
 
     QPixmap pixstat("C:/Users/user/Downloads/stat.png");
@@ -96,8 +104,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label_logo->setPixmap(pixlogo.scaled(100,100,Qt::KeepAspectRatio));
     QPixmap pixqrc("C:/Users/user/Downloads/qrcode.png");
     ui->label_qrc->setPixmap(pixqrc.scaled(150,150,Qt::KeepAspectRatio));
-    QPixmap pixrecherchee("C:/Users/user/Downloads/chercher.png");
-    ui->label_recherchee->setPixmap(pixrecherchee.scaled(70,70,Qt::KeepAspectRatio));
     QPixmap pixcherch("C:/Users/user/Downloads/chercher.png");
     ui->label_chercher->setPixmap(pixcherch.scaled(70,70,Qt::KeepAspectRatio));
     QPixmap pixlogoo("C:/Users/user/Downloads/logo.png");
@@ -111,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QPixmap pixcall("C:/Users/user/Downloads/calee-removebg-preview.png");
     ui->label_call->setPixmap(pixcall.scaled(150,150,Qt::KeepAspectRatio));
     QPixmap pixpdf1("C:/Users/user/Downloads/exporter_en_pdf-removebg-preview.png");
-    ui->label_pdf1->setPixmap(pixpdf1.scaled(150,150,Qt::KeepAspectRatio));
+    ui->label_pdf1->setPixmap(pixpdf1.scaled(100,100,Qt::KeepAspectRatio));
     QPixmap pixsta("C:/Users/user/Downloads/stat.png");
     ui->label_sta->setPixmap(pixsta.scaled(150,150,Qt::KeepAspectRatio));
     QPixmap pixqrc2("C:/Users/user/Downloads/qrcode.png");
@@ -121,11 +127,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QPixmap pixpdf2("C:/Users/user/Downloads/exporter_en_pdf-removebg-preview.png");
     ui->label_pdf2->setPixmap(pixpdf2.scaled(150,150,Qt::KeepAspectRatio));
     QPixmap pixpdf("C:/Users/user/Downloads/exporter_en_pdf-removebg-preview.png");
-    ui->label_pdf->setPixmap(pixpdf.scaled(150,150,Qt::KeepAspectRatio));
+    ui->label_pdf->setPixmap(pixpdf.scaled(100,100,Qt::KeepAspectRatio));
     QPixmap pixcalendrier("C:/Users/user/Downloads/calee-removebg-preview.png");
     ui->label_calendrier->setPixmap(pixcalendrier.scaled(150,150,Qt::KeepAspectRatio));
     QPixmap pixstat2("C:/Users/user/Downloads/stat.png");
     ui->label_stat_2->setPixmap(pixstat2.scaled(150,150,Qt::KeepAspectRatio));
+    QPixmap pixmain1("C:/Users/user/Downloads/maintenance.png");
+    ui->label_main1->setPixmap(pixmain1.scaled(30,30,Qt::KeepAspectRatio));
+    QPixmap pixmain2("C:/Users/user/Downloads/maintenance.png");
+    ui->label_main2->setPixmap(pixmain2.scaled(30,30,Qt::KeepAspectRatio));
+    QPixmap pixmain3("C:/Users/user/Downloads/maintenance.png");
+    ui->label_main3->setPixmap(pixmain3.scaled(30,30,Qt::KeepAspectRatio));
+
 }
 
 MainWindow::~MainWindow()
@@ -133,59 +146,98 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
 void MainWindow::on_pushButton_39_clicked() {
     bool ok = false;
 
     // Récupération des valeurs des champs
     int ID_MAINTENANCE = ui->lineEdit_85->text().toInt(&ok);
     QString ID_EMPLOYE = ui->lineEdit_192->text();
-    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_86->text().toInt();
+    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_86->text().toInt(&ok);
     QString TYPE_MAINTENANCE = ui->comboBox_40->currentText();
-    QDate DATE_DEBUT = ui->dateEdit_11->date(); // Récupération avec heure
-    QDate DATE_FIN = ui->dateEdit_12->date();   // Récupération avec heure
+    QDate DATE_DEBUT = ui->dateEdit_11->date();
+    QDate DATE_FIN = ui->dateEdit_12->date();
     QString ETAT_MAINTENANCE = ui->comboBox_36->currentText();
     QString PRIORITE = ui->comboBox_41->currentText();
-
-    // Vérification de l'ID de maintenance
+    QDateTime DATE_RAPPEL = ui->dateTimeEdit->dateTime();
+    QString DESCRIPTION_RAPPEL = ui->lineEdit_193->text();
     if (!ok || ID_MAINTENANCE == 0) {
         QMessageBox::warning(this, tr("ID Maintenance invalide"), tr("L'ID de maintenance doit être un entier numérique non nul."));
         return;
     }
 
-    // Vérification des champs obligatoires
-    if (NUM_CHAMBRE_CONCERNEE == 0 || TYPE_MAINTENANCE.isEmpty() || ETAT_MAINTENANCE.isEmpty()) {
-        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez remplir tous les champs."));
+    if (ID_EMPLOYE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez remplir l'ID de l'employé."));
         return;
     }
 
-    // Vérification que les dates ne sont pas nulles
+    if (NUM_CHAMBRE_CONCERNEE <= 0) {
+        QMessageBox::warning(this, tr("Numéro de chambre invalide"), tr("Le numéro de chambre doit être un entier positif."));
+        return;
+    }
+
+    if (TYPE_MAINTENANCE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez choisir un type de maintenance."));
+        return;
+    }
+
+    if (ETAT_MAINTENANCE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez choisir un état de maintenance."));
+        return;
+    }
+
+    if (PRIORITE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez choisir une priorité."));
+        return;
+    }
     if (!DATE_DEBUT.isValid() || !DATE_FIN.isValid()) {
         QMessageBox::warning(this, tr("Date invalide"), tr("Veuillez sélectionner des dates valides."));
         return;
     }
-
-    // Vérification si la date de fin est avant la date de début
     if (DATE_FIN < DATE_DEBUT) {
         QMessageBox::warning(this, tr("Date incohérente"), tr("La date de fin ne peut pas être antérieure à la date de début."));
         return;
     }
 
-    // Création de l'objet Maintenance avec les valeurs saisies
-    Mtmp = Maintenance(ID_MAINTENANCE, ID_EMPLOYE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE);
-
-    // Appel de la méthode pour ajouter la maintenance
+    if (!DATE_RAPPEL.isValid()) {
+        QMessageBox::warning(this, tr("Date de rappel invalide"), tr("Veuillez sélectionner une date de rappel valide."));
+        return;
+    }
+    Mtmp = Maintenance(ID_MAINTENANCE, ID_EMPLOYE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE, DATE_RAPPEL, DESCRIPTION_RAPPEL);
     bool test = Mtmp.ajouter();
 
     if (test) {
-        loadMaintenanceData(); // Recharger les données
         QMessageBox::information(this, tr("OK"), tr("Ajout effectué\nCliquez sur Annuler pour quitter."));
+        loadMaintenanceData();
     } else {
         QMessageBox::critical(this, tr("Not OK"), tr("L'ajout a échoué\nCliquez sur Annuler pour quitter."));
     }
 }
+void MainWindow::loadMaintenanceData()
+{
 
 
+    QSqlQueryModel *model = Mtmp.afficher();  // Reload the model with afficher()
 
+    if (!model->query().isActive()) {
+        qDebug() << "Failed to load data:" << model->query().lastError();
+        return;
+    } else {
+        qDebug() << "Data loaded successfully in loadMaintenanceData";
+    }
+    if (ui->tableView_2->model()) {
+        ui->tableView_2->setModel(nullptr);
+    }
+
+    ui->tableView_2->setModel(model);
+
+    if (model->rowCount() == 0) {
+        qDebug() << "No data found!";
+    } else {
+        ui->tableView_2->resizeColumnsToContents();
+        ui->tableView_2->setAlternatingRowColors(true);
+    }
+}
 void MainWindow::on_pushButton_38_clicked() {
     int id_maintenance = ui->lineEdit_85->text().toInt();
 
@@ -211,19 +263,7 @@ void MainWindow::on_pushButton_38_clicked() {
                               QMessageBox::Cancel);
     }
 }
-void MainWindow::loadMaintenanceData()
-{
-    QSqlQueryModel *model = Mtmp.afficher();  // Reload the model with afficher()
 
-    if (!model->query().isActive()) {
-        qDebug() << "Failed to load data:" << model->query().lastError();
-    } else {
-        qDebug() << "Data loaded successfully in loadMaintenanceData";
-    }
-
-    ui->tableView_2->setModel(model);
-    ui->tableView_2->resizeColumnsToContents();  // Adjust column width to fit contents
-}
 
 void MainWindow::on_pushButton_2_clicked() {
     int ID_MAINTENANCE = ui->lineEdit_85->text().toInt();
@@ -235,13 +275,14 @@ void MainWindow::on_pushButton_2_clicked() {
     QDate DATE_FIN = ui->dateEdit_12 ->date();
     QString ETAT_MAINTENANCE = ui->comboBox_36->currentText();
     QString PRIORITE = ui->comboBox_41->currentText();
-
+    QDateTime DATE_RAPPEL = ui->dateTimeEdit->dateTime();
+    QString DESCRIPTION_RAPPEL =ui->lineEdit_193->text();
     if ( NUM_CHAMBRE_CONCERNEE== 0 || TYPE_MAINTENANCE.isEmpty() || ETAT_MAINTENANCE .isEmpty() || PRIORITE .isEmpty()) {
         QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez remplir tous les champs."));
         return;
     }
 
-    Mtmp= Maintenance (ID_MAINTENANCE,ID_EMPLOYE,NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT,  DATE_FIN, ETAT_MAINTENANCE,PRIORITE);
+    Mtmp= Maintenance (ID_MAINTENANCE,ID_EMPLOYE,NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT,  DATE_FIN, ETAT_MAINTENANCE,PRIORITE,DATE_RAPPEL,DESCRIPTION_RAPPEL);
     bool test = Mtmp.modifier();
 
     if (test) {
@@ -258,8 +299,6 @@ void MainWindow::on_comboBox_34_currentTextChanged(const QString &priorite)
         QMessageBox::warning(this, tr("Erreur de sélection"), tr("Veuillez sélectionner une priorité valide."));
         return;
     }
-
-    // Appeler la fonction pour trier les maintenances par priorité
     QSqlQueryModel *model = Mtmp.trierParPriorite(priorite);
     if (model->rowCount() > 0) {
         ui->tableView_2->setModel(model);
@@ -302,21 +341,28 @@ void MainWindow::on_pushButton_40_clicked()
 }
 void MainWindow::on_pushButton_43_clicked()
 {
-    // Récupérer l'ID de maintenance saisi par l'utilisateur
-    int ID_MAINTENANCE= ui->lineEdit_87->text().toInt();
-
-    // Vérifier si l'ID est valide (non nul)
-    if (ID_MAINTENANCE == 0) {
-        QMessageBox::warning(this, tr("ID Invalide"), tr("Veuillez entrer un ID valide."));
+    int ID_MAINTENANCE = ui->lineEdit_87->text().toInt();
+    QString descriptionRappel = ui->lineEdit_97->text(); // Assurez-vous d'avoir un champ pour la description
+    if (ID_MAINTENANCE == 0 && descriptionRappel.isEmpty()) {
+        QMessageBox::warning(this, tr("Entrée Invalide"), tr("Veuillez entrer un ID ou une description."));
         return;
     }
-    QSqlQueryModel *model = Mtmp.rechercherParID(ID_MAINTENANCE);
-    if (model->rowCount() > 0) {
+
+    QSqlQueryModel *model = nullptr;
+
+    if (ID_MAINTENANCE != 0) {
+        model = Mtmp.rechercherParID(ID_MAINTENANCE);
+    }
+    else if (!descriptionRappel.isEmpty()) {
+        model = Mtmp.rechercherParDescription(descriptionRappel);
+    }
+
+    if (model && model->rowCount() > 0) {
         ui->tableView_2->setModel(model);
         ui->tableView_2->resizeColumnsToContents();
-        QMessageBox::information(this, tr("Recherche"), tr("Maintenance trouvée."));
+        QMessageBox::information(this, tr("Recherche"), tr("Maintenance(s) trouvée(s)."));
     } else {
-        QMessageBox::warning(this, tr("Non trouvé"), tr("Aucune maintenance trouvée pour cet ID."));
+        QMessageBox::warning(this, tr("Non trouvé"), tr("Aucune maintenance trouvée pour les critères spécifiés."));
     }
 }
 
@@ -325,14 +371,14 @@ void MainWindow::on_pushButton_43_clicked()
 
 
 void MainWindow::on_acceuilcalmaint_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_15); // page_maintenance est la page principale de maintenance
+    ui->stackedWidget->setCurrentWidget(ui->page_15);
 }
 void MainWindow::on_acceuilcalmaint_2_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_15); // page_maintenance est la page principale de maintenance
+    ui->stackedWidget->setCurrentWidget(ui->page_15);
 }
 
 void MainWindow::on_acceuilcalmaint_3_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_15); // pa
+    ui->stackedWidget->setCurrentWidget(ui->page_15);
 
 }
 using std::int8_t;
@@ -417,16 +463,15 @@ QrSegment QrSegment::makeAlphanumeric(const char *text) {
             accumCount = 0;
         }
     }
-    if (accumCount > 0)  // 1 character remaining
+    if (accumCount > 0)
         bb.appendBits(static_cast<uint32_t>(accumData), 6);
     return QrSegment(Mode::ALPHANUMERIC, charCount, std::move(bb));
 }
 
 
 vector<QrSegment> QrSegment::makeSegments(const char *text) {
-    // Select the most efficient segment encoding automatically
     vector<QrSegment> result;
-    if (*text == '\0');  // Leave result empty
+    if (*text == '\0');
     else if (isNumeric(text))
         result.push_back(makeNumeric(text));
     else if (isAlphanumeric(text))
@@ -618,7 +663,7 @@ QrCode::QrCode(int ver, Ecc ecl, const vector<uint8_t> &dataCodewords, int msk) 
     drawFunctionPatterns();
     const vector<uint8_t> allCodewords = addEccAndInterleave(dataCodewords);
     drawCodewords(allCodewords);
-    if (msk == -1) {  // Automatically choose best mask
+    if (msk == -1) {
         long minPenalty = LONG_MAX;
         for (int i = 0; i < 8; i++) {
             applyMask(i);
@@ -666,42 +711,31 @@ bool QrCode::getModule(int x, int y) const {
 
 
 void QrCode::drawFunctionPatterns() {
-    // Draw horizontal and vertical timing patterns
     for (int i = 0; i < size; i++) {
         setFunctionModule(6, i, i % 2 == 0);
         setFunctionModule(i, 6, i % 2 == 0);
     }
-
-    // Draw 3 finder patterns (all corners except bottom right; overwrites some timing modules)
     drawFinderPattern(3, 3);
     drawFinderPattern(size - 4, 3);
     drawFinderPattern(3, size - 4);
-
-    // Draw numerous alignment patterns
     const vector<int> alignPatPos = getAlignmentPatternPositions();
     size_t numAlign = alignPatPos.size();
     for (size_t i = 0; i < numAlign; i++) {
         for (size_t j = 0; j < numAlign; j++) {
-            // Don't draw on the three finder corners
             if (!((i == 0 && j == 0) || (i == 0 && j == numAlign - 1) || (i == numAlign - 1 && j == 0)))
                 drawAlignmentPattern(alignPatPos.at(i), alignPatPos.at(j));
         }
     }
-
-    // Draw configuration data
-    drawFormatBits(0);  // Dummy mask value; overwritten later in the constructor
+    drawFormatBits(0);
     drawVersion();
 }
 void QrCode::drawFormatBits(int msk) {
-    // Calculate error correction code and pack bits
-    int data = getFormatBits(errorCorrectionLevel) << 3 | msk;  // errCorrLvl is uint2, msk is uint3
+    int data = getFormatBits(errorCorrectionLevel) << 3 | msk;
     int rem = data;
     for (int i = 0; i < 10; i++)
         rem = (rem << 1) ^ ((rem >> 9) * 0x537);
-    int bits = (data << 10 | rem) ^ 0x5412;  // uint15
+    int bits = (data << 10 | rem) ^ 0x5412;
     assert(bits >> 15 == 0);
-
-    // Draw first copy
     for (int i = 0; i <= 5; i++)
         setFunctionModule(8, i, getBit(bits, i));
     setFunctionModule(8, 7, getBit(bits, 6));
@@ -709,26 +743,20 @@ void QrCode::drawFormatBits(int msk) {
     setFunctionModule(7, 8, getBit(bits, 8));
     for (int i = 9; i < 15; i++)
         setFunctionModule(14 - i, 8, getBit(bits, i));
-
-    // Draw second copy
     for (int i = 0; i < 8; i++)
         setFunctionModule(size - 1 - i, 8, getBit(bits, i));
     for (int i = 8; i < 15; i++)
         setFunctionModule(8, size - 15 + i, getBit(bits, i));
-    setFunctionModule(8, size - 8, true);  // Always dark
+    setFunctionModule(8, size - 8, true);
 }
 void QrCode::drawVersion() {
     if (version < 7)
         return;
-
-    // Calculate error correction code and pack bits
-    int rem = version;  // version is uint6, in the range [7, 40]
+    int rem = version;
     for (int i = 0; i < 12; i++)
         rem = (rem << 1) ^ ((rem >> 11) * 0x1F25);
-    long bits = static_cast<long>(version) << 12 | rem;  // uint18
+    long bits = static_cast<long>(version) << 12 | rem;
     assert(bits >> 18 == 0);
-
-    // Draw two copies
     for (int i = 0; i < 18; i++) {
         bool bit = getBit(bits, i);
         int a = size - 11 + i % 3;
@@ -742,7 +770,7 @@ void QrCode::drawVersion() {
 void QrCode::drawFinderPattern(int x, int y) {
     for (int dy = -4; dy <= 4; dy++) {
         for (int dx = -4; dx <= 4; dx++) {
-            int dist = std::max(std::abs(dx), std::abs(dy));  // Chebyshev/infinity norm
+            int dist = std::max(std::abs(dx), std::abs(dy));
             int xx = x + dx, yy = y + dy;
             if (0 <= xx && xx < size && 0 <= yy && yy < size)
                 setFunctionModule(xx, yy, dist != 2 && dist != 4);
@@ -792,7 +820,6 @@ vector<uint8_t> QrCode::addEccAndInterleave(const vector<uint8_t> &data) const {
     vector<uint8_t> result;
     for (size_t i = 0; i < blocks.at(0).size(); i++) {
         for (size_t j = 0; j < blocks.size(); j++) {
-            // Skip the padding byte in short blocks
             if (i != static_cast<unsigned int>(shortBlockLen - blockEccLen) || j >= static_cast<unsigned int>(numShortBlocks))
                 result.push_back(blocks.at(j).at(i));
         }
@@ -804,15 +831,15 @@ void QrCode::drawCodewords(const vector<uint8_t> &data) {
     if (data.size() != static_cast<unsigned int>(getNumRawDataModules(version) / 8))
         throw std::invalid_argument("Invalid argument");
 
-    size_t i = 0;  // Bit index into the data
-    for (int right = size - 1; right >= 1; right -= 2) {  // Index of right column in each column pair
+    size_t i = 0;
+    for (int right = size - 1; right >= 1; right -= 2) {
         if (right == 6)
             right = 5;
-        for (int vert = 0; vert < size; vert++) {  // Vertical counter
+        for (int vert = 0; vert < size; vert++) {
             for (int j = 0; j < 2; j++) {
-                size_t x = static_cast<size_t>(right - j);  // Actual x coordinate
+                size_t x = static_cast<size_t>(right - j);
                 bool upward = ((right + 1) & 2) == 0;
-                size_t y = static_cast<size_t>(upward ? size - 1 - vert : vert);  // Actual y coordinate
+                size_t y = static_cast<size_t>(upward ? size - 1 - vert : vert);
                 if (!isFunction.at(y).at(x) && i < data.size() * 8) {
                     modules.at(y).at(x) = getBit(data.at(i >> 3), 7 - static_cast<int>(i & 7));
                     i++;
@@ -1115,8 +1142,8 @@ void MainWindow::on_pushButton_stat_clicked()
 
     query.first();
 
-    int yAxisHeight = maxBarHeight + 50; // Hauteur de l'axe Y avec un espace en haut
-    int xAxisLength = query.size() * (barWidth + spacing); // Longueur de l'axe X
+    int yAxisHeight = maxBarHeight + 50;
+    int xAxisLength = query.size() * (barWidth + spacing);
 
     scene->addLine(100, 0, 100, -yAxisHeight, QPen(Qt::black));
     scene->addLine(100, 0, 800 + xAxisLength, 0, QPen(Qt::black));
@@ -1135,13 +1162,13 @@ void MainWindow::on_pushButton_stat_clicked()
 
         QColor barColor;
         if (etat == "En attente") {
-            barColor = Qt::gray;  // Gris pour En attente
+            barColor = Qt::gray;
         } else if (etat == "En cours") {
-            barColor = Qt::darkBlue;  // Bleu foncé pour En cours
+            barColor = Qt::darkBlue;
         } else if (etat == "Terminé") {
-            barColor = QColor(238, 130, 238);  // Violet clair pour Terminé
+            barColor = QColor(238, 130, 238);
         } else {
-            barColor = Qt::black;  // Par défaut, noir pour les autres états
+            barColor = Qt::black;
         }
         QGraphicsRectItem *bar = scene->addRect(x, -barHeight, barWidth, barHeight, QPen(Qt::black), QBrush(barColor));
         bar->setPos(x + 2, 0);
@@ -1157,6 +1184,9 @@ void MainWindow::on_pushButton_stat_clicked()
     qDebug() << "Graphique de maintenance généré avec succès.";
 }
 
+
+
+
 void MainWindow::afficherMaintenancesPourDate(const QDate &date) {
     if (!date.isValid()) {
         QMessageBox::warning(this, "Erreur", "Date invalide sélectionnée.");
@@ -1168,7 +1198,7 @@ void MainWindow::afficherMaintenancesPourDate(const QDate &date) {
     QSqlQuery query;
     query.prepare(
         "SELECT ID_MAINTENANCE, ID_EMPLOYE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, "
-        "       DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE "
+        "       DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE, DATE_RAPPEL, DESCRIPTION_RAPPEL    "
         "FROM MAINTENANCES "
         "WHERE TRUNC(DATE_DEBUT) = TO_DATE(:selectedDate, 'YYYY-MM-DD')"
         );
@@ -1179,7 +1209,7 @@ void MainWindow::afficherMaintenancesPourDate(const QDate &date) {
         return;
     }
 
-    ui->commandesTableWidget->setRowCount(0); // Réinitialiser le tableau
+    ui->commandesTableWidget->setRowCount(0);
     int row = 0;
 
     while (query.next()) {
@@ -1209,43 +1239,150 @@ void MainWindow::afficherMaintenancesPourDate(const QDate &date) {
     if (row == 0) {
         QMessageBox::information(this, "Information", "Aucune maintenance trouvée pour la date sélectionnée.");
     }
+
+
+
+
 }
 
 void MainWindow::chargerMaintenancesDansCalendrier() {
-    QSqlQuery query;
-    query.prepare(
-        "SELECT DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE "
-        "FROM MAINTENANCES"
-        );
+    QList<QPair<QDate, QString>> maintenances = {
+        { QDate(2024, 11, 26), "En attente" },
+        { QDate(2024, 11, 27), "En cours" },
+        { QDate(2024, 11, 28), "Terminé" },
+        { QDate(2024, 11, 29), "En attente" },
+        { QDate(2024, 01, 01), "En cours" },
+        { QDate(2024, 01, 03), "En attente" },
+        { QDate(2024, 01, 07), "En cours" },
+        { QDate(2024, 01, 04), "En attente" },
+        { QDate(2024, 01, 11), "En cours" },
+        { QDate(2024,01, 12), "En attente" },
+    };
 
-    if (!query.exec()) {
-        qDebug() << "Erreur lors du chargement des maintenances dans le calendrier : " << query.lastError().text();
+    if (!ui->calendarWidget) {
+        qDebug() << "Erreur : widget de calendrier non initialisé.";
         return;
     }
 
-    QMap<QDate, QTextCharFormat> getHighlightedDates(QAbstractItemModel *model);
-    while (query.next()) {
-        QDate DATE_DEBUT= query.value("DATE_DEBUT").toDate();
-        QDate DATE_FIN = query.value("DATE_FIN").toDate();
-        QString ETAT_MAINTENANCE = query.value("ETAT_MAINTENANCE").toString();
+    QDate firstVisibleDate = ui->calendarWidget->selectedDate().addMonths(-1);
+    QDate lastVisibleDate = ui->calendarWidget->selectedDate().addMonths(1);
 
-        QTextCharFormat format;
-        if (ETAT_MAINTENANCE == "En attente") {
-            format.setBackground(Qt::yellow);
-        } else if (ETAT_MAINTENANCE== "En cours") {
-            format.setBackground(Qt::blue);
-        } else if (ETAT_MAINTENANCE == "Terminé") {
-            format.setBackground(Qt::green);
+    for (QDate date = firstVisibleDate; date <= lastVisibleDate; date = date.addDays(1)) {
+        ui->calendarWidget->setDateTextFormat(date, QTextCharFormat());
+    }
+
+    for (const auto& maintenance : maintenances) {
+        QDate DATE_DEBUT = maintenance.first; // Récupère la date depuis la paire
+        QString ETAT_MAINTENANCE = maintenance.second;
+
+        if (!DATE_DEBUT.isValid()) {
+            qDebug() << "Erreur : DATE_DEBUT invalide pour " << ETAT_MAINTENANCE;
+            continue;
         }
 
-        // Appliquer le format à toutes les dates de la plage
-        for (QDate date = DATE_DEBUT; date <= DATE_FIN; date = date.addDays(1)) {
-            ui->calendarWidget->setDateTextFormat(date, format);
+        // Définir un format pour chaque état
+        QTextCharFormat format;
+        if (ETAT_MAINTENANCE == "En attente") {
+            format.setBackground(Qt::blue);
+        } else if (ETAT_MAINTENANCE == "En cours") {
+            format.setBackground(QColorConstants::Svg::violet);
+        } else if (ETAT_MAINTENANCE == "Terminé") {
+            format.setBackground(Qt::red);
+        } else {
+            qDebug() << "Etat inconnu : " << ETAT_MAINTENANCE;
+        }
+
+        ui->calendarWidget->setDateTextFormat(DATE_DEBUT, format);
+        qDebug() << "Format appliqué : Date = " << DATE_DEBUT.toString("yyyy-MM-dd")
+                 << ", Couleur = " << format.background().color();
+    }
+}
+
+
+
+
+
+void MainWindow::ajouterOuModifierRappel(int idMaintenance) {
+    QDialog dialog(this);
+    dialog.setWindowTitle("Définir un rappel");
+
+    QVBoxLayout layout(&dialog);
+    QLabel label("Veuillez sélectionner la date et l'heure du rappel :", &dialog);
+    QDateTimeEdit dateTimeEdit(&dialog);
+    dateTimeEdit.setCalendarPopup(true);
+    dateTimeEdit.setDateTime(QDateTime::currentDateTime());  // Initialiser avec l'heure actuelle
+
+    QPushButton okButton("OK", &dialog);
+    QPushButton cancelButton("Annuler", &dialog);
+
+    QHBoxLayout buttonLayout;
+    buttonLayout.addWidget(&okButton);
+    buttonLayout.addWidget(&cancelButton);
+
+    layout.addWidget(&label);
+    layout.addWidget(&dateTimeEdit);
+    layout.addLayout(&buttonLayout);
+
+    connect(&okButton, &QPushButton::clicked, &dialog, &QDialog::accept);
+    connect(&cancelButton, &QPushButton::clicked, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        QDateTime rappelDate = dateTimeEdit.dateTime();
+        QString descriptionRappel = QInputDialog::getText(this, "Définir un rappel",
+                                                          "Entrez la description du rappel:");
+
+        if (rappelDate.isValid() && !descriptionRappel.isEmpty()) {
+            QSqlQuery query;
+            query.prepare("UPDATE MAINTENANCES SET DATE_RAPPEL = :dateRappel, DESCRIPTION_RAPPEL = :description WHERE ID_MAINTENANCE = :idMaintenance");
+            query.bindValue(":dateRappel", rappelDate.toString("yyyy-MM-dd hh:mm:ss"));
+            query.bindValue(":description", descriptionRappel);
+            query.bindValue(":idMaintenance", idMaintenance);
+
+            if (!query.exec()) {
+                QMessageBox::warning(this, "Erreur", "Impossible de mettre à jour le rappel : " + query.lastError().text());
+                return;
+            }
+            chargerMaintenancesDansCalendrier();
+            chargerRappelsDansTableau();
+
+            ui->labelMessage->setText("Rappel ajouté avec succès!");
+        } else {
+            QMessageBox::warning(this, "Erreur", "Veuillez entrer une date et une description valides pour le rappel.");
         }
     }
 }
-void MainWindow::configurerMiseAJourAutomatique() {
-    timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MainWindow::chargerMaintenancesDansCalendrier);
-    timer->start(3600000);  // Toutes les heures
+void MainWindow::chargerRappelsDansTableau() {
+    QSqlQuery query;
+    query.prepare("SELECT ID_MAINTENANCE, DESCRIPTION_RAPPEL, DATE_RAPPEL FROM MAINTENANCES WHERE DATE_RAPPEL IS NOT NULL");
+
+    if (!query.exec()) {
+        qDebug() << "Erreur lors de la récupération des rappels :" << query.lastError().text();
+        return;
+    }
+
+    int row = 0;
+    ui->tableRappels->setRowCount(0); // Réinitialiser les lignes avant de les remplir.
+
+    while (query.next()) {
+        QString idMaintenance = query.value("ID_MAINTENANCE").toString();
+        QString descriptionRappel = query.value("DESCRIPTION_RAPPEL").toString();
+        QDateTime dateRappel = query.value("DATE_RAPPEL").toDateTime();
+
+        ui->tableRappels->insertRow(row);
+        ui->tableRappels->setItem(row, 0, new QTableWidgetItem(idMaintenance));
+        ui->tableRappels->setItem(row, 1, new QTableWidgetItem(dateRappel.toString("yyyy-MM-dd hh:mm:ss")));
+        ui->tableRappels->setItem(row, 2, new QTableWidgetItem(descriptionRappel));
+        row++;
+    }
+}
+void MainWindow::afficherRappelsPourDate(const QDate &date) {
+    QSqlQueryModel *model = new QSqlQueryModel(this);
+    model->setQuery("SELECT id_maintenance, description_rappel ,date_rappel, "
+                    "FROM tableRappels WHERE date_rappel = '" + date.toString("yyyy-MM-dd") + "'");
+
+    if (model->lastError().isValid()) {
+        qDebug() << "Erreur lors du filtrage des rappels :" << model->lastError().text();
+    }
+
+    ui->tableView_2->setModel(model);
 }
