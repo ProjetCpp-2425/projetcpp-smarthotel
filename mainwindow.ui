@@ -261,7 +261,7 @@ font: 700 10pt &quot;Segoe UI&quot;;</string>
 background-color: rgb(255, 255, 255);</string>
     </property>
     <property name="currentIndex">
-     <number>14</number>
+     <number>11</number>
     </property>
     <widget class="QWidget" name="page_61">
      <widget class="QLineEdit" name="lineEdit_nom">
@@ -47647,8 +47647,8 @@ border-radius:20px;</string>
      <widget class="QPushButton" name="acceuilcalmaint">
       <property name="geometry">
        <rect>
-        <x>1180</x>
-        <y>100</y>
+        <x>1130</x>
+        <y>110</y>
         <width>181</width>
         <height>41</height>
        </rect>
@@ -47769,7 +47769,7 @@ font: 700 10pt &quot;Segoe UI&quot;;</string>
        <rect>
         <x>240</x>
         <y>340</y>
-        <width>1141</width>
+        <width>1031</width>
         <height>111</height>
        </rect>
       </property>

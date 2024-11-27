@@ -39,23 +39,17 @@ private slots:
     void on_pushButton_43_clicked();
     void on_comboBox_34_currentTextChanged(const QString &priorite);
     void on_pushButton_57_clicked();
-    //void on_calendar_date_clicked(const QDate &date);
     void on_acceuilcalmaint_clicked();
     void on_acceuilcalmaint_2_clicked();
-    //void on_pushButton_42_clicked();
     void on_pushButton_111_clicked();
     void on_acceuilcalmaint_3_clicked();
     void on_pushButton_stat2_clicked();
-    //void computeMaintenanceStats();
-    //void on_pushButton_44_clicked();
     void on_pushButton_stat_clicked();
     void chargerMaintenancesDansCalendrier();
-    //void verifierRappels();  // Vérifie les rappels programmés
-    //void afficherNotification(const QString &titre, const QString &message); // Affiche une notification
-    void chargerRappelsDansTableau();    // QDateTime obtenirDateTime(const QDateTime &dateParDefaut);
-    void ajouterOuModifierRappel(int idMaintenance); // Ajoute ou modifie
+
+    void chargerRappelsDansTableau();
+    void ajouterOuModifierRappel(int idMaintenance);
     void afficherRappelsPourDate(const QDate &date);
-    //void afficherMaintenancesPourDate(const QDate &date, QTableWidget *table);
 private:
     Ui::MainWindow *ui;
     Maintenance Mtmp;
@@ -64,23 +58,7 @@ private:
     QTimer *timer;
     QTimer *timerRappels;
     QTableWidget *tableRappels;
-
-    // Pour la mise à jour automatique
-   // QList<Maintenance> obtenirMaintenancesPourDate(const QDate &date);
-
-    //void setupComboBoxes();                    // Initialise les ComboBox
-   // void updateComboBoxes();                   // Met à jour les jours dans la ComboBoxDay
-    //void updateCalendar(int year, int month);  // Met à jour la vue du calendrier
-    //void highlightDatesFromTableView();          // Colore les dates dans le calendrier
-   // void addOrUpdateMaintenance(QDate date, const QString &state); // Insère ou met à jour une maintenance
-
-    //void on_comboBoxYear_currentIndexChanged(int index);
-    //void on_comboBoxMonth_currentIndexChanged(int index);
-    //void on_comboBoxDay_currentIndexChanged(int index);
-    //void updateCalendarFromComboBoxes(); // Synchronise les ComboBox avec le calendrier
-    //void testStaticHighlight();
     void afficherMaintenancesPourDate(const QDate &date);
-    //void mettreAJourStatutsMaintenances();
     void configurerMiseAJourAutomatique();
 
 
