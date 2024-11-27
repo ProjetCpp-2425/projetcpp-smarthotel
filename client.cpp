@@ -1,5 +1,5 @@
 #include "Client.h"
-#include<QString>
+#include <QString>
 #include "mainwindow.h"
 #include "QSqlQuery"
 #include<QSqlQueryModel>
@@ -199,7 +199,7 @@ QSqlQueryModel* Client::his_reservation()
 {
     QSqlQuery query;
 
-    query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrivé, r.date_depart, "
+    query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrive, r.date_depart, "
                   "c.ID_client, c.nom, c.prenom, c.demande_special "
                   "FROM RESERVATIONS r "
                   "LEFT JOIN CLIENTS c ON r.ID_client = c.ID_client");

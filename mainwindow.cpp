@@ -5,17 +5,39 @@
 #include <QPdfWriter>
 #include <QFileDialog>
 #include<QSqlError>
-
-
-
-
-
 #include <QSqlTableModel>
 #include<QPrinter>
 #include <QStandardItemModel>
 #include<QSqlError>
 #include <QLayoutItem>
 #include <QLayout>
+
+
+
+#include "reservation.h"
+#include <QDebug>
+#include <QVector>
+#include <QString>
+#include <QStandardPaths>
+#include <QTcpSocket>
+#include <QHttpMultiPart>
+#include <QHttpPart>
+#include <QTextStream>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QUrl>
+#include <QRandomGenerator>
+#include <QSslSocket>
+#include <QUrlQuery>
+#include <QtCore>
+#include <QByteArray>
+#include <QUrlQuery>
+#include <QDebug>
+#include "pdf.h"
+#include "email.h"
 
 
 
@@ -31,10 +53,29 @@ MainWindow::MainWindow(QWidget *parent)
     afficherSalaireEtMasseSalariale();
     ui->tableClient->setModel(cl.afficher());
     ui->tabemp->setModel(employe.afficher());
+    ui->tabres->setModel(reservation.afficher());
     ui->modifier->setVisible(false);
     ui->supprimer->setVisible(false);
 
     ui->mdp->setEchoMode(QLineEdit::Password);
+
+    searchLineEdit = ui->rechercheres;
+    idReservationLineEdit = ui->idr;
+    dateReservationDateEdit = ui->dateR;
+    dateArriveDateEdit = ui->datear;
+    dateDepartDateEdit = ui->datedr;
+    typeChambreComboBox = ui->typer;
+    statutReservationComboBox = ui->statutr;
+    modePaiementComboBox = ui->moder;
+    montantLineEdit = ui->montantr;
+
+
+    validerButton = ui->validerr;
+    supprimerButton = ui->supprimerreservation;
+    modifierButton = ui->modifierreservation;
+    exporterPdf=ui->pdfr;
+
+
 
 
 
@@ -59,6 +100,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->client_fidele, &QPushButton::clicked, this, &MainWindow::on_client_fidele_clicked );
 
 
+    connect(validerButton, &QPushButton::clicked, this, &MainWindow::on_validerButtonreservation_clicked);
+    connect(supprimerButton, &QPushButton::clicked, this, &MainWindow::on_supprimerButtonreservation_clicked);
+    connect(modifierButton, &QPushButton::clicked, this, &MainWindow::on_modifierButtonreservation_clicked);
+    connect(exporterPdf, &QPushButton::clicked, this, &MainWindow::on_exporterreservation_clicked);
+    connect(ui->trires, SIGNAL(currentIndexChanged(int)), this, SLOT(on_triComboBox_currentIndexChanged(int)));
+    connect(ui->boutonstatres, &QPushButton::clicked, this, &MainWindow::afficherStatistiquesTypeChambre);
+    networkManager = new QNetworkAccessManager(this);
+    connect(ui->mail, &QPushButton::clicked, this, &MainWindow::on_email_clicked);
+    connect(ui->envoi, &QPushButton::clicked, this, &MainWindow::on_sendVerificationButton_clicked);
+    connect(ui->con,&QPushButton::clicked,this,&MainWindow::on_verifyCodeButton_clicked);
+
+
 
     connect(ui->rechercher, &QPushButton::clicked, this, &MainWindow::on_rechercher_clicked);
     connect(ui->recherche, &QLineEdit::textChanged, this, &MainWindow::onRechercheTextChanged);
@@ -79,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->seconnecter1, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
     connect(ui->mdpoublie, &QPushButton::clicked, this, &MainWindow::changerDePagemdp);
-    connect(ui->envoi, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
+    connect(ui->con, &QPushButton::clicked, this, &MainWindow::changerDePageclient);
     connect(ui->sedeconnecter1, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
     connect(ui->sedeconnecter2, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
     connect(ui->sedeconnecter3, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
@@ -206,12 +259,15 @@ void MainWindow::changerDePagestatclient()
     QPieSeries *series = new QPieSeries();
     QVector<QColor> colors =
         {
-            QColor(0, 0, 80),
-            QColor(38, 0, 128),
-            QColor(76, 0, 179),
-            QColor(102, 51, 204),
-            QColor(140, 102, 230),
-            QColor(179, 170, 255),
+             QColor(128, 0, 128),
+             QColor(153, 50, 204),
+             QColor(186, 85, 211),
+             QColor(218, 112, 214),
+             QColor(230, 230, 250),
+             QColor(138, 43, 226),
+             QColor(199, 21, 133),
+             QColor(148, 0, 211),
+             QColor(221, 160, 221)
         };
     int colorIndex = 0;
     for (auto it = statistiques.begin(); it != statistiques.end(); ++it)
@@ -708,6 +764,7 @@ void MainWindow::afficherStatistiquesPostes() {
     QChart *chart = new QChart();
     chart->addSeries(series);
     chart->setTitle("Statistiques des postes");
+    chart->setAnimationOptions(QChart::AllAnimations);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
@@ -1273,7 +1330,7 @@ void MainWindow::on_chercher_2_clicked()
 
 
         // Créer la requête SQL avec paramètre
-        query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrivé, r.date_depart, "
+        query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrive, r.date_depart, "
                       "c.ID_client, c.nom, c.prenom, c.demande_special "
                       "FROM RESERVATIONS r "
                       "LEFT JOIN CLIENTS c ON r.ID_client = c.ID_client "
@@ -1285,7 +1342,7 @@ void MainWindow::on_chercher_2_clicked()
     }
     else if (critere == "nom")
     {
-        query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrivé, r.date_depart, "
+        query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrive, r.date_depart, "
                       "c.ID_client, c.nom, c.prenom, c.demande_special "
                       "FROM RESERVATIONS r "
                       "LEFT JOIN CLIENTS c ON r.ID_client = c.ID_client "
@@ -1325,7 +1382,7 @@ void MainWindow::on_retour_clicked()
     QSqlQuery query;
 
     // Requête SQL mise à jour pour récupérer les colonnes supplémentaires
-    query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrivé, r.date_depart, "
+    query.prepare("SELECT r.ID_reservation, r.date_reservation, r.date_arrive, r.date_depart, "
                   "c.ID_client, c.nom, c.prenom, c.demande_special "
                   "FROM RESERVATIONS r "
                   "LEFT JOIN CLIENTS c ON r.ID_client = c.ID_client");
@@ -1360,4 +1417,342 @@ void MainWindow::on_retour_clicked()
         QMessageBox::information(this, "Aucune donnée", "Aucune réservation trouvée.");
     }
 }
+void MainWindow::on_validerButtonreservation_clicked()
+{
+    int idReservation = idReservationLineEdit->text().toInt();
+    QDate dateReservation = dateReservationDateEdit->date();
+    QDate dateArrive = dateArriveDateEdit->date();
+    QDate dateDepart = dateDepartDateEdit->date();
+    QString typeChambre = typeChambreComboBox->currentText();
+    QString statutReservation = statutReservationComboBox->currentText();
+    QString modePaiement = modePaiementComboBox->currentText();
+    float montant = montantLineEdit->text().toFloat();
+    int idclient = ui->idclientr->text().toInt();
 
+    Reservation reservation(idReservation, dateReservation, dateArrive, dateDepart,
+                            typeChambre, statutReservation, modePaiement, montant,idclient);
+
+    if (reservation.ajouter()) {
+        ui->tabres->setModel(reservation.afficher());
+        reservations.append(reservation);  // Ajout au vecteur de réservations
+        QMessageBox::information(this, "Ajout réussi", "La réservation a été ajoutée avec succès.");
+    } else {
+        QMessageBox::warning(this, "Erreur", "Échec de l'ajout de la réservation.");
+    }
+}
+
+void MainWindow::on_supprimerButtonreservation_clicked()
+{
+    int idReservation = searchLineEdit->text().toInt();
+
+
+    if (idReservation == 0) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer un ID de réservation valide.");
+        return;
+    }
+
+
+    Reservation reservation;
+    if (reservation.supprimer(idReservation)) {
+        ui->tabres->setModel(reservation.afficher());
+        QMessageBox::information(this, "Suppression réussie", "La réservation a été supprimée avec succès.");
+    } else {
+        QMessageBox::warning(this, "Erreur", "Échec de la suppression de la réservation. Vérifiez l'ID.");
+    }
+}
+
+void MainWindow::on_modifierButtonreservation_clicked()
+{
+
+    int idReservation = idReservationLineEdit->text().toInt();
+    QDate dateReservation = dateReservationDateEdit->date();
+    QDate dateArrive = dateArriveDateEdit->date();
+    QDate dateDepart = dateDepartDateEdit->date();
+    QString typeChambre = typeChambreComboBox->currentText();
+    QString statutReservation = statutReservationComboBox->currentText();
+    QString modePaiement = modePaiementComboBox->currentText();
+    float montant = montantLineEdit->text().toFloat();
+    int idclient = ui->idclientr->text().toInt();
+
+
+    Reservation reservation(idReservation, dateReservation, dateArrive, dateDepart,
+                            typeChambre, statutReservation, modePaiement, montant,idclient);
+
+
+    if (reservation.modifier(idReservation, dateReservation, dateArrive, dateDepart,
+                             typeChambre, statutReservation, modePaiement, montant,idclient)) {
+        ui->tabres->setModel(reservation.afficher());
+        QMessageBox::information(this, "Modification réussie", "La réservation a été modifiée avec succès.");
+    } else {
+        QMessageBox::warning(this, "Erreur", "Échec de la modification de la réservation.");
+    }
+}
+void MainWindow::afficherres() {
+
+    Reservation reservation;
+
+
+    QSqlQueryModel *model = reservation.afficher();
+
+
+    if (model) {
+
+        ui->tabres->setModel(model);
+    } else {
+        qDebug() << "Erreur : Le modèle de données n'a pas pu être créé.";
+    }
+}
+void MainWindow::on_searchLineEdit_textChanged(const QString &text)
+{
+    int idReservation = text.toInt();
+
+    if (idReservation != 0) {
+        Reservation reservation;
+        if (reservation.rechercher(idReservation)) {
+
+            idReservationLineEdit->setText(QString::number(reservation.getIdReservation()));
+            dateReservationDateEdit->setDate(reservation.getDateReservation());
+            dateArriveDateEdit->setDate(reservation.getDateArrive());
+            dateDepartDateEdit->setDate(reservation.getDateDepart());
+            typeChambreComboBox->setCurrentText(reservation.getTypeChambre());
+            statutReservationComboBox->setCurrentText(reservation.getStatutReservation());
+            modePaiementComboBox->setCurrentText(reservation.getModePaiment());
+            montantLineEdit->setText(QString::number(reservation.getMontant()));
+        } else {
+            QMessageBox::warning(this, "Réservation non trouvée", "Aucune réservation trouvée pour cet ID.");
+        }
+    }
+}
+void MainWindow::on_exporterreservation_clicked() {
+
+    QString filePath = QFileDialog::getSaveFileName(this, "Enregistrer le PDF", QStandardPaths::writableLocation(QStandardPaths::DesktopLocation), "PDF Files (*.pdf)");
+    if (!filePath.isEmpty()) {
+        generateReservationTablePdf(reservations, filePath);
+    }
+}
+
+void MainWindow::on_triComboBox_currentIndexChanged(int index) {
+    QString orderBy;
+
+
+    if (index == 0) {
+        orderBy = "ID_RESERVATION";
+    } else if (index == 1) {
+        orderBy = "DATE_ARRIVE";
+    }
+
+
+    QSqlQueryModel *model = reservation.trierPar(orderBy);
+    if (model) {
+        ui->tabres->setModel(model);
+    } else {
+        qDebug() << "Erreur : Le tri n'a pas pu être appliqué.";
+    }
+}
+void MainWindow::afficherStatistiquesTypeChambre() {
+    QPieSeries *series = new QPieSeries();
+
+    // Exemple de données issues de la base
+    int simpleCount = 30, doubleCount = 50, suiteCount = 20;
+
+    series->append("Simple", simpleCount);
+    series->append("Double", doubleCount);
+    series->append("Suite", suiteCount);
+
+    for (auto slice : series->slices()) {
+        slice->setLabelVisible(true);
+        slice->setExploded();
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Répartition des Types de Chambres");
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+
+    chartView->setParent(ui->statres);
+    chartView->resize(ui->statres->size());
+    chartView->show();
+}
+void MainWindow::on_email_clicked()
+{
+
+    QString destinataire = "ramysnoussi@gmail.com";
+    QString objet = "Confirmation de votre réservation";
+    QString corps = "Bonjour Rami,\n\nVotre réservation est confirmée.\n\nMerci de votre confiance.";
+
+
+
+
+    envoyerEmail(destinataire, objet, corps);
+
+
+    QMessageBox::information(this, "Succès", "Email envoyé avec succès.");
+}
+void MainWindow::envoyerEmail(const QString& destinataire, const QString& sujet, const QString& message) {
+    QString smtpServer = "smtp.gmail.com";
+    int smtpPort = 465;
+    QString from = "aziz228nasri@gmail.com";
+    QString password = "paqd yivs yzja uyxa";
+
+    QString emailBody = "From: " + from + "\r\n" +
+                        "To: " + destinataire + "\r\n" +
+                        "Subject: " + sujet + "\r\n\r\n" +
+                        message;
+
+    QSslSocket socket;
+    socket.connectToHostEncrypted(smtpServer, smtpPort);
+    if (!socket.waitForConnected()) {
+        qDebug() << "Erreur de connexion au serveur SMTP:" << socket.errorString();
+        return;
+    }
+    qDebug() << "Connexion réussie au serveur SMTP.";
+
+
+    if (!socket.waitForReadyRead()) {
+        qDebug() << "Erreur lecture du serveur SMTP:" << socket.errorString();
+        return;
+    }
+    qDebug() << "Réponse du serveur:" << socket.readAll();
+
+
+    socket.write("EHLO localhost\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse EHLO:" << socket.readAll();
+
+    socket.write("AUTH LOGIN\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse AUTH LOGIN:" << socket.readAll();
+
+    socket.write(QByteArray().append(from.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse email (AUTH):" << socket.readAll();
+
+    socket.write(QByteArray().append(password.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse mot de passe (AUTH):" << socket.readAll();
+
+    socket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse MAIL FROM:" << socket.readAll();
+
+    socket.write("RCPT TO:<" + destinataire.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse RCPT TO:" << socket.readAll();
+
+    socket.write("DATA\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse DATA:" << socket.readAll();
+
+    socket.write(emailBody.toUtf8() + "\r\n.\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+    qDebug() << "Réponse après envoi du contenu:" << socket.readAll();
+
+    socket.write("QUIT\r\n");
+    socket.waitForBytesWritten();
+    qDebug() << "Fermeture de la connexion.";
+
+    socket.close();
+    qDebug() << "E-mail envoyé avec succès.";
+}
+void MainWindow::on_sendVerificationButton_clicked() {
+    QString userEmail = ui->email->text(); // Lire l'adresse e-mail saisie
+
+    if (userEmail.isEmpty() || !userEmail.contains("@")) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer une adresse e-mail valide.");
+        return;
+    }
+
+    // Générer un code aléatoire
+    QString verificationCode = QString::number(QRandomGenerator::global()->bounded(100000, 999999)); // Code à 6 chiffres
+
+    // Préparer le sujet et le contenu de l'e-mail
+    QString subject = "Votre code de vérification";
+    QString body = QString("Bonjour,\n\nVoici votre code de vérification : %1.\n\nMerci.").arg(verificationCode);
+
+    // Appeler la fonction pour envoyer l'e-mail
+    if (envoyerVerificationEmail(userEmail, subject, body)) {
+        QMessageBox::information(this, "Succès", "Un e-mail avec un code de vérification a été envoyé.");
+        qDebug() << "Code envoyé à l'utilisateur : " << verificationCode; // Affiche le code dans la console pour vérification (optionnel)
+    } else {
+        QMessageBox::warning(this, "Erreur", "Échec de l'envoi de l'e-mail.");
+    }
+}
+bool MainWindow::envoyerVerificationEmail(const QString &recipient, const QString &subject, const QString &body) {
+    QString smtpServer = "smtp.gmail.com";
+    int smtpPort = 465; // Port SSL
+    QString senderEmail = "aziz228nasri@gmail.com"; // Remplacez par votre adresse e-mail
+    QString appPassword = "paqd yivs yzja uyxa"; // Remplacez par votre mot de passe d'application
+
+    QSslSocket socket;
+    socket.connectToHostEncrypted(smtpServer, smtpPort);
+    if (!socket.waitForConnected(5000)) {
+        qDebug() << "Erreur de connexion au serveur SMTP:" << socket.errorString();
+        return false;
+    }
+
+    socket.write("EHLO localhost\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("AUTH LOGIN\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write(QByteArray().append(senderEmail.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write(QByteArray().append(appPassword.toUtf8()).toBase64() + "\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("MAIL FROM:<" + senderEmail.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("RCPT TO:<" + recipient.toUtf8() + ">\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("DATA\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    QString emailBody = "From: " + senderEmail + "\r\n"
+                                                 "To: " + recipient + "\r\n"
+                                      "Subject: " + subject + "\r\n\r\n" +
+                        body + "\r\n.\r\n";
+
+    socket.write(emailBody.toUtf8());
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.write("QUIT\r\n");
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
+
+    socket.close();
+    return true;
+}
+void MainWindow::on_verifyCodeButton_clicked() {
+    QString enteredCode = ui->code->text();
+
+    if (enteredCode == verificationCode) {
+        QMessageBox::information(this, "Vérification réussie", "Code vérifié avec succès !");
+        ui->stackedWidget->setCurrentIndex(3);
+    } else {
+        QMessageBox::information(this, "Vérification échoué", "Code échoué !");
+        ui->stackedWidget->setCurrentIndex(2);
+    }
+}

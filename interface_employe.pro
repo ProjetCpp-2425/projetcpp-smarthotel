@@ -5,6 +5,8 @@ QT       += core gui
 QT += charts
 QT += network
 QT +=printsupport
+QT += serialport
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,15 +19,21 @@ CONFIG += c++17
 SOURCES += \
     client.cpp \
     connection.cpp \
+    email.cpp \
     employe.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    pdf.cpp \
+    reservation.cpp
 
 HEADERS += \
     client.h \
     connection.h \
+    email.h \
     employe.h \
-    mainwindow.h
+    mainwindow.h \
+    pdf.h \
+    reservation.h
 
 FORMS += \
     mainwindow.ui

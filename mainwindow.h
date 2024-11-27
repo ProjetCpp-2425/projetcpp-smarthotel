@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include "employe.h"
 #include "client.h"
+#include "reservation.h"
 #include <QSqlQueryModel>
 #include <QLabel>
 #include <QMainWindow>
@@ -9,6 +10,14 @@
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
 #include <QVBoxLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QDateEdit>
+#include <QComboBox>
+#include <QNetworkAccessManager>
+#include <QRandomGenerator>
+#include <QNetworkReply>
+#include <QVector>
 
 
 
@@ -31,6 +40,27 @@ private:
     Employe employe;
      QLabel *masse;
      Client cl;
+     Reservation reservation;
+     QVector<Reservation> reservations;
+
+
+     QLineEdit *searchLineEdit;
+     QLineEdit *idReservationLineEdit;
+     QDateEdit *dateReservationDateEdit;
+     QDateEdit *dateArriveDateEdit;
+     QDateEdit *dateDepartDateEdit;
+     QComboBox *typeChambreComboBox;
+     QComboBox *statutReservationComboBox;
+     QComboBox *modePaiementComboBox;
+     QLineEdit *montantLineEdit;
+
+
+     QPushButton *validerButton;
+     QPushButton *supprimerButton;
+     QPushButton *modifierButton;
+     QPushButton *exporterPdf;
+     QNetworkAccessManager *networkManager;
+     QString verificationCode;
 private slots:
      void on_valider_clicked();
      void on_supprimer_clicked();
@@ -47,6 +77,23 @@ private slots:
 
      void on_retour_clicked();
      void calculerPointsEtDuree(QStandardItemModel* sqlModel);
+
+ private slots:
+    void on_validerButtonreservation_clicked();
+     void on_supprimerButtonreservation_clicked();
+     void on_modifierButtonreservation_clicked();
+    void afficherres();
+     void on_searchLineEdit_textChanged(const QString &text);
+     void on_exporterreservation_clicked();
+     void on_triComboBox_currentIndexChanged(int index);
+     void afficherStatistiquesTypeChambre();
+     void envoyerEmail(const QString& destinataire, const QString& sujet, const QString& message);
+     void on_email_clicked();
+     void on_sendVerificationButton_clicked();
+     bool envoyerVerificationEmail(const QString &recipient, const QString &subject, const QString &body);
+     void on_verifyCodeButton_clicked();
+
+
 
 
 
