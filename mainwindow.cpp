@@ -1287,7 +1287,7 @@ void MainWindow::chargerMaintenancesDansCalendrier() {
         } else if (ETAT_MAINTENANCE == "En cours") {
             format.setBackground(QColorConstants::Svg::violet);
         } else if (ETAT_MAINTENANCE == "Terminé") {
-            format.setBackground(Qt::red);
+            format.setBackground(Qt::gray);
         } else {
             qDebug() << "Etat inconnu : " << ETAT_MAINTENANCE;
         }
@@ -1383,6 +1383,6 @@ void MainWindow::afficherRappelsPourDate(const QDate &date) {
     if (model->lastError().isValid()) {
         qDebug() << "Erreur lors du filtrage des rappels :" << model->lastError().text();
     }
-
+    chargerMaintenancesDansCalendrier();
     ui->tableView_2->setModel(model);
 }

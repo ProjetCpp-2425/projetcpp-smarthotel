@@ -21075,7 +21075,7 @@ public:
 "border-radius:20px;"));
         acceuilcalmaint = new QPushButton(page_129);
         acceuilcalmaint->setObjectName("acceuilcalmaint");
-        acceuilcalmaint->setGeometry(QRect(1180, 100, 181, 41));
+        acceuilcalmaint->setGeometry(QRect(1130, 110, 181, 41));
         acceuilcalmaint->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
 "font: 700 11pt \"Segoe UI\";\n"
 "text-decoration: underline;\n"
@@ -21130,7 +21130,7 @@ public:
         if (commandesTableWidget->rowCount() < 2)
             commandesTableWidget->setRowCount(2);
         commandesTableWidget->setObjectName("commandesTableWidget");
-        commandesTableWidget->setGeometry(QRect(240, 340, 1141, 111));
+        commandesTableWidget->setGeometry(QRect(240, 340, 1031, 111));
         labelMessage = new QLabel(page_129);
         labelMessage->setObjectName("labelMessage");
         labelMessage->setGeometry(QRect(1040, 180, 291, 121));
@@ -22803,7 +22803,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidget->setCurrentIndex(14);
+        stackedWidget->setCurrentIndex(11);
         stackedWidget_3->setCurrentIndex(0);
         stackedWidget_4->setCurrentIndex(2);
         stackedWidget_5->setCurrentIndex(7);
