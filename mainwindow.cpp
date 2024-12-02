@@ -62,13 +62,17 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setStyleSheet("QLineEdit { color : white; }");
     connect(ui->pushButton_43,SIGNAL(clicked()), this, SLOT(on_pushButton_43_clicked()));
     connect(ui->pushButton_57, &QPushButton::clicked, this, &MainWindow::on_pushButton_57_clicked);
-    ui->tableWidget->setColumnCount(4);
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ID Maintenance"
-                                                             << "Date Début"
-                                                             << "Date Fin"
-                                                             << "État Maintenance");
-    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->commandesTableWidget->setColumnCount(8);
+    ui->commandesTableWidget->setHorizontalHeaderLabels(QStringList() << "ID Maintenance"
+                                                             << "ID Emplyé"
+                                                             << "Num Chambre"
+                                                            << "Type de maintenance"
+                                                            << "Date debut"
+                                                            << "Date Fin"
+                                                            << "etat maintenance"
+                                                             << "priorite");
+    ui->commandesTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->commandesTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(ui->pushButton_stat, &QPushButton::clicked, this, &MainWindow::on_pushButton_stat_clicked);
     ui->stackedWidget->setCurrentWidget(ui->page_395);  // Montrez la page contenant le graphique
     model = new QStandardItemModel(0, 3, this); // 3 columns (Date, State, Priority)
