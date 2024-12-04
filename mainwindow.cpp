@@ -45,10 +45,21 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    ,arduino()
+
 
 
 {
     ui->setupUi(this);
+    arduino.listAvailablePorts();
+    connect(ui->executer, &QPushButton::clicked, this, &MainWindow::on_validerClientButton_clicked);
+
+    if (arduino.connect() == 0) {
+        ui->statuslabel->setText("Arduino connecté sur le port " + arduino.getPortName());
+        connect(arduino.getSerialPort(), &QSerialPort::readyRead, this, &MainWindow::readArduinoData);
+    } else {
+        ui->statuslabel->setText("Erreur : Arduino non connecté.");
+    }
 
     afficherSalaireEtMasseSalariale();
     ui->tableClient->setModel(cl.afficher());
@@ -79,16 +90,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-
-
     connect(ui->sinscrire, &QPushButton::clicked, this, [this]() {
         if (inscrireEmploye()) {
             changerDePageconnexion();
         }
     });
     connect(ui->seconnecter2, &QPushButton::clicked, this, &MainWindow::on_connexionButton_clicked);
-
-
     connect(ui->validerclient, &QPushButton::clicked, this, &MainWindow::on_valider_clicked);
     connect(ui->supprimerclient, &QPushButton::clicked, this, &MainWindow::on_supprimer_clicked);
     connect(ui->modifierclient, &QPushButton::clicked, this, &MainWindow::on_modifierclient_clicked);
@@ -208,6 +215,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    arduino.disconnect();
     delete ui;
 }
 void MainWindow::changerDePageconnexion()
@@ -1550,28 +1558,41 @@ void MainWindow::on_triComboBox_currentIndexChanged(int index) {
     }
 }
 void MainWindow::afficherStatistiquesTypeChambre() {
-    QPieSeries *series = new QPieSeries();
+    // Requête SQL pour obtenir les statistiques des types de chambres
+    QSqlQuery query;
+    query.prepare("SELECT TYPE_CHAMBRE, COUNT(*) as Nombre FROM RESERVATIONS GROUP BY TYPE_CHAMBRE");
 
-    // Exemple de données issues de la base
-    int simpleCount = 30, doubleCount = 50, suiteCount = 20;
-
-    series->append("Simple", simpleCount);
-    series->append("Double", doubleCount);
-    series->append("Suite", suiteCount);
-
-    for (auto slice : series->slices()) {
-        slice->setLabelVisible(true);
-        slice->setExploded();
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Impossible de récupérer les données de la base de données : " + query.lastError().text());
+        return;
     }
 
+    // Création d'une série pour le graphique
+    QPieSeries *series = new QPieSeries();
+
+    // Parcourir les résultats de la requête et remplir la série
+    while (query.next()) {
+        QString typeChambre = query.value("TYPE_CHAMBRE").toString();
+        int count = query.value("Nombre").toInt();
+        series->append(typeChambre, count);
+    }
+
+    // Configurer les tranches du graphique
+    for (auto slice : series->slices()) {
+        slice->setLabelVisible(true); // Rendre les étiquettes visibles
+        slice->setExploded(false);   // Vous pouvez ajuster cette valeur si vous voulez exploser des tranches
+    }
+
+    // Créer et configurer le graphique
     QChart *chart = new QChart();
     chart->addSeries(series);
     chart->setTitle("Répartition des Types de Chambres");
 
+    // Créer et afficher le graphique dans le `QWidget` nommé `omar`
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
 
-
+    // Ajuster la taille et afficher dans le conteneur `omar`
     chartView->setParent(ui->statres);
     chartView->resize(ui->statres->size());
     chartView->show();
@@ -1756,3 +1777,143 @@ void MainWindow::on_verifyCodeButton_clicked() {
         ui->stackedWidget->setCurrentIndex(2);
     }
 }
+void MainWindow::on_sendButton_clicked() {
+    int id = ui->lineEdit_chercher->text().toInt(); // Récupérer l'ID depuis le champ recherche
+
+    if (id > 0) { // Vérification que l'ID est valide
+        if (!QSqlDatabase::database().isOpen()) {
+            qDebug() << "Erreur : Connexion à la base de données fermée.";
+            ui->statuslabel->setText("Erreur : Connexion à la base de données.");
+            return;
+        }
+
+        QSqlQuery query;
+        query.prepare("SELECT nom, prenom FROM clients WHERE ID_client = :id");
+        query.bindValue(":id", id);
+
+        if (query.exec() && query.next()) {
+            QString nom = query.value(0).toString();
+            QString prenom = query.value(1).toString();
+
+            QString data = "NOM:" + nom + ";" + prenom + "\n";
+            if (arduino.sendData(data)) {
+                ui->statuslabel->setText("Données envoyées : " + data);
+            } else {
+                ui->statuslabel->setText("Erreur : Échec de l'envoi des données.");
+            }
+        } else {
+            // ID inexistant
+            QString lcdMessage = "ID n'existe pas";
+            arduino.sendData(lcdMessage); // Afficher sur le LCD
+            ui->statuslabel->setText("Erreur : ID introuvable.");
+        }
+    } else {
+        ui->statuslabel->setText("Erreur : L'ID est invalide.");
+    }
+}
+
+
+void MainWindow::on_validerClientButton_clicked() {
+    int id = ui->lineEdit_chercher->text().toInt(); // Récupérer l'ID depuis le champ recherche
+
+    if (id > 0) {
+        if (!QSqlDatabase::database().isOpen()) {
+            qDebug() << "Erreur : Connexion à la base de données fermée.";
+            ui->statuslabel->setText("Erreur : Connexion à la base de données.");
+            return;
+        }
+
+        QSqlQuery query;
+        query.prepare("SELECT nom, prenom FROM clients WHERE ID_client = :id");
+        query.bindValue(":id", id);
+
+        if (query.exec() && query.next()) {
+            QString nom = query.value(0).toString();
+            QString prenom = query.value(1).toString();
+
+            QString data = "NOM:" + nom + ";" + prenom + "\n";
+            if (arduino.sendData(data)) {
+                ui->statuslabel->setText("Données envoyées : " + data);
+
+                QSerialPort *serial = arduino.getSerialPort();
+                if (serial && serial->canReadLine()) {
+                    QString response = serial->readAll().trimmed();
+                    if (response == "CLIM:ON") {
+                        QSqlQuery updateQuery;
+                        updateQuery.prepare("UPDATE clients SET statut = 'en cours' WHERE ID_client = :id");
+                        updateQuery.bindValue(":id", id);
+
+                        if (updateQuery.exec()) {
+                            ui->statuslabel->setText("Climatisation activée et statut mis à jour.");
+                            ui->tableClient->setModel(cl.afficher());
+                        } else {
+                            qDebug() << "Erreur SQL :" << updateQuery.lastError().text();
+                            ui->statuslabel->setText("Erreur : Mise à jour du statut échouée.");
+                        }
+                    } else if (response == "CLIM:OFF") {
+                        ui->statuslabel->setText("Climatisation désactivée.");
+                    } else {
+                        ui->statuslabel->setText("Données inconnues reçues : " + response);
+                    }
+                }
+            } else {
+                ui->statuslabel->setText("Erreur : Échec de l'envoi des données.");
+            }
+        } else {
+            // ID inexistant
+            QString lcdMessage = "ID n'existe pas";
+            arduino.sendData(lcdMessage); // Afficher sur le LCD
+            ui->statuslabel->setText("Erreur : ID introuvable.");
+        }
+    } else {
+        ui->statuslabel->setText("Erreur : L'ID est invalide.");
+    }
+}
+
+
+void MainWindow::readArduinoData() {
+    QSerialPort *serial = arduino.getSerialPort();
+    if (serial && serial->canReadLine()) {
+        QString data = serial->readAll().trimmed();
+        qDebug() << "Donnée reçue depuis Arduino :" << data;
+
+        QString id = ui->lineEdit_chercher->text();
+
+        if (!id.isEmpty() && data == "CLIM:ON") {
+            if (!QSqlDatabase::database().isOpen()) {
+                qDebug() << "Erreur : Connexion à la base de données fermée.";
+                ui->statuslabel->setText("Erreur : Connexion à la base de données.");
+                return;
+            }
+
+            QSqlQuery query;
+            query.prepare("UPDATE clients SET statut = 'en cours' WHERE ID_client = :id");
+            query.bindValue(":id", id);
+
+            if (query.exec()) {
+                ui->statuslabel->setText("Climatisation activée. Statut client mis à jour : 'en cours'.");
+                ui->tableClient->setModel(cl.afficher());
+                QMessageBox::information(this, "Climatisation activée",
+                                         "La climatisation est activée et le statut du client a été mis à jour.");
+            } else {
+                qDebug() << "Erreur SQL :" << query.lastError().text();
+                QMessageBox::warning(this, "Erreur",
+                                     "Impossible de mettre à jour le statut du client : " + query.lastError().text());
+            }
+        } else if (data == "CLIM:OFF") {
+            ui->statuslabel->setText("Climatisation désactivée.");
+        } else if (data == "ID n'existe pas") {
+            ui->statuslabel->setText("Erreur : ID introuvable. Rien à afficher.");
+        } else {
+            ui->statuslabel->setText("Données inconnues reçues : " + data);
+        }
+    }
+}
+
+
+
+void MainWindow::listPorts() {
+    arduino.listAvailablePorts();
+}
+
+

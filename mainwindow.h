@@ -1,5 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "arduino.h"
 #include "employe.h"
 #include "client.h"
 #include "reservation.h"
@@ -42,6 +43,7 @@ private:
      Client cl;
      Reservation reservation;
      QVector<Reservation> reservations;
+    Arduino arduino;
 
 
      QLineEdit *searchLineEdit;
@@ -61,6 +63,11 @@ private:
      QPushButton *exporterPdf;
      QNetworkAccessManager *networkManager;
      QString verificationCode;
+ private slots:
+      void on_sendButton_clicked();
+     void on_validerClientButton_clicked();
+      void readArduinoData();
+     void listPorts();
 private slots:
      void on_valider_clicked();
      void on_supprimer_clicked();

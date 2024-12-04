@@ -28,7 +28,7 @@
 background-color: rgb(255, 255, 255);</string>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page_61">
      <widget class="QLineEdit" name="nomi">
@@ -1105,7 +1105,8 @@ font: 8pt &quot;Segoe UI&quot;;</string>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(0, 0, 81);</string>
+        <string notr="true">background-color: rgb(0, 0, 81);
+color: rgb(255, 255, 255);</string>
        </property>
       </widget>
       <widget class="QComboBox" name="comboBox_dmd">
@@ -1423,8 +1424,8 @@ text-decoration: underline;</string>
      <widget class="QPushButton" name="supprimerclient">
       <property name="geometry">
        <rect>
-        <x>1150</x>
-        <y>120</y>
+        <x>1140</x>
+        <y>170</y>
         <width>141</width>
         <height>29</height>
        </rect>
@@ -1444,7 +1445,7 @@ text-decoration: underline;</string>
      <widget class="QPushButton" name="modifierclient">
       <property name="geometry">
        <rect>
-        <x>1000</x>
+        <x>1140</x>
         <y>120</y>
         <width>141</width>
         <height>29</height>
@@ -1558,7 +1559,7 @@ background-color:transparent;</string>
       <property name="geometry">
        <rect>
         <x>70</x>
-        <y>570</y>
+        <y>560</y>
         <width>131</width>
         <height>41</height>
        </rect>
@@ -1675,6 +1676,44 @@ text-decoration: underline;</string>
        <string>le client le plus fidèle</string>
       </property>
      </widget>
+     <widget class="QLabel" name="statuslabel">
+      <property name="geometry">
+       <rect>
+        <x>800</x>
+        <y>170</y>
+        <width>311</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(209, 196, 233);
+color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="executer">
+      <property name="geometry">
+       <rect>
+        <x>930</x>
+        <y>120</y>
+        <width>111</width>
+        <height>29</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"> background-color: rgb(172, 44, 103);
+border-radius:10px;
+color: rgb(255, 255, 255);
+ 
+font: 700 10pt &quot;Segoe UI&quot;;
+text-decoration: underline;</string>
+      </property>
+      <property name="text">
+       <string>executer</string>
+      </property>
+     </widget>
      <zorder>widget_7</zorder>
      <zorder>graphicsView_19</zorder>
      <zorder>label_24</zorder>
@@ -1701,6 +1740,8 @@ text-decoration: underline;</string>
      <zorder>tableClient</zorder>
      <zorder>trierclient</zorder>
      <zorder>client_fidele</zorder>
+     <zorder>statuslabel</zorder>
+     <zorder>executer</zorder>
     </widget>
     <widget class="QWidget" name="page_5">
      <widget class="QStackedWidget" name="stackedWidget_3">
