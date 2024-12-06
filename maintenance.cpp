@@ -117,7 +117,7 @@ QSqlQueryModel* Maintenance::trierParPriorite(const QString &priorite)
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQuery query;
 
-    query.prepare("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE "
+    query.prepare("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE,DATE_RAPPEL,DESCRIPTION_RAPPEL "
                   "FROM MAINTENANCES WHERE PRIORITE = :priorite ORDER BY PRIORITE ASC");
     query.bindValue(":priorite", priorite);
 
@@ -135,7 +135,7 @@ QSqlQueryModel* Maintenance::rechercherParID(int ID_MAINTENANCE)
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQuery query;
 
-    query.prepare("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE "
+    query.prepare("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE,DATE_RAPPEL,DESCRIPTION_RAPPEL "
                   "FROM MAINTENANCES WHERE ID_MAINTENANCE = :id_maintenance");
     query.bindValue(":id_maintenance", ID_MAINTENANCE);
 
@@ -154,7 +154,7 @@ QSqlQueryModel* Maintenance::rechercherParDescription(const QString &description
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQuery query;
 
-    query.prepare("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE "
+    query.prepare("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE,DATE_RAPPEL,DESCRIPTION_RAPPEL "
                   "FROM MAINTENANCES WHERE DESCRIPTION_RAPPEL LIKE :description");
     query.bindValue(":description", "%" + description + "%");
 
@@ -166,3 +166,8 @@ QSqlQueryModel* Maintenance::rechercherParDescription(const QString &description
 
     return model;
 }
+
+
+
+
+

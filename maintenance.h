@@ -22,6 +22,7 @@ class Maintenance
     QString PRIORITE;
     QDateTime DATE_RAPPEL;
     QString DESCRIPTION_RAPPEL;
+
 public:
     Maintenance(){}
     Maintenance(int,QString,int, QString, QDate , QDate, QString ,QString,QDateTime,QString );

@@ -45,39 +45,63 @@
 #include <QGraphicsScene>
 #include <QStackedWidget>
 #include <QColor>
-#include <QTextCharFormat>  // Pour personnaliser les dates (arrière-plan, texte)
+#include <QTextCharFormat>
 #include<QSqlTableModel>
 #include <QPainter>
 #include <QTimer>
 
 #include<QSqlQueryModel>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
 
     ui->setupUi(this);
-    ui->tableView_2->setModel(Mtmp.afficher());
-    connect(ui->comboBox_34, SIGNAL(currentTextChanged(QString)), this, SLOT(onComboBoxPriorityChanged(QString)));
+    setupAlertTable();
+    loadAlertHistory();
+    ui->tableWidgetAlerts->resizeColumnsToContents();
+    ui->tableWidgetAlerts->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidgetAlerts->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    isValidRoom = false;
+    selectedRoomId = "";
+    serialPort.setPortName("COM3");
+    serialPort.setBaudRate(QSerialPort::Baud9600);
+    serialPort.setDataBits(QSerialPort::Data8);
+    serialPort.setParity(QSerialPort::NoParity);
+    serialPort.setStopBits(QSerialPort::OneStop);
+    serialPort.setFlowControl(QSerialPort::NoFlowControl);
+    if (serialPort.open(QIODevice::ReadOnly)) {
+        connect(&serialPort, &QSerialPort::readyRead, this, &MainWindow::onReadyRead);
+        qDebug() << "Port série ouvert avec succès.";
+    } else {
+        qDebug() << "Erreur d'ouverture du port série.";
+    }
+
+
+    ui->tableView_maintenance->setModel(Mtmp.afficher());
+    connect(ui->comboBox_tri_maintenance, SIGNAL(currentTextChanged(QString)), this, SLOT(onComboBoxPriorityChanged(QString)));
     this->setStyleSheet("QLineEdit { color : white; }");
-    connect(ui->pushButton_43,SIGNAL(clicked()), this, SLOT(on_pushButton_43_clicked()));
-    connect(ui->pushButton_57, &QPushButton::clicked, this, &MainWindow::on_pushButton_57_clicked);
+    connect(ui->pushButton_supprimer_maintenance,SIGNAL(clicked()), this, SLOT(on_pushButton_supprimer_maintenance_clicked()));
+    connect(ui->pushButton_modifier_maintenance, &QPushButton::clicked, this, &MainWindow::on_pushButton_modifier_maintenance_clicked);
     ui->commandesTableWidget->setColumnCount(8);
     ui->commandesTableWidget->setHorizontalHeaderLabels(QStringList() << "ID Maintenance"
-                                                             << "ID Emplyé"
-                                                             << "Num Chambre"
-                                                            << "Type de maintenance"
-                                                            << "Date debut"
-                                                            << "Date Fin"
-                                                            << "etat maintenance"
-                                                             << "priorite");
+                                                                      << "ID Emplyé"
+                                                                      << "Num Chambre"
+                                                                      << "Type de maintenance"
+                                                                      << "Date debut"
+                                                                      << "Date Fin"
+                                                                      << "etat maintenance"
+                                                                      << "priorite");
     ui->commandesTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->commandesTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    connect(ui->pushButton_stat, &QPushButton::clicked, this, &MainWindow::on_pushButton_stat_clicked);
-    ui->stackedWidget->setCurrentWidget(ui->page_395);  // Montrez la page contenant le graphique
-    model = new QStandardItemModel(0, 3, this); // 3 columns (Date, State, Priority)
+    connect(ui->pushButton_stat_maintenance, &QPushButton::clicked, this, &MainWindow::on_pushButton_stat_maintenance_clicked);
+    ui->stackedWidget->setCurrentWidget(ui->page_statistique_maintenance);
+    model = new QStandardItemModel(0, 3, this);
     model->setHorizontalHeaderLabels({"Date", "State", "Priority"});
-    ui->tableView_2->setModel(model);
+    ui->tableView_maintenance->setModel(model);
     connect(ui->btnAjouterRappel, &QPushButton::clicked, this, &MainWindow::ajouterOuModifierRappel);
     chargerMaintenancesDansCalendrier();
     QDate firstVisibleDate = ui->calendarWidget->selectedDate().addMonths(-1);
@@ -125,7 +149,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QPixmap pixsta("C:/Users/user/Downloads/stat.png");
     ui->label_sta->setPixmap(pixsta.scaled(150,150,Qt::KeepAspectRatio));
     QPixmap pixqrc2("C:/Users/user/Downloads/qrcode.png");
-    ui->label_qrc2->setPixmap(pixqrc2.scaled(150,150,Qt::KeepAspectRatio));
+    ui->label_qrc2->setPixmap(pixqrc2.scaled(250,250,Qt::KeepAspectRatio));
     QPixmap pixca("C:/Users/user/Downloads/calee-removebg-preview.png");
     ui->label_ca->setPixmap(pixca.scaled(150,150,Qt::KeepAspectRatio));
     QPixmap pixpdf2("C:/Users/user/Downloads/exporter_en_pdf-removebg-preview.png");
@@ -142,6 +166,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label_main2->setPixmap(pixmain2.scaled(30,30,Qt::KeepAspectRatio));
     QPixmap pixmain3("C:/Users/user/Downloads/maintenance.png");
     ui->label_main3->setPixmap(pixmain3.scaled(30,30,Qt::KeepAspectRatio));
+    QPixmap pixmain31("C:/Users/user/Downloads/maintenance.png");
+    ui->label_main1_2->setPixmap(pixmain31.scaled(30,30,Qt::KeepAspectRatio));
+    QPixmap pixsecurité("C:/Users/user/Downloads/imageflamme-removebg-preview.png");
+    ui->label_securite->setPixmap(pixsecurité.scaled(100,100,Qt::KeepAspectRatio));
+    QPixmap pixsecuritée("C:/Users/user/Downloads/imageflamme-removebg-preview.png");
+    ui->label_securitee->setPixmap(pixsecuritée.scaled(300,300,Qt::KeepAspectRatio));
+    QPixmap pixlogo1("C:/Users/user/Downloads/logo.png");
+    ui->label_log_2->setPixmap(pixlogo1.scaled(150,150,Qt::KeepAspectRatio));
 
 }
 
@@ -151,20 +183,162 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_pushButton_39_clicked() {
+void MainWindow::on_btnGoToArduino_clicked() {
+    ui->stackedWidget->setCurrentWidget(ui->pageArduino);
+}
+
+void MainWindow::on_btnRetourPage15_clicked() {
+    ui->stackedWidget->setCurrentWidget(ui->page_maintenance);
+}
+
+bool MainWindow::chamberExists(const QString& roomId) {
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM MAINTENANCES WHERE NUM_CHAMBRE_CONCERNEE = :roomId");
+    query.bindValue(":roomId", roomId);
+
+    if (!query.exec()) {
+        qDebug() << "Erreur lors de la vérification de la chambre :" << query.lastError().text();
+        return false; // En cas d'erreur, considérez que la chambre n'existe pas
+    }
+
+    if (query.next() && query.value(0).toInt() > 0) {
+        qDebug() << "La chambre" << roomId << "existe.";
+        return true; // La chambre existe
+    }
+
+    qDebug() << "La chambre" << roomId << "n'existe pas.";
+    return false; // La chambre n'existe pas
+}
+
+
+void MainWindow::on_pushButton_afficher_arduino_clicked() {
+    QString roomId = ui->lineEditNumChambre->text();
+    if (roomId.isEmpty()) {
+        ui->labelMessage_2->setText("Veuillez entrer un numéro de chambre.");
+        isValidRoom = false;
+        return;
+    }
+
+    if (!chamberExists(roomId)) {
+        ui->labelMessage_2->setText("La chambre n'existe pas dans l'hotel.");
+        isValidRoom = false;
+        return;
+    }
+
+    // La chambre existe
+    ui->labelMessage_2->setText("Détection activée pour la chambre " + roomId);
+    selectedRoomId = roomId;
+    isValidRoom = true;
+}
+
+
+void MainWindow::onReadyRead() {
+    QByteArray data = serialPort.readAll();
+    serialBuffer.append(data);
+
+    if (!serialBuffer.contains('\n')) {
+        return; // Attendez que le message soit complet (terminé par '\n')
+    }
+
+    QString message = QString::fromStdString(serialBuffer.toStdString()).trimmed();
+    serialBuffer.clear(); // Réinitialisez le buffer pour les prochains messages
+
+    qDebug() << "Message reçu complet :" << message;
+    if (!isValidRoom) {
+        qDebug() << "Message ignoré, aucune chambre valide sélectionnée.";
+        return;
+    }
+    QSqlQuery query;
+    query.prepare("UPDATE MAINTENANCES SET ALERT_FLAME = 'Détectée', ALERT_DESCRIPTION = :alertMessage WHERE NUM_CHAMBRE_CONCERNEE = :roomId");
+    query.bindValue(":alertMessage", message);
+    query.bindValue(":roomId", selectedRoomId);
+
+    if (query.exec()) {
+        ui->labelMessage_2->setText("Alerte pour la chambre " + selectedRoomId + ": " + message);
+        qDebug() << "Base de données mise à jour pour la chambre" << selectedRoomId;
+    } else {
+        qDebug() << "Erreur lors de la mise à jour de la base de données:" << query.lastError().text();
+    }
+}
+
+
+void MainWindow::updateDatabaseWithAlert(const QString& roomId, const QString& alertMessage)
+{
+    QSqlQuery query;
+    query.prepare("INSERT INTO ALERTES (ID_CHAMBRE, MESSAGE) VALUES (:roomId, :alertMessage)");
+    query.bindValue(":roomId", roomId);
+    query.bindValue(":alertMessage", alertMessage);
+
+    if (query.exec()) {
+        qDebug() << "Alerte insérée dans la base de données.";
+    } else {
+        qDebug() << "Erreur lors de l'insertion de l'alerte:" << query.lastError().text();
+    }
+}
+void MainWindow::updateMaintenanceRecord(const QString& roomId, const QString& alertMessage)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE MAINTENANCES SET ETAT_MAINTENANCE = 'En cours', DESCRIPTION_RAPPEL = :alertMessage WHERE NUM_CHAMBRE_CONCERNEE = :roomId");
+    query.bindValue(":roomId", roomId);
+    query.bindValue(":alertMessage", alertMessage);
+
+    if (query.exec()) {
+        qDebug() << "Enregistrement de maintenance mis à jour pour la chambre " << roomId;
+    } else {
+        qDebug() << "Erreur de mise à jour de la maintenance:" << query.lastError().text();
+    }
+}
+void MainWindow::setupAlertTable() {
+    // Configuration initiale
+    ui->tableWidgetAlerts->setColumnCount(3);
+    ui->tableWidgetAlerts->setHorizontalHeaderLabels({"NUM_CHAMBRE_CONCERNEE", "ALERT_FLAME", "ALERT_DESCRIPTION"});
+    ui->tableWidgetAlerts->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidgetAlerts->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableWidgetAlerts->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidgetAlerts->horizontalHeader()->setStretchLastSection(true);
+}
+void MainWindow::loadAlertHistory() {
+    QSqlQuery query;
+    query.prepare("SELECT NUM_CHAMBRE_CONCERNEE, ALERT_DESCRIPTION, ALERT_FLAME, DATE_RAPPEL FROM MAINTENANCES WHERE ALERT_FLAME != 'Non détectée'");
+
+    if (query.exec()) {
+        // Effacer le tableau avant de recharger les données
+        ui->tableWidgetAlerts->setRowCount(0);
+
+        int row = 0;
+        while (query.next()) {
+            ui->tableWidgetAlerts->insertRow(row);
+
+            // Remplir chaque colonne avec les données
+            ui->tableWidgetAlerts->setItem(row, 0, new QTableWidgetItem(query.value("NUM_CHAMBRE_CONCERNEE").toString()));
+            ui->tableWidgetAlerts->setItem(row, 1, new QTableWidgetItem(query.value("ALERT_FLAME").toString()));
+            ui->tableWidgetAlerts->setItem(row, 2, new QTableWidgetItem(query.value("ALERT_DESCRIPTION").toString()));
+
+            row++;
+        }
+    } else {
+        qDebug() << "Erreur lors du chargement de l'historique des alertes :" << query.lastError().text();
+    }
+}
+
+
+
+
+
+void MainWindow::on_pushButton_ajouter_maintenance_clicked() {
     bool ok = false;
 
     // Récupération des valeurs des champs
-    int ID_MAINTENANCE = ui->lineEdit_85->text().toInt(&ok);
-    QString ID_EMPLOYE = ui->lineEdit_192->text();
-    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_86->text().toInt(&ok);
-    QString TYPE_MAINTENANCE = ui->comboBox_40->currentText();
-    QDate DATE_DEBUT = ui->dateEdit_11->date();
-    QDate DATE_FIN = ui->dateEdit_12->date();
-    QString ETAT_MAINTENANCE = ui->comboBox_36->currentText();
-    QString PRIORITE = ui->comboBox_41->currentText();
-    QDateTime DATE_RAPPEL = ui->dateTimeEdit->dateTime();
-    QString DESCRIPTION_RAPPEL = ui->lineEdit_193->text();
+    int ID_MAINTENANCE = ui->lineEdit_id_maintenance->text().toInt(&ok);
+    QString ID_EMPLOYE = ui->lineEdit_id_emplye->text();
+    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_num_chambre->text().toInt(&ok);
+    QString TYPE_MAINTENANCE = ui->comboBox_type_maintenance->currentText();
+    QDate DATE_DEBUT = ui->dateEdit_date_debut->date();
+    QDate DATE_FIN = ui->dateEdit_date_fin->date();
+    QString ETAT_MAINTENANCE = ui->comboBox_etat_maintenance->currentText();
+    QString PRIORITE = ui->comboBox_priorite->currentText();
+    QDateTime DATE_RAPPEL = ui->date_rappel->dateTime();
+    QString DESCRIPTION_RAPPEL = ui->lineEdit_description_rappel->text();
     if (!ok || ID_MAINTENANCE == 0) {
         QMessageBox::warning(this, tr("ID Maintenance invalide"), tr("L'ID de maintenance doit être un entier numérique non nul."));
         return;
@@ -221,7 +395,7 @@ void MainWindow::loadMaintenanceData()
 {
 
 
-    QSqlQueryModel *model = Mtmp.afficher();  // Reload the model with afficher()
+    QSqlQueryModel *model = Mtmp.afficher();
 
     if (!model->query().isActive()) {
         qDebug() << "Failed to load data:" << model->query().lastError();
@@ -229,21 +403,21 @@ void MainWindow::loadMaintenanceData()
     } else {
         qDebug() << "Data loaded successfully in loadMaintenanceData";
     }
-    if (ui->tableView_2->model()) {
-        ui->tableView_2->setModel(nullptr);
+    if (ui->tableView_maintenance->model()) {
+        ui->tableView_maintenance->setModel(nullptr);
     }
 
-    ui->tableView_2->setModel(model);
+    ui->tableView_maintenance->setModel(model);
 
     if (model->rowCount() == 0) {
         qDebug() << "No data found!";
     } else {
-        ui->tableView_2->resizeColumnsToContents();
-        ui->tableView_2->setAlternatingRowColors(true);
+        ui->tableView_maintenance->resizeColumnsToContents();
+        ui->tableView_maintenance->setAlternatingRowColors(true);
     }
 }
-void MainWindow::on_pushButton_38_clicked() {
-    int id_maintenance = ui->lineEdit_85->text().toInt();
+void MainWindow::on_pushButton_supprimer_maintenance_clicked() {
+    int id_maintenance = ui->lineEdit_id_maintenance->text().toInt();
 
     if (id_maintenance <= 0) {
         QMessageBox::warning(this, tr("ID invalide"), tr("Veuillez entrer un ID de maintenance valide pour la suppression."));
@@ -269,18 +443,18 @@ void MainWindow::on_pushButton_38_clicked() {
 }
 
 
-void MainWindow::on_pushButton_2_clicked() {
-    int ID_MAINTENANCE = ui->lineEdit_85->text().toInt();
-    QString ID_EMPLOYE = ui->lineEdit_192->text();
+void MainWindow::on_pushButton_modifier_maintenance_clicked() {
+    int ID_MAINTENANCE = ui->lineEdit_id_maintenance->text().toInt();
+    QString ID_EMPLOYE = ui->lineEdit_id_emplye->text();
 
-    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_86->text().toInt();
-    QString TYPE_MAINTENANCE = ui->comboBox_40->currentText();
-    QDate DATE_DEBUT = ui->dateEdit_11->date();
-    QDate DATE_FIN = ui->dateEdit_12 ->date();
-    QString ETAT_MAINTENANCE = ui->comboBox_36->currentText();
-    QString PRIORITE = ui->comboBox_41->currentText();
-    QDateTime DATE_RAPPEL = ui->dateTimeEdit->dateTime();
-    QString DESCRIPTION_RAPPEL =ui->lineEdit_193->text();
+    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_num_chambre->text().toInt();
+    QString TYPE_MAINTENANCE = ui->comboBox_type_maintenance->currentText();
+    QDate DATE_DEBUT = ui->dateEdit_date_debut->date();
+    QDate DATE_FIN = ui->dateEdit_date_fin ->date();
+    QString ETAT_MAINTENANCE = ui->comboBox_etat_maintenance->currentText();
+    QString PRIORITE = ui->comboBox_priorite->currentText();
+    QDateTime DATE_RAPPEL = ui->date_rappel->dateTime();
+    QString DESCRIPTION_RAPPEL =ui->lineEdit_description_rappel->text();
     if ( NUM_CHAMBRE_CONCERNEE== 0 || TYPE_MAINTENANCE.isEmpty() || ETAT_MAINTENANCE .isEmpty() || PRIORITE .isEmpty()) {
         QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez remplir tous les champs."));
         return;
@@ -295,9 +469,9 @@ void MainWindow::on_pushButton_2_clicked() {
     } else {
         QMessageBox::critical(this, tr("Erreur"), tr("Échec de la modification."));
     }
-    }
+}
 
-void MainWindow::on_comboBox_34_currentTextChanged(const QString &priorite)
+void MainWindow::on_comboBox_tri_maintenance_currentTextChanged(const QString &priorite)
 {
     if (priorite.isEmpty()) {
         QMessageBox::warning(this, tr("Erreur de sélection"), tr("Veuillez sélectionner une priorité valide."));
@@ -305,15 +479,15 @@ void MainWindow::on_comboBox_34_currentTextChanged(const QString &priorite)
     }
     QSqlQueryModel *model = Mtmp.trierParPriorite(priorite);
     if (model->rowCount() > 0) {
-        ui->tableView_2->setModel(model);
-        ui->tableView_2->resizeColumnsToContents();
+        ui->tableView_maintenance->setModel(model);
+        ui->tableView_maintenance->resizeColumnsToContents();
         QMessageBox::information(this, tr("Tri"), tr("Maintenance triée par priorité."));
     } else {
         QMessageBox::warning(this, tr("Non trouvé"), tr("Aucune maintenance trouvée pour cette priorité."));
     }
 
 }
-void MainWindow::on_pushButton_40_clicked()
+void MainWindow::on_pushButton_exporter_maintenance_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export PDF"), QString(), "*.pdf");
     if (!fileName.isEmpty()) {
@@ -328,7 +502,7 @@ void MainWindow::on_pushButton_40_clicked()
 
         QSqlQuery query("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE FROM MAINTENANCES");
         while (query.next()) {
-             html += "<tr><td>" + query.value("ID_MAINTENANCE").toString() + "</td>";
+            html += "<tr><td>" + query.value("ID_MAINTENANCE").toString() + "</td>";
             html += "<td>" + query.value("NUM_CHAMBRE_CONCERNEE").toString() + "</td>";
             html += "<td>" + query.value("TYPE_MAINTENANCE").toString() + "</td>";
             html += "<td>" + query.value("DATE_DEBUT").toString() + "</td>";
@@ -343,10 +517,10 @@ void MainWindow::on_pushButton_40_clicked()
         QMessageBox::information(this, "Export PDF", "MAINTENANCE exported to PDF successfully!");
     }
 }
-void MainWindow::on_pushButton_43_clicked()
+void MainWindow::on_pushButton_recherche_maintenance_clicked()
 {
-    int ID_MAINTENANCE = ui->lineEdit_87->text().toInt();
-    QString descriptionRappel = ui->lineEdit_97->text(); // Assurez-vous d'avoir un champ pour la description
+    int ID_MAINTENANCE = ui->lineEdit_id_maintenance_2->text().toInt();
+    QString descriptionRappel = ui->lineEdit_description_rappel_2->text(); // Assurez-vous d'avoir un champ pour la description
     if (ID_MAINTENANCE == 0 && descriptionRappel.isEmpty()) {
         QMessageBox::warning(this, tr("Entrée Invalide"), tr("Veuillez entrer un ID ou une description."));
         return;
@@ -362,8 +536,8 @@ void MainWindow::on_pushButton_43_clicked()
     }
 
     if (model && model->rowCount() > 0) {
-        ui->tableView_2->setModel(model);
-        ui->tableView_2->resizeColumnsToContents();
+        ui->tableView_maintenance->setModel(model);
+        ui->tableView_maintenance->resizeColumnsToContents();
         QMessageBox::information(this, tr("Recherche"), tr("Maintenance(s) trouvée(s)."));
     } else {
         QMessageBox::warning(this, tr("Non trouvé"), tr("Aucune maintenance trouvée pour les critères spécifiés."));
@@ -374,17 +548,16 @@ void MainWindow::on_pushButton_43_clicked()
 
 
 
-void MainWindow::on_acceuilcalmaint_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_15);
+void MainWindow::on_acceuilmaintenance_clicked() {
+    ui->stackedWidget->setCurrentWidget(ui->page_maintenance);
 }
-void MainWindow::on_acceuilcalmaint_2_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_15);
+void MainWindow::on_acceuilmaintenance_2_clicked() {
+    ui->stackedWidget->setCurrentWidget(ui->page_maintenance);
 }
 
-void MainWindow::on_acceuilcalmaint_3_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_15);
 
-}
+
+
 using std::int8_t;
 using std::uint8_t;
 using std::size_t;
@@ -1065,16 +1238,16 @@ void BitBuffer::appendBits(std::uint32_t val, int len) {
 
 }
 
-void MainWindow::on_pushButton_111_clicked()
+void MainWindow::on_pushButton_QRC_clicked()
 {    bool ok = false;
-    int ID_MAINTENANCE = ui->lineEdit_85->text().toInt(&ok);
-    QString ID_EMPLOYE = ui->lineEdit_192->text();
-    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_86->text().toInt();
-    QString TYPE_MAINTENANCE = ui->comboBox_40->currentText();
-    QDate DATE_DEBUT = ui->dateEdit_11->date();
-    QDate DATE_FIN = ui->dateEdit_12->date();
-    QString ETAT_MAINTENANCE = ui->comboBox_36->currentText();
-    QString PRIORITE = ui->comboBox_41->currentText();
+    int ID_MAINTENANCE = ui->lineEdit_id_maintenance->text().toInt(&ok);
+    QString ID_EMPLOYE = ui->lineEdit_id_emplye->text();
+    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_num_chambre->text().toInt();
+    QString TYPE_MAINTENANCE = ui->comboBox_type_maintenance->currentText();
+    QDate DATE_DEBUT = ui->dateEdit_date_debut->date();
+    QDate DATE_FIN = ui->dateEdit_date_fin->date();
+    QString ETAT_MAINTENANCE = ui->comboBox_etat_maintenance->currentText();
+    QString PRIORITE = ui->comboBox_priorite->currentText();
     if (!ok || ID_MAINTENANCE == 0) {
         QMessageBox::warning(this, tr("ID Maintenance invalide"), tr("L'ID de maintenance doit être un entier numérique non nul."));
         return;
@@ -1107,17 +1280,17 @@ void MainWindow::on_pushButton_111_clicked()
 
     ui->qr_code->setPixmap(QPixmap::fromImage(im.scaled(256, 256, Qt::KeepAspectRatio, Qt::FastTransformation)));
 }
-void MainWindow::on_pushButton_57_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_129);}
+void MainWindow::on_pushButton_calendrier_clicked() {
+    ui->stackedWidget->setCurrentWidget(ui->page_calendrier);}
 
-void MainWindow::on_pushButton_stat2_clicked() {
-    ui->stackedWidget->setCurrentWidget(ui->page_395);}
-
-
+void MainWindow::on_pushButton_stat2_maintenance_clicked() {
+    ui->stackedWidget->setCurrentWidget(ui->page_statistique_maintenance);}
 
 
 
-void MainWindow::on_pushButton_stat_clicked()
+
+
+void MainWindow::on_pushButton_stat_maintenance_clicked()
 {
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->graphic->setScene(scene);
@@ -1251,17 +1424,17 @@ void MainWindow::afficherMaintenancesPourDate(const QDate &date) {
 
 void MainWindow::chargerMaintenancesDansCalendrier() {
     QList<QPair<QDate, QString>> maintenances = {
-        { QDate(2024, 11, 26), "En attente" },
-        { QDate(2024, 11, 27), "En cours" },
-        { QDate(2024, 11, 28), "Terminé" },
-        { QDate(2024, 11, 29), "En attente" },
-        { QDate(2024, 01, 01), "En cours" },
-        { QDate(2024, 01, 03), "En attente" },
-        { QDate(2024, 01, 07), "En cours" },
-        { QDate(2024, 01, 04), "En attente" },
-        { QDate(2024, 01, 11), "En cours" },
-        { QDate(2024,01, 12), "En attente" },
-    };
+                                                 { QDate(2024, 11, 26), "En attente" },
+                                                 { QDate(2024, 11, 27), "En cours" },
+                                                 { QDate(2024, 11, 28), "Terminé" },
+                                                 { QDate(2024, 11, 29), "En attente" },
+                                                 { QDate(2024, 01, 01), "En cours" },
+                                                 { QDate(2024, 01, 03), "En attente" },
+                                                 { QDate(2024, 01, 07), "En cours" },
+                                                 { QDate(2024, 01, 04), "En attente" },
+                                                 { QDate(2024, 01, 11), "En cours" },
+                                                 { QDate(2024,01, 12), "En attente" },
+                                                 };
 
     if (!ui->calendarWidget) {
         qDebug() << "Erreur : widget de calendrier non initialisé.";
@@ -1365,8 +1538,7 @@ void MainWindow::chargerRappelsDansTableau() {
     }
 
     int row = 0;
-    ui->tableRappels->setRowCount(0); // Réinitialiser les lignes avant de les remplir.
-
+    ui->tableRappels->setRowCount(0);
     while (query.next()) {
         QString idMaintenance = query.value("ID_MAINTENANCE").toString();
         QString descriptionRappel = query.value("DESCRIPTION_RAPPEL").toString();
@@ -1388,5 +1560,5 @@ void MainWindow::afficherRappelsPourDate(const QDate &date) {
         qDebug() << "Erreur lors du filtrage des rappels :" << model->lastError().text();
     }
     chargerMaintenancesDansCalendrier();
-    ui->tableView_2->setModel(model);
+    ui->tableView_maintenance->setModel(model);
 }

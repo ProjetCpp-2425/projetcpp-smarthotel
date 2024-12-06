@@ -11,6 +11,8 @@ QT += charts
 RESOURCES += resources.qrc
 QT += core gui widgets charts
 QT += core gui widgets sql
+QT += serialport
+QT += core gui serialport
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

@@ -16,6 +16,8 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 namespace Ui {
 class MainWindow;
 }
@@ -32,27 +34,39 @@ public:
 
 private slots:
 
-    void on_pushButton_39_clicked();
-    void on_pushButton_38_clicked();
-    void on_pushButton_2_clicked();
-    void on_pushButton_40_clicked();
-    void on_pushButton_43_clicked();
-    void on_comboBox_34_currentTextChanged(const QString &priorite);
-    void on_pushButton_57_clicked();
-    void on_acceuilcalmaint_clicked();
-    void on_acceuilcalmaint_2_clicked();
-    void on_pushButton_111_clicked();
-    void on_acceuilcalmaint_3_clicked();
-    void on_pushButton_stat2_clicked();
-    void on_pushButton_stat_clicked();
+    void on_pushButton_ajouter_maintenance_clicked();
+    void on_pushButton_supprimer_maintenance_clicked();
+    void on_pushButton_modifier_maintenance_clicked();
+    void on_pushButton_exporter_maintenance_clicked();
+    void on_pushButton_recherche_maintenance_clicked();
+    void on_comboBox_tri_maintenance_currentTextChanged(const QString &priorite);
+    void on_pushButton_calendrier_clicked();
+    void on_acceuilmaintenance_clicked();
+    void on_acceuilmaintenance_2_clicked();
+    void on_pushButton_QRC_clicked();
+    void on_pushButton_stat2_maintenance_clicked();
+    void on_pushButton_stat_maintenance_clicked();
     void chargerMaintenancesDansCalendrier();
 
     void chargerRappelsDansTableau();
     void ajouterOuModifierRappel(int idMaintenance);
     void afficherRappelsPourDate(const QDate &date);
+
+    void on_pushButton_afficher_arduino_clicked();
+    void onReadyRead();
+    void on_btnGoToArduino_clicked();
+    void on_btnRetourPage15_clicked();
+    bool chamberExists(const QString& roomId);
+    void setupAlertTable();
+    void loadAlertHistory();
+
 private:
     Ui::MainWindow *ui;
     Maintenance Mtmp;
+    QSerialPort serialPort;
+    QByteArray serialBuffer;
+    bool isValidRoom;
+    QString selectedRoomId;
     void loadMaintenanceData();
     QStandardItemModel *model;
     QTimer *timer;
@@ -60,7 +74,8 @@ private:
     QTableWidget *tableRappels;
     void afficherMaintenancesPourDate(const QDate &date);
     void configurerMiseAJourAutomatique();
-
+    void updateDatabaseWithAlert(const QString& roomId, const QString& alertMessage);
+    void updateMaintenanceRecord(const QString& roomId, const QString& alertMessage);
 
 };
 
