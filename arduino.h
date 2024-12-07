@@ -12,15 +12,15 @@ public:
     int disconnect();
     bool sendData(const QString &data);
     QString getPortName();
-    QSerialPort *getSerialPort(); // Getter pour accéder au port série
+    QSerialPort *getSerialPort();
     void listAvailablePorts();
     QString autoDetectPort();
 
 private:
-    QSerialPort *serial; // Port série
+    QSerialPort *serial;
     QString portName;
-    static const quint16 vendorId = 0x2341; // Vendor ID Arduino
-    static const quint16 productId = 0x0043; // Product ID Arduino
+    static const quint16 vendorId = 0x2341;
+    static const quint16 productId = 0x0043;
 };
 
-#endif // ARDUINO_H
+#endif

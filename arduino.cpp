@@ -6,7 +6,7 @@ Arduino::Arduino() {
 }
 
 int Arduino::connect() {
-    // Détection automatique du port
+
     portName = autoDetectPort();
 
     if (portName.isEmpty()) {
@@ -22,20 +22,20 @@ int Arduino::connect() {
         serial->setStopBits(QSerialPort::OneStop);
         serial->setFlowControl(QSerialPort::NoFlowControl);
         qDebug() << "Connecté à : " << portName;
-        return 0; // Connexion réussie
+        return 0;
     } else {
         qDebug() << "Erreur : Impossible de se connecter au port série.";
-        return 1; // Échec de la connexion
+        return 1;
     }
 }
 
 QString Arduino::autoDetectPort() {
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        if (info.description().contains("Arduino")) { // Vérifie la description
+        if (info.description().contains("Arduino")) {
             return info.portName();
         }
     }
-    return ""; // Aucun port correspondant trouvé
+    return "";
 }
 
 
@@ -43,9 +43,9 @@ QString Arduino::autoDetectPort() {
 int Arduino::disconnect() {
     if (serial->isOpen()) {
         serial->close();
-        return 0; // Déconnexion réussie
+        return 0;
     }
-    return 1; // Erreur lors de la déconnexion
+    return 1;
 }
 
 bool Arduino::sendData(const QString &data) {
@@ -66,7 +66,7 @@ QString Arduino::getPortName() {
 }
 
 QSerialPort *Arduino::getSerialPort() {
-    return serial; // Retourner le pointeur vers le port série
+    return serial;
 }
 void Arduino::listAvailablePorts() {
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {

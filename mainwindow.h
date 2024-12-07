@@ -21,6 +21,14 @@
 #include <QVector>
 
 
+#include "produit.h"
+#include <QTableWidgetItem>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+
+
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -36,6 +44,36 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void sendWhatsAppNotification(const QString& criticalProducts, const QString& lowStockProducts);
+    void onTwilioResponseReceived();
+
+
+
+
+private slots:
+    void afficherStatistiques();
+    void afficherProduitsDansTable();
+    void on_sushButton_clicked();
+    void on_sushButton_19_clicked();
+    void on_sushButton_23_clicked();
+    void on_sushButton_25_clicked();
+    void on_sushButton_21_clicked();
+    void on_sushButton_24_clicked();
+    void on_sushButton_22_clicked(); // Slot pour exporter en PDF
+    void on_sushButton_whatsapp_clicked();
+
+    // Ajouter d'autres slots si nécessaire
+
+    void on_sushButton_28_clicked();  // Slot pour la recherche du produit
+
+
+    void on_sortComboBox_currentIndexChanged();  // <- Ajoutez cette ligne ici
+
+
+private:
+    bool messageDisplayed = false;
+
+
 private:
     Ui::MainWindow *ui;
     Employe employe;
@@ -45,6 +83,11 @@ private:
      QVector<Reservation> reservations;
     Arduino arduino;
 
+
+    void Rechercher(const QString &searchID);  // Déclaration de la fonction Rechercher
+
+    // Déclarez 'tri' comme membre de la classe MainWindow
+    QSqlQueryModel* tri;  // Déclarez le modèle SQL ici
 
      QLineEdit *searchLineEdit;
      QLineEdit *idReservationLineEdit;

@@ -41,26 +41,68 @@
 
 
 
+// stat
+#include <QtCharts>
+#include <QChartView>
+#include <QPieSeries>
+#include <QPieSlice>
+#include <stdexcept>
+
+//tri
+#include <QSqlQueryModel>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QMessageBox>
+#include <QVBoxLayout>
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QPieSlice>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+
+#include <QUrl>
+#include <QUrlQuery>
+
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply> // Include this for QNetworkReply
+#include <QUrlQuery>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    ,arduino()
+    ,arduino(),
+    tri(new QSqlQueryModel())  // Initialisation ici
 
 
 
 {
     ui->setupUi(this);
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
     arduino.listAvailablePorts();
     connect(ui->executer, &QPushButton::clicked, this, &MainWindow::on_validerClientButton_clicked);
+    connect(arduino.getSerialPort(), &QSerialPort::readyRead, this, &MainWindow::readArduinoData);
 
     if (arduino.connect() == 0) {
         ui->statuslabel->setText("Arduino connecté sur le port " + arduino.getPortName());
-        connect(arduino.getSerialPort(), &QSerialPort::readyRead, this, &MainWindow::readArduinoData);
     } else {
         ui->statuslabel->setText("Erreur : Arduino non connecté.");
     }
 
+
+    connect(reply, &QNetworkReply::finished, this, &MainWindow::onTwilioResponseReceived);
+
+
+    connect(ui->sortComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(on_sortComboBox_currentIndexChanged(int)));
+
+     afficherProduitsDansTable();
     afficherSalaireEtMasseSalariale();
     ui->tableClient->setModel(cl.afficher());
     ui->tabemp->setModel(employe.afficher());
@@ -120,6 +162,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
+
+
+
+
     connect(ui->rechercher, &QPushButton::clicked, this, &MainWindow::on_rechercher_clicked);
     connect(ui->recherche, &QLineEdit::textChanged, this, &MainWindow::onRechercheTextChanged);
     connect(ui->recherche, &QLineEdit::textChanged, this, &MainWindow::Rechercheemploye);
@@ -131,7 +177,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->envoyer, &QPushButton::clicked, this, &MainWindow::sendRenewalMessages);
     connect(ui->boutonstat, &QPushButton::clicked, this, &MainWindow::afficherStatistiquesPostes);
 
-    connect(ui->valider, &QPushButton::clicked, this, &MainWindow::on_ajouterButton_clicked);
+    connect(ui->valideremp, &QPushButton::clicked, this, &MainWindow::on_ajouterButton_clicked);
     connect(ui->modifier, &QPushButton::clicked, this, &MainWindow::on_modifier_clicked);
     connect(ui->supprimer, &QPushButton::clicked, this, &MainWindow::on_supprimerButton_clicked);
 
@@ -159,7 +205,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->boutonsms, &QPushButton::clicked, this, &MainWindow::changerDePagesms);
     connect(ui->boutonstatclient, &QPushButton::clicked, this, &MainWindow::changerDePagestatclient);
     connect(ui->boutonhisclient, &QPushButton::clicked, this, &MainWindow::changerDePagehisclient);
-    connect(ui->boutonstatstock, &QPushButton::clicked, this, &MainWindow::changerDePagestatstock);
+    connect(ui->sushButton, &QPushButton::clicked, this, &MainWindow::changerDePagestatstock);
     connect(ui->boutonstatres, &QPushButton::clicked, this, &MainWindow::changerDePagestatres);
     connect(ui->boutonstatcal, &QPushButton::clicked, this, &MainWindow::changerDePagestatistique);
     connect(ui->boutoncalcul, &QPushButton::clicked, this, &MainWindow::changerDePagecalcul);
@@ -217,6 +263,7 @@ MainWindow::~MainWindow()
 {
     arduino.disconnect();
     delete ui;
+    delete tri; // Libère le modèle SQL trié
 }
 void MainWindow::changerDePageconnexion()
 {
@@ -1778,9 +1825,9 @@ void MainWindow::on_verifyCodeButton_clicked() {
     }
 }
 void MainWindow::on_sendButton_clicked() {
-    int id = ui->lineEdit_chercher->text().toInt(); // Récupérer l'ID depuis le champ recherche
+    int id = ui->lineEdit_chercher->text().toInt();
 
-    if (id > 0) { // Vérification que l'ID est valide
+    if (id > 0) {
         if (!QSqlDatabase::database().isOpen()) {
             qDebug() << "Erreur : Connexion à la base de données fermée.";
             ui->statuslabel->setText("Erreur : Connexion à la base de données.");
@@ -1804,7 +1851,7 @@ void MainWindow::on_sendButton_clicked() {
         } else {
             // ID inexistant
             QString lcdMessage = "ID n'existe pas";
-            arduino.sendData(lcdMessage); // Afficher sur le LCD
+            arduino.sendData(lcdMessage);
             ui->statuslabel->setText("Erreur : ID introuvable.");
         }
     } else {
@@ -1814,7 +1861,7 @@ void MainWindow::on_sendButton_clicked() {
 
 
 void MainWindow::on_validerClientButton_clicked() {
-    int id = ui->lineEdit_chercher->text().toInt(); // Récupérer l'ID depuis le champ recherche
+    int id = ui->lineEdit_chercher->text().toInt();
 
     if (id > 0) {
         if (!QSqlDatabase::database().isOpen()) {
@@ -1862,7 +1909,7 @@ void MainWindow::on_validerClientButton_clicked() {
         } else {
             // ID inexistant
             QString lcdMessage = "ID n'existe pas";
-            arduino.sendData(lcdMessage); // Afficher sur le LCD
+            arduino.sendData(lcdMessage);
             ui->statuslabel->setText("Erreur : ID introuvable.");
         }
     } else {
@@ -1877,33 +1924,42 @@ void MainWindow::readArduinoData() {
         QString data = serial->readAll().trimmed();
         qDebug() << "Donnée reçue depuis Arduino :" << data;
 
-        QString id = ui->lineEdit_chercher->text();
+        int id = ui->lineEdit_chercher->text().toInt();
+        /*if (!id) {
+            ui->statuslabel->setText("Erreur : ID invalide.");
+            return;
+        }*/
 
-        if (!id.isEmpty() && data == "CLIM:ON") {
-            if (!QSqlDatabase::database().isOpen()) {
-                qDebug() << "Erreur : Connexion à la base de données fermée.";
-                ui->statuslabel->setText("Erreur : Connexion à la base de données.");
-                return;
-            }
+        if (data == "CLIM:ON") {
+            if (!messageDisplayed) {
+                if (!QSqlDatabase::database().isOpen()) {
+                    qDebug() << "Erreur : Connexion à la base de données fermée.";
+                    ui->statuslabel->setText("Erreur : Connexion à la base de données.");
+                    return;
+                }
 
-            QSqlQuery query;
-            query.prepare("UPDATE clients SET statut = 'en cours' WHERE ID_client = :id");
-            query.bindValue(":id", id);
+                QSqlQuery query;
+                query.prepare("UPDATE clients SET statut = 'en cours' WHERE ID_client = :id");
+                query.bindValue(":id", id);
 
-            if (query.exec()) {
-                ui->statuslabel->setText("Climatisation activée. Statut client mis à jour : 'en cours'.");
-                ui->tableClient->setModel(cl.afficher());
-                QMessageBox::information(this, "Climatisation activée",
-                                         "La climatisation est activée et le statut du client a été mis à jour.");
+                if (query.exec()) {
+                    ui->statuslabel->setText("Climatisation activée. Statut client mis à jour : 'en cours'.");
+                    ui->tableClient->setModel(cl.afficher());
+                    QMessageBox::information(this, "Climatisation activée",
+                                             "La climatisation est activée et le statut du client a été mis à jour.");
+                    messageDisplayed = true;
+                } else {
+                    qDebug() << "Erreur SQL :" << query.lastError().text();
+                    QMessageBox::warning(this, "Erreur",
+                                         "Impossible de mettre à jour le statut du client : " + query.lastError().text());
+                }
             } else {
-                qDebug() << "Erreur SQL :" << query.lastError().text();
-                QMessageBox::warning(this, "Erreur",
-                                     "Impossible de mettre à jour le statut du client : " + query.lastError().text());
+                qDebug() << "Message déjà affiché, pas de mise à jour supplémentaire.";
             }
+
         } else if (data == "CLIM:OFF") {
             ui->statuslabel->setText("Climatisation désactivée.");
-        } else if (data == "ID n'existe pas") {
-            ui->statuslabel->setText("Erreur : ID introuvable. Rien à afficher.");
+            messageDisplayed = false;
         } else {
             ui->statuslabel->setText("Données inconnues reçues : " + data);
         }
@@ -1912,8 +1968,436 @@ void MainWindow::readArduinoData() {
 
 
 
+
 void MainWindow::listPorts() {
     arduino.listAvailablePorts();
 }
 
 
+void MainWindow::on_sushButton_23_clicked()
+{
+    // Get input values from UI
+    int id = ui->lineEdit->text().toInt();
+    QString nomProduit = ui->lineEdit_2->text();
+    int quantiteDispo = ui->lineEdit_3->text().toInt();
+    QDate dateLivraison = ui->dateEdit_2->date();
+    QDate dateReapprovisionnement = ui->dateEdit_3->date();
+    // Create a Produit object with these values
+    Produit produit(id, nomProduit, quantiteDispo, dateLivraison, dateReapprovisionnement);
+    // Check if the product already exists in the database
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM stocks WHERE id = :id");
+    query.bindValue(":id", id);
+    if (!query.exec()) {
+        QMessageBox::warning(this, "Database Error", "Failed to check product existence.");
+        return;
+    }
+    query.next();
+    bool exists = query.value(0).toInt() > 0;
+    // If the product exists, update it; otherwise, add it
+    if (exists) {
+        // Update the existing product
+        if (produit.modifier(id)) {
+            QMessageBox::information(this, "Update Product", "Product updated successfully.");
+            afficherProduitsDansTable();
+        } else {
+            QMessageBox::warning(this, "Update Product", "Failed to update product.");
+        }
+    } else {
+        // Add the new product
+        if (produit.ajouter()) {
+            QMessageBox::information(this, "Add Product", "Product added successfully.");
+            afficherProduitsDansTable();
+        } else {
+            QMessageBox::warning(this, "Add Product", "Failed to add product.");
+        }
+    }
+    // Optionally, refresh the product display after adding/updating
+    // Assuming you have a method to update the view, e.g., displayProducts()
+    // displayProducts();
+}
+void MainWindow::afficherProduitsDansTable() {
+    // Déterminer l'ordre de tri depuis sortComboBox
+    int sortIndex = ui->sortComboBox->currentIndex();
+    QString sortOrder = (sortIndex == 0) ? "ORDER BY quantiteDispo DESC" : "ORDER BY quantiteDispo ASC";
+
+    // Récupérer les données triées via Produit::afficher
+    Produit produit(0, "", 0, QDate::currentDate(), QDate::currentDate());
+    QSqlQueryModel* queryModel = produit.afficher(sortOrder);
+
+    // Configurer les en-têtes pour le modèle
+    queryModel->setHeaderData(0, Qt::Horizontal, "ID");
+    queryModel->setHeaderData(1, Qt::Horizontal, "Nom du Produit");
+    queryModel->setHeaderData(2, Qt::Horizontal, "Quantité");
+    queryModel->setHeaderData(3, Qt::Horizontal, "Date de Livraison");
+    queryModel->setHeaderData(4, Qt::Horizontal, "Date de Réapprovisionnement");
+
+    // Appliquer le modèle à la table
+    ui->tableslim->setModel(queryModel);
+
+    // Appliquer les couleurs via un délégué
+    for (int row = 0; row < queryModel->rowCount(); ++row) {
+        int quantity = queryModel->index(row, 2).data().toInt(); // Colonne "Quantité"
+
+        // Vérification des seuils
+        if (quantity == 0) {
+            ui->tableslim->model()->setData(
+                ui->tableslim->model()->index(row, 2),
+                QColor(Qt::red),
+                Qt::BackgroundRole
+                );
+        } else if (quantity < 10) {
+            ui->tableslim->model()->setData(
+                ui->tableslim->model()->index(row, 2),
+                QColor(Qt::yellow),
+                Qt::BackgroundRole
+                );
+        }
+    }
+}
+void MainWindow::on_sushButton_21_clicked() {
+    afficherProduitsDansTable();
+}
+void MainWindow::on_sushButton_24_clicked() {
+    // Lire l'ID à supprimer depuis le QLineEdit (assurez-vous de nommer votre QLineEdit comme lineEdit_id)
+    int id = ui->lineEdit->text().toInt();
+    Produit produit(0, "", 0, QDate::currentDate(), QDate::currentDate());
+    if (produit.supprimer(id)) {
+        // Afficher un message de confirmation
+        QMessageBox::information(this, "Suppression", "Le produit a été supprimé avec succès.");
+        // Actualiser l'affichage des produits après la suppression
+        afficherProduitsDansTable();
+    } else {
+        // Afficher un message d'erreur si la suppression a échoué
+        QMessageBox::warning(this, "Erreur", "Échec de la suppression du produit.");
+    }
+}
+void MainWindow::Rechercher(const QString &searchID)
+{
+    QSqlQueryModel* model = qobject_cast<QSqlQueryModel*>(ui->tableslim->model());  // Récupérer le modèle attaché à la QTableView
+    if (!model) {
+        QMessageBox::warning(this, "Erreur", "Modèle de données non valide.");
+        return;
+    }
+
+    int rowCount = model->rowCount();
+    bool productFound = false;  // Indicateur pour vérifier si le produit a été trouvé
+
+    // Parcourir chaque ligne du modèle pour chercher l'ID du produit
+    for (int i = 0; i < rowCount; ++i) {
+        QString id = model->index(i, 0).data().toString();  // Supposons que l'ID est dans la 1ère colonne (index 0)
+
+        // Vérifier si l'ID correspond à celui recherché
+        if (id == searchID) {
+            productFound = true;
+
+            // Sélectionner la ligne correspondante
+            ui->tableslim->selectRow(i);
+
+            // Afficher les détails du produit trouvé
+            QString productName = model->index(i, 1).data().toString();  // Nom du produit dans la 2ème colonne (index 1)
+            QString quantity = model->index(i, 2).data().toString();  // Quantité dans la 3ème colonne (index 2)
+            QString deliveryDate = model->index(i, 3).data().toString();  // Date de livraison dans la 4ème colonne (index 3)
+            QString restockDate = model->index(i, 4).data().toString();  // Date de réapprovisionnement dans la 5ème colonne (index 4)
+
+            // Affichage des informations dans une boîte de message
+            QMessageBox::information(this, "Produit trouvé",
+                                     "ID: " + searchID + "\nNom: " + productName +
+                                         "\nQuantité disponible: " + quantity +
+                                         "\nDate de livraison: " + deliveryDate +
+                                         "\nDate de réapprovisionnement: " + restockDate);
+            return;
+        }
+    }
+
+    // Si le produit n'a pas été trouvé, afficher un message d'erreur
+    if (!productFound) {
+        QMessageBox::warning(this, "Produit introuvable", "Aucun produit trouvé avec l'ID " + searchID);
+    }
+}
+
+void MainWindow::on_sushButton_28_clicked()
+{
+    // Récupérer l'ID de produit depuis le QLineEdit
+    QString searchID = ui->recherchesalim->text();  // lineEdit_7 contient l'ID du produit
+
+    // Vérifier si l'ID est vide
+    if (searchID.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer un ID de produit.");
+        return;
+    }
+
+    // Appeler la méthode Rechercher avec l'ID de produit
+    Rechercher(searchID);
+}
+void MainWindow::afficherStatistiques()
+{
+    QSqlQuery query;
+    query.prepare("SELECT nomProduit, quantiteDispo FROM stocks");
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec de la récupération des données : " + query.lastError().text());
+        return;
+    }
+
+    QPieSeries *series = new QPieSeries(this);
+    while (query.next()) {
+        QString nomProduit = query.value(0).toString();
+        int quantiteDispo = query.value(1).toInt();
+        series->append(nomProduit, quantiteDispo);
+    }
+
+    if (series->slices().isEmpty()) {
+        QMessageBox::warning(this, "Avertissement", "Aucune donnée disponible pour les statistiques.");
+        delete series; // Prevent memory leak
+        return;
+    }
+
+    // Customize colors
+    QList<QColor> customColors = {
+        QColor("#ff6f61"), // Warm red
+        QColor("#6a9fb5"), // Soft blue
+        QColor("#77dd77"), // Light green
+        QColor("#fdfd96"), // Yellow
+        QColor("#ffb347"), // Orange
+        QColor("#836953"), // Brown
+        QColor("#b19cd9"), // Lavender
+        QColor("#ff6961"), // Pastel red
+        QColor("#aec6cf"), // Pastel blue
+        QColor("#f49ac2")  // Pastel pink
+    };
+
+    int colorIndex = 0;
+    for (auto slice : series->slices()) {
+        slice->setBrush(customColors[colorIndex % customColors.size()]);
+        colorIndex++;
+        slice->setLabel(QString("%1 (%2)").arg(slice->label()).arg(slice->value())); // Set slice labels
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Statistiques des Produits");
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView = new QChartView(chart, this);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QWidget *statsPage = ui->stat_2;
+    if (!statsPage) {
+        QMessageBox::critical(this, "Erreur", "Le widget 'stat' n'est pas initialisé.");
+        return;
+    }
+
+    if (statsPage->layout()) {
+        QLayout *oldLayout = statsPage->layout();
+        QLayoutItem *item;
+        while ((item = oldLayout->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        delete oldLayout;
+    }
+
+    QVBoxLayout *layout = new QVBoxLayout(statsPage);
+    layout->addWidget(chartView);
+    statsPage->setLayout(layout);
+}
+void MainWindow::on_sushButton_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(16);
+    afficherStatistiques();               // Display statistics
+
+}
+void MainWindow::on_sushButton_19_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(15);
+}
+void MainWindow::on_sortComboBox_currentIndexChanged() {
+    afficherProduitsDansTable(); // Refresh table when sorting changes
+}
+void MainWindow::on_sushButton_22_clicked() {
+    try {
+        // Étape 1 : Choisir le chemin du fichier
+        QString filePath = QFileDialog::getSaveFileName(this, "Enregistrer le fichier PDF", QDir::homePath(), "Documents (*.pdf)");
+
+        // Vérifier si l'utilisateur a annulé l'opération
+        if (filePath.isEmpty()) {
+            QMessageBox::warning(this, "Exportation annulée", "Aucun fichier sélectionné.");
+            return;
+        }
+
+        // Forcer l'ajout de l'extension .pdf si elle est manquante
+        if (!filePath.endsWith(".pdf", Qt::CaseInsensitive)) {
+            filePath += ".pdf";
+        }
+
+        qDebug() << "Chemin sélectionné pour le fichier PDF:" << filePath;
+
+        // Vérifier l'initialisation de la table
+        if (!ui->tableslim || !ui->tableslim->model()) {
+            QMessageBox::critical(this, "Erreur", "Table ou modèle non initialisé.");
+            return;
+        }
+
+        QAbstractItemModel *model = ui->tableslim->model();
+
+        // Étape 2 : Créer un objet QPrinter
+        QPrinter printer(QPrinter::HighResolution);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setOutputFileName(filePath);
+
+        // Créer un QPageLayout pour définir l'orientation en paysage
+        QPageLayout pageLayout(QPageSize::A4, QPageLayout::Landscape, QMarginsF(10, 10, 10, 10));
+        printer.setPageLayout(pageLayout);
+
+        // Créer un QPainter pour dessiner sur le PDF
+        QPainter painter;
+        if (!painter.begin(&printer)) {
+            QMessageBox::critical(this, "Erreur d'accès", "Impossible de commencer l'écriture dans le fichier PDF.");
+            return;
+        }
+
+        // Étape 3 : Dessiner le contenu du tableau sur le PDF
+        const int tableMargin = 20;   // Marge autour du tableau
+        const int rowHeight = 500;   // Hauteur des lignes
+        const int colWidth = 2500;   // Largeur des colonnes
+        const int titleSpacing = 1500; // Espace après le titre
+        const int lineThickness = 1; // Épaisseur des lignes
+
+        int currentY = tableMargin;
+
+        // Dessiner le titre
+        painter.setFont(QFont("Arial", 16, QFont::Bold));  // Titre plus grand
+        painter.drawText(0, currentY, "Liste des Produits");
+        currentY += titleSpacing;  // Espace après le titre
+
+        // Dessiner les en-têtes du tableau
+        painter.setFont(QFont("Arial", 12, QFont::Bold));  // En-têtes plus grands
+        int currentX = tableMargin;
+
+        for (int col = 0; col < model->columnCount(); ++col) {
+            QString headerText = model->headerData(col, Qt::Horizontal).toString();
+            painter.drawText(currentX, currentY, headerText);
+            currentX += colWidth;
+        }
+        currentY += rowHeight;  // Espacement après les en-têtes
+
+        // Dessiner les données du tableau
+        painter.setFont(QFont("Arial", 12));  // Données plus grandes
+        for (int row = 0; row < model->rowCount(); ++row) {
+            currentX = tableMargin;
+            for (int col = 0; col < model->columnCount(); ++col) {
+                QString cellText = model->index(row, col).data().toString();
+                painter.drawText(currentX, currentY, cellText);
+                currentX += colWidth;
+            }
+            currentY += rowHeight;  // Passer à la ligne suivante
+        }
+
+        // Terminer l'écriture du fichier PDF
+        painter.end();
+
+        // Étape 4 : Vérification si le fichier a bien été créé
+        if (QFile::exists(filePath)) {
+            QMessageBox::information(this, "Exportation réussie", "Le fichier PDF a été enregistré avec succès :\n" + filePath);
+        } else {
+            QMessageBox::critical(this, "Erreur", "Le fichier PDF n'a pas été créé.");
+        }
+
+    } catch (std::exception &e) {
+        QMessageBox::critical(this, "Exception", "Une erreur inattendue est survenue : " + QString::fromStdString(e.what()));
+    } catch (...) {
+        QMessageBox::critical(this, "Erreur inconnue", "Une erreur inconnue est survenue.");
+    }
+}
+void MainWindow::on_sushButton_whatsapp_clicked() {
+    QString criticalProducts;
+    QString lowStockProducts;
+
+    // Récupérer le modèle associé au QTableView
+    QAbstractItemModel* model = ui->tableslim->model();
+    if (!model) {
+        qDebug() << "Le modèle est null.";
+        return;
+    }
+
+    // Parcourir les lignes du modèle
+    for (int row = 0; row < model->rowCount(); ++row) {
+        // Accéder à la quantité (colonne 2) et au nom du produit (colonne 1)
+        QModelIndex quantityIndex = model->index(row, 2);
+        QModelIndex productNameIndex = model->index(row, 1);
+
+        int quantity = model->data(quantityIndex).toInt();
+        QString productName = model->data(productNameIndex).toString();
+
+        // Vérification des seuils de stock
+        if (quantity == 0) {
+            criticalProducts += productName + " (Stock: 0)\n";
+        } else if (quantity < 10) {
+            lowStockProducts += productName + " (Stock: " + QString::number(quantity) + ")\n";
+        }
+    }
+
+    // Envoi de la notification WhatsApp
+    sendWhatsAppNotification(criticalProducts, lowStockProducts);
+}
+
+void MainWindow::sendWhatsAppNotification(const QString& criticalProducts, const QString& lowStockProducts) {
+
+
+    // Prepare the message content
+    QString message = "Stock Alerts as of " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":\n\n";
+    if (!criticalProducts.isEmpty()) {
+        message += "Critical Stock:\n" + criticalProducts + "\n";
+    }
+    if (!lowStockProducts.isEmpty()) {
+        message += "Low Stock:\n" + lowStockProducts + "\n";
+    }
+
+    // Create API URL
+    QUrl apiUrl("https://api.twilio.com/2010-04-01/Accounts/" + accountSID + "/Messages.json");
+
+    // Initialize QNetworkRequest
+    QNetworkRequest request(apiUrl);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+    // Prepare POST data
+    QByteArray data;
+    data.append("From=" + QUrl::toPercentEncoding(fromWhatsApp) + "&");
+    data.append("To=" + QUrl::toPercentEncoding(toWhatsApp) + "&");
+    data.append("Body=" + QUrl::toPercentEncoding(message));
+
+    // Add basic authentication
+    QByteArray auth = accountSID.toUtf8() + ":" + authToken.toUtf8();
+    request.setRawHeader("Authorization", "Basic " + auth.toBase64());
+
+    // Debugging: Log the request
+    qDebug() << "API URL:" << apiUrl.toString();
+    qDebug() << "POST Data:" << data;
+
+    // Send request
+    QNetworkAccessManager* networkManager = new QNetworkAccessManager(this);
+    QNetworkReply* reply = networkManager->post(request, data);
+
+    // Handle response
+    connect(reply, &QNetworkReply::finished, this, &MainWindow::onTwilioResponseReceived);
+}
+
+void MainWindow::onTwilioResponseReceived() {
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+    if (reply) {
+        if (reply->error() == QNetworkReply::NoError) {
+            QString response = reply->readAll();
+            qDebug() << "Message envoyé avec succès: " << response;
+            QMessageBox::information(this, "Succès", "Le Message a été envoyé avec succès.");
+        } else {
+            QString errorResponse = reply->readAll();
+            qDebug() << "Erreur d'envoi du SMS: " << errorResponse;
+            QMessageBox::critical(this, "Erreur", "L'envoi du SMS a échoué: " + errorResponse);
+        }
+        reply->deleteLater();
+    }
+}
+void MainWindow::on_sushButton_25_clicked()
+{
+    QMessageBox::information(this, "Information", "La SESSION EST EXPIREE");
+}

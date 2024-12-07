@@ -25,6 +25,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     pdf.cpp \
+    produit.cpp \
     reservation.cpp
 
 HEADERS += \
@@ -35,6 +36,7 @@ HEADERS += \
     employe.h \
     mainwindow.h \
     pdf.h \
+    produit.h \
     reservation.h
 
 FORMS += \
