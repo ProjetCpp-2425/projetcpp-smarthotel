@@ -10,10 +10,10 @@ Reservation::Reservation() {}
 
 Reservation::Reservation(int ID_RESERVATION, QDate DATE_RESERVATION, QDate DATE_ARRIVE,
                          QDate DATE_DEPART, QString TYPE_CHAMBRE, QString STATUT_RESERVATION,
-                         QString MODE_PAIMENT, float MONTANT)
+                         QString MODE_PAIMENT, float MONTANT ,QString UID_CARTE)
     : ID_RESERVATION(ID_RESERVATION), DATE_RESERVATION(DATE_RESERVATION), DATE_ARRIVE(DATE_ARRIVE),
     DATE_DEPART(DATE_DEPART), TYPE_CHAMBRE(TYPE_CHAMBRE), STATUT_RESERVATION(STATUT_RESERVATION),
-    MODE_PAIMENT(MODE_PAIMENT), MONTANT(MONTANT) {}
+    MODE_PAIMENT(MODE_PAIMENT), MONTANT(MONTANT) ,UID_CARTE(UID_CARTE) {}
 
 
 int Reservation::getIdReservation() const { return ID_RESERVATION; }
@@ -24,7 +24,7 @@ QString Reservation::getTypeChambre() const { return TYPE_CHAMBRE; }
 QString Reservation::getStatutReservation() const { return STATUT_RESERVATION; }
 QString Reservation::getModePaiment() const { return MODE_PAIMENT; }
 float Reservation::getMontant() const { return MONTANT; }
-
+QString Reservation::getUidcarte() const { return UID_CARTE; }
 
 void Reservation::setIdReservation(int id_reservation) { ID_RESERVATION = id_reservation; }
 void Reservation::setDateReservation(const QDate &date_reservation) { DATE_RESERVATION = date_reservation; }
@@ -34,7 +34,7 @@ void Reservation::setTypeChambre(const QString &type_chambre) { TYPE_CHAMBRE = t
 void Reservation::setStatutReservation(const QString &statut_reservation) { STATUT_RESERVATION = statut_reservation; }
 void Reservation::setModePaiment(const QString &mode_paiment) { MODE_PAIMENT = mode_paiment; }
 void Reservation::setMontant(float montant) { MONTANT = montant; }
-
+void Reservation::setUidcarte(QString uid) { UID_CARTE = uid; }
 
 bool Reservation::ajouter() {
     QSqlQuery query;
@@ -51,10 +51,10 @@ bool Reservation::ajouter() {
 
 
     query.prepare("INSERT INTO RESERVATIONS (\"ID_RESERVATION\", \"DATE_RESERVATION\", \"DATE_ARRIVE\", \"DATE_DEPART\", "
-                  "\"TYPE_CHAMBRE\", \"STATUT_RESERVATION\", \"MODE_PAIMENT\", \"MONTANT\") "
+                  "\"TYPE_CHAMBRE\", \"STATUT_RESERVATION\", \"MODE_PAIMENT\", \"MONTANT\",\"UID_CARTE\") "
                   "VALUES (:ID_RESERVATION, TO_DATE(:DATE_RESERVATION, 'YYYY-MM-DD'), "
                   "TO_DATE(:DATE_ARRIVE, 'YYYY-MM-DD'), TO_DATE(:DATE_DEPART, 'YYYY-MM-DD'), "
-                  ":TYPE_CHAMBRE, :STATUT_RESERVATION, :MODE_PAIMENT, :MONTANT)");
+                  ":TYPE_CHAMBRE, :STATUT_RESERVATION, :MODE_PAIMENT, :MONTANT, :UID_CARTE)");
 
 
     query.bindValue(":ID_RESERVATION", ID_RESERVATION);
@@ -65,6 +65,7 @@ bool Reservation::ajouter() {
     query.bindValue(":STATUT_RESERVATION", STATUT_RESERVATION);
     query.bindValue(":MODE_PAIMENT", MODE_PAIMENT);
     query.bindValue(":MONTANT", MONTANT);
+    query.bindValue(":UID_CARTE", UID_CARTE);
 
     if (!query.exec()) {
         qDebug() << "Erreur lors de l'insertion de la réservation : " << query.lastError().text();

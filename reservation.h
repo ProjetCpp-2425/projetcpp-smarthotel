@@ -12,7 +12,7 @@ public:
     Reservation();
     Reservation(int ID_RESERVATION, QDate DATE_RESERVATION, QDate DATE_ARRIVE, QDate DATE_DEPART,
                 QString TYPE_CHAMBRE, QString STATUT_RESERVATION, QString MODE_PAIMENT,
-                float MONTANT);
+                float MONTANT,QString UID_CARTE);
 
 
     bool ajouter();
@@ -32,6 +32,7 @@ public:
     QString getStatutReservation() const;
     QString getModePaiment() const;
     float getMontant() const;
+    QString getUidcarte() const;
 
     void setIdReservation(int id_reservation);
     void setDateReservation(const QDate &date_reservation);
@@ -41,6 +42,7 @@ public:
     void setStatutReservation(const QString &statut_reservation);
     void setModePaiment(const QString &mode_paiment);
     void setMontant(float montant);
+    void setUidcarte(QString uid);
     QSqlQueryModel* trierPar(const QString &critere);
     QMap<QString, int> obtenirStatistiquesTypeChambre();
 
@@ -53,6 +55,7 @@ private:
     QString STATUT_RESERVATION;
     QString MODE_PAIMENT;
     float MONTANT;
+    QString UID_CARTE;
 };
 
 #endif

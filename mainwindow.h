@@ -11,7 +11,7 @@
 #include <QNetworkReply>
 #include <QVector>
 #include "reservation.h"
-
+#include "arduino1.h"
 namespace Ui {
 class MainWindow;
 }
@@ -38,6 +38,8 @@ private slots:
     void on_sendVerificationButton_clicked();
     bool envoyerVerificationEmail(const QString &recipient, const QString &subject, const QString &body);
     void on_verifyCodeButton_clicked();
+    void onCardRead(QString uid);
+
         // Fonction pour afficher les réservations
 
 
@@ -50,6 +52,7 @@ private:
     // Champs de l'interface
     QLineEdit *searchLineEdit;
     QLineEdit *idReservationLineEdit;
+    QLineEdit *uidcarteline;
     QDateEdit *dateReservationDateEdit;
     QDateEdit *dateArriveDateEdit;
     QDateEdit *dateDepartDateEdit;
@@ -57,6 +60,9 @@ private:
     QComboBox *statutReservationComboBox;
     QComboBox *modePaiementComboBox;
     QLineEdit *montantLineEdit;
+    ArduinoManager *arduinoManager;
+    QSerialPort *serial;
+    QString dataBuffer;
 
     // Boutons
     QPushButton *validerButton;

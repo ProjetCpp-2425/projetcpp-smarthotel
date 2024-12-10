@@ -24,15 +24,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">QWidget {
-    background: qlineargradient(
-        spread:pad, 
-        x1:0.7, y1:1, x2:0.1, y2:0, 
-        stop:0 #3533cd, 
-        stop:1 #000000
-    );
-} 
-</string>
+     <string notr="true">color: rgb(255, 255, 255);</string>
     </property>
     <property name="currentIndex">
      <number>2</number>
@@ -8982,7 +8974,7 @@ color: rgb(0, 0, 0);</string>
 color: rgb(0, 0, 0);</string>
       </property>
       <property name="text">
-       <string>ID Client :</string>
+       <string>UID :</string>
       </property>
      </widget>
      <widget class="QWidget" name="widget_19" native="true">
@@ -9016,7 +9008,7 @@ color: rgb(0, 0, 0);</string>
         <string>ID reservation :</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="id_10">
+      <widget class="QLineEdit" name="uid">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -9092,17 +9084,12 @@ color: rgb(255, 255, 255);</string>
        </property>
        <item>
         <property name="text">
-         <string>Type</string>
+         <string>Single</string>
         </property>
        </item>
        <item>
         <property name="text">
          <string>Double</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Single</string>
         </property>
        </item>
        <item>
@@ -9456,16 +9443,16 @@ color: rgb(0, 0, 0);
      <widget class="QPushButton" name="mail">
       <property name="geometry">
        <rect>
-        <x>660</x>
-        <y>600</y>
-        <width>191</width>
+        <x>1020</x>
+        <y>170</y>
+        <width>161</width>
         <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(179, 170, 255);
+       <string notr="true"> background-color: rgb(172, 44, 103);
 border-radius:10px;
-color: rgb(0, 0, 80);
+color: rgb(255, 255, 255);
  
 font: 700 10pt &quot;Segoe UI&quot;;
 text-decoration: underline;</string>

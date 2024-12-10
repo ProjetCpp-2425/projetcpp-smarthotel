@@ -537,7 +537,7 @@ public:
     QLabel *label_30;
     QWidget *widget_19;
     QLabel *label_34;
-    QLineEdit *id_10;
+    QLineEdit *uid;
     QLineEdit *id_11;
     QDateEdit *dateEdit_13;
     QLabel *label_33;
@@ -2913,15 +2913,7 @@ public:
         stackedWidget = new QStackedWidget(centralwidget);
         stackedWidget->setObjectName("stackedWidget");
         stackedWidget->setGeometry(QRect(0, 0, 1301, 731));
-        stackedWidget->setStyleSheet(QString::fromUtf8("QWidget {\n"
-"    background: qlineargradient(\n"
-"        spread:pad, \n"
-"        x1:0.7, y1:1, x2:0.1, y2:0, \n"
-"        stop:0 #3533cd, \n"
-"        stop:1 #000000\n"
-"    );\n"
-"} \n"
-""));
+        stackedWidget->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);"));
         page_61 = new QWidget();
         page_61->setObjectName("page_61");
         lineEdit_nom = new QLineEdit(page_61);
@@ -6370,10 +6362,10 @@ public:
         label_34->setStyleSheet(QString::fromUtf8("font: 700 9pt \"Segoe UI\";\n"
 " background-color:transparent;\n"
 "color: rgb(0, 0, 0);"));
-        id_10 = new QLineEdit(widget_19);
-        id_10->setObjectName("id_10");
-        id_10->setGeometry(QRect(130, 70, 131, 21));
-        id_10->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
+        uid = new QLineEdit(widget_19);
+        uid->setObjectName("uid");
+        uid->setGeometry(QRect(130, 70, 131, 21));
+        uid->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
 "color: rgb(255, 255, 255);"));
         id_11 = new QLineEdit(widget_19);
         id_11->setObjectName("id_11");
@@ -6393,7 +6385,6 @@ public:
 " background-color:transparent;\n"
 "color: rgb(0, 0, 0);"));
         type = new QComboBox(widget_19);
-        type->addItem(QString());
         type->addItem(QString());
         type->addItem(QString());
         type->addItem(QString());
@@ -6531,10 +6522,10 @@ public:
         omar->setGeometry(QRect(830, 240, 361, 211));
         mail = new QPushButton(page_13);
         mail->setObjectName("mail");
-        mail->setGeometry(QRect(660, 600, 191, 31));
-        mail->setStyleSheet(QString::fromUtf8("background-color: rgb(179, 170, 255);\n"
+        mail->setGeometry(QRect(1020, 170, 161, 31));
+        mail->setStyleSheet(QString::fromUtf8(" background-color: rgb(172, 44, 103);\n"
 "border-radius:10px;\n"
-"color: rgb(0, 0, 80);\n"
+"color: rgb(255, 255, 255);\n"
 " \n"
 "font: 700 10pt \"Segoe UI\";\n"
 "text-decoration: underline;"));
@@ -23091,13 +23082,12 @@ public:
         statut->setItemText(3, QCoreApplication::translate("MainWindow", "en attente", nullptr));
 
         label_31->setText(QCoreApplication::translate("MainWindow", "Montant :", nullptr));
-        label_30->setText(QCoreApplication::translate("MainWindow", "ID Client :", nullptr));
+        label_30->setText(QCoreApplication::translate("MainWindow", "UID :", nullptr));
         label_34->setText(QCoreApplication::translate("MainWindow", "ID reservation :", nullptr));
         label_33->setText(QCoreApplication::translate("MainWindow", "Type de chambre :", nullptr));
-        type->setItemText(0, QCoreApplication::translate("MainWindow", "Type", nullptr));
+        type->setItemText(0, QCoreApplication::translate("MainWindow", "Single", nullptr));
         type->setItemText(1, QCoreApplication::translate("MainWindow", "Double", nullptr));
-        type->setItemText(2, QCoreApplication::translate("MainWindow", "Single", nullptr));
-        type->setItemText(3, QCoreApplication::translate("MainWindow", "suite", nullptr));
+        type->setItemText(2, QCoreApplication::translate("MainWindow", "suite", nullptr));
 
         label_634->setText(QCoreApplication::translate("MainWindow", "Date depart :", nullptr));
         label_36->setText(QCoreApplication::translate("MainWindow", "Date d'arriv\303\251 :", nullptr));
