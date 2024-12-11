@@ -7,6 +7,9 @@ QT += network
 QT +=printsupport
 QT += serialport
 
+RESOURCES += resources.qrc
+QT += core gui widgets charts
+QT += core gui widgets sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,11 +21,13 @@ CONFIG += c++17
 
 SOURCES += \
     arduino.cpp \
+    arduino1.cpp \
     client.cpp \
     connection.cpp \
     email.cpp \
     employe.cpp \
     main.cpp \
+    maintenance.cpp \
     mainwindow.cpp \
     pdf.cpp \
     produit.cpp \
@@ -30,10 +35,12 @@ SOURCES += \
 
 HEADERS += \
     arduino.h \
+    arduino1.h \
     client.h \
     connection.h \
     email.h \
     employe.h \
+    maintenance.h \
     mainwindow.h \
     pdf.h \
     produit.h \

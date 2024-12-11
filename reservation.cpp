@@ -10,10 +10,11 @@ Reservation::Reservation() {}
 
 Reservation::Reservation(int ID_RESERVATION, QDate DATE_RESERVATION, QDate DATE_ARRIVE,
                          QDate DATE_DEPART, QString TYPE_CHAMBRE, QString STATUT_RESERVATION,
-                         QString MODE_PAIMENT, float MONTANT,int ID_CLIENT)
+                         QString MODE_PAIMENT, float MONTANT,int ID_CLIENT , QString UID_CARTE)
     : ID_RESERVATION(ID_RESERVATION), DATE_RESERVATION(DATE_RESERVATION), DATE_ARRIVE(DATE_ARRIVE),
     DATE_DEPART(DATE_DEPART), TYPE_CHAMBRE(TYPE_CHAMBRE), STATUT_RESERVATION(STATUT_RESERVATION),
-    MODE_PAIMENT(MODE_PAIMENT), MONTANT(MONTANT) , ID_CLIENT(ID_CLIENT){}
+    MODE_PAIMENT(MODE_PAIMENT), MONTANT(MONTANT) , ID_CLIENT(ID_CLIENT) ,UID_CARTE(UID_CARTE) {}
+
 
 
 int Reservation::getIdReservation() const { return ID_RESERVATION; }
@@ -25,7 +26,7 @@ QString Reservation::getStatutReservation() const { return STATUT_RESERVATION; }
 QString Reservation::getModePaiment() const { return MODE_PAIMENT; }
 float Reservation::getMontant() const { return MONTANT; }
 int Reservation::getIdclient() const { return ID_CLIENT; }
-
+QString Reservation::getUidcarte() const { return UID_CARTE; }
 
 void Reservation::setIdReservation(int id_reservation) { ID_RESERVATION = id_reservation; }
 void Reservation::setDateReservation(const QDate &date_reservation) { DATE_RESERVATION = date_reservation; }
@@ -36,7 +37,7 @@ void Reservation::setStatutReservation(const QString &statut_reservation) { STAT
 void Reservation::setModePaiment(const QString &mode_paiment) { MODE_PAIMENT = mode_paiment; }
 void Reservation::setMontant(float montant) { MONTANT = montant; }
 void Reservation::setIDclient(int id_client) { ID_CLIENT = id_client; }
-
+void Reservation::setUidcarte(QString uid) { UID_CARTE = uid; }
 
 bool Reservation::ajouter() {
     QSqlQuery query;
@@ -53,10 +54,10 @@ bool Reservation::ajouter() {
 
 
     query.prepare("INSERT INTO RESERVATIONS (\"ID_RESERVATION\", \"DATE_RESERVATION\", \"DATE_ARRIVE\", \"DATE_DEPART\", "
-                  "\"TYPE_CHAMBRE\", \"STATUT_RESERVATION\", \"MODE_PAIMENT\", \"MONTANT\" ,\"ID_CLIENT\") "
+                  "\"TYPE_CHAMBRE\", \"STATUT_RESERVATION\", \"MODE_PAIMENT\", \"MONTANT\" ,\"ID_CLIENT\" ,\"UID_CARTE\") "
                   "VALUES (:ID_RESERVATION, TO_DATE(:DATE_RESERVATION, 'YYYY-MM-DD'), "
                   "TO_DATE(:DATE_ARRIVE, 'YYYY-MM-DD'), TO_DATE(:DATE_DEPART, 'YYYY-MM-DD'), "
-                  ":TYPE_CHAMBRE, :STATUT_RESERVATION, :MODE_PAIMENT, :MONTANT ,:ID_CLIENT)");
+                  ":TYPE_CHAMBRE, :STATUT_RESERVATION, :MODE_PAIMENT, :MONTANT ,:ID_CLIENT , :UID_CARTE)");
 
 
     query.bindValue(":ID_RESERVATION", ID_RESERVATION);
@@ -68,6 +69,7 @@ bool Reservation::ajouter() {
     query.bindValue(":MODE_PAIMENT", MODE_PAIMENT);
     query.bindValue(":MONTANT", MONTANT);
     query.bindValue(":ID_CLIENT", ID_CLIENT);
+    query.bindValue(":UID_CARTE", UID_CARTE);
 
     if (!query.exec()) {
         qDebug() << "Erreur lors de l'insertion de la réservation : " << query.lastError().text();
@@ -81,7 +83,7 @@ bool Reservation::ajouter() {
 
 bool Reservation::modifier(int ID_RESERVATION, QDate DATE_RESERVATION, QDate DATE_ARRIVE, QDate DATE_DEPART,
                            QString TYPE_CHAMBRE, QString STATUT_RESERVATION, QString MODE_PAIMENT,
-                           float MONTANT , int ID_CLIENT) {
+                           float MONTANT , int ID_CLIENT ,  QString UID_CARTE) {
     QSqlQuery query;
     if (ID_RESERVATION <= 0) {
         QMessageBox::warning(nullptr, "Erreur", "L'ID_RESERVATION doit être un nombre positif.");
@@ -103,6 +105,7 @@ bool Reservation::modifier(int ID_RESERVATION, QDate DATE_RESERVATION, QDate DAT
                   "\"STATUT_RESERVATION\" = :STATUT_RESERVATION, "
                   "\"MODE_PAIMENT\" = :MODE_PAIMENT, "
                   "\"MONTANT\" = :MONTANT ,"
+                  "\"UID_CARTE\" = :UID_CARTE ,"
                   "WHERE \"ID_RESERVATION\" = :ID_RESERVATION");
 
 
@@ -115,6 +118,8 @@ bool Reservation::modifier(int ID_RESERVATION, QDate DATE_RESERVATION, QDate DAT
     query.bindValue(":MODE_PAIMENT", MODE_PAIMENT);
     query.bindValue(":MONTANT", MONTANT);
     query.bindValue(":ID_CLIENT", ID_CLIENT);
+    query.bindValue(":UID_CARTE", UID_CARTE);
+
 
 
     if (!query.exec()) {

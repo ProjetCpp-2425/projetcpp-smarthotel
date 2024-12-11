@@ -215,9 +215,17 @@ bool Employe::modifier(int ID_EMPLOYE, QString NOM, QString PRENOM, float SALAIR
 
 bool Employe::supprimer(int ID_EMPLOYE) {
     QSqlQuery query;
+
+    // Supprimer les enregistrements dans la table maintenance
+    query.prepare("DELETE FROM maintenances WHERE ID_EMPLOYE=:ID_EMPLOYE");
+    query.bindValue(":ID_EMPLOYE", ID_EMPLOYE);
+    if (!query.exec()) {
+        return false; // Échec de la suppression dans maintenance
+    }
+
+    // Supprimer l'employé dans la table employes
     query.prepare("DELETE FROM employes WHERE ID_EMPLOYE=:ID_EMPLOYE");
     query.bindValue(":ID_EMPLOYE", ID_EMPLOYE);
-
     return query.exec();
 }
 

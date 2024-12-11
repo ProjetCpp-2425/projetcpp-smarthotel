@@ -75,6 +75,63 @@
 #include <QUrlQuery>
 
 
+
+
+
+
+#include "qsqlerror.h"
+#include "ui_mainwindow.h"
+#include "QSqlQueryModel"
+#include "QTableView"
+#include "maintenance.h"
+#include "qmessagebox.h"
+#include <QFileDialog>
+#include <QPrinter>
+#include <QTextDocument>
+#include <QFileInfo>
+#include <QString>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QLineSeries>
+#include <QtMath>
+#include <QtSql/QSqlQuery>
+#include <QVBoxLayout>
+#include <QtCharts>
+#include <QCalendarWidget>
+#include <QSqlRecord>
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
+#include <sstream>
+#include <utility>
+#include <QStandardItemModel>
+#include <QDate>
+#include <QChartView>
+#include <QChart>
+#include <QPieSeries>
+#include <QPieSlice>
+#include <QVBoxLayout>
+#include <QTableWidgetItem>
+#include <QMessageBox>
+#include <QPixmap>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QStackedWidget>
+#include <QColor>
+#include <QTextCharFormat>  // Pour personnaliser les dates (arrière-plan, texte)
+#include<QSqlTableModel>
+#include <QPainter>
+#include <QTimer>
+
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -85,6 +142,17 @@ MainWindow::MainWindow(QWidget *parent)
 
 {
     ui->setupUi(this);
+
+    ui->tableView_2->setModel(Mtmp.afficher());
+    connect(ui->comboBox_34, SIGNAL(currentTextChanged(QString)), this, SLOT(onComboBoxPriorityChanged(QString)));
+    this->setStyleSheet("QLineEdit { color : white; }");
+    connect(ui->pushButton_rechercheimen,SIGNAL(clicked()), this, SLOT(on_pushButton_43_clicked()));
+    connect(ui->pushButton_ajoutimen,SIGNAL(clicked()), this, SLOT(on_pushButton_39_clicked()));
+    connect(ui->pushButton_supprimerimen,SIGNAL(clicked()), this, SLOT(on_pushButton_38_clicked()));
+    connect(ui->pushButton_40,SIGNAL(clicked()), this, SLOT(on_pushButton_40_clicked()));
+    connect(ui->statmaintenance, &QPushButton::clicked, this, &MainWindow::on_pushButton_stat_clicked);
+
+
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
     arduino.listAvailablePorts();
     connect(ui->executer, &QPushButton::clicked, this, &MainWindow::on_validerClientButton_clicked);
@@ -95,6 +163,13 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         ui->statuslabel->setText("Erreur : Arduino non connecté.");
     }
+
+    //connect(arduinoManager, &ArduinoManager::cardRead, this, &MainWindow::onCardRead);
+
+
+    /*if (!arduinoManager->connectToArduino("COM3")) { // Remplacez "COM3" par le port série d'Arduino
+        QMessageBox::warning(this, "Erreur", "Impossible de se connecter à Arduino.");
+    }*/
 
 
     connect(reply, &QNetworkReply::finished, this, &MainWindow::onTwilioResponseReceived);
@@ -127,6 +202,12 @@ MainWindow::MainWindow(QWidget *parent)
     supprimerButton = ui->supprimerreservation;
     modifierButton = ui->modifierreservation;
     exporterPdf=ui->pdfr;
+    uidcarteline=ui->uid;
+
+
+
+
+
 
 
 
@@ -171,7 +252,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->recherche, &QLineEdit::textChanged, this, &MainWindow::Rechercheemploye);
 
     connect(ui->trier, &QPushButton::clicked, this, &MainWindow::on_boutonTrier_clicked);
-    connect(ui->pdf, &QPushButton::clicked, this, &MainWindow::exporterListeEmployesPDF);
+    connect(ui->pdfemploye, &QPushButton::clicked, this, &MainWindow::exporterListeEmployesPDF);
 
     connect(ui->boutonsms, &QPushButton::clicked, this, &MainWindow::afficherEmployeesAvecUnAnDeContratRestant);
     connect(ui->envoyer, &QPushButton::clicked, this, &MainWindow::sendRenewalMessages);
@@ -199,6 +280,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sedeconnecter11, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
     connect(ui->sedeconnecter12, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
     connect(ui->sedeconnecter13, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
+    connect(ui->sedeconnecter14, &QPushButton::clicked, this, &MainWindow::changerDePageconnexion);
 
     connect(ui->boutoncalmaint, &QPushButton::clicked, this, &MainWindow::changerDePagecalmaint);
     connect(ui->boutonstat, &QPushButton::clicked, this, &MainWindow::changerDePagestatistique);
@@ -218,6 +300,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->acceuilstatres, &QPushButton::clicked, this, &MainWindow::changerDePagereservation);
     connect(ui->acceuilcal, &QPushButton::clicked, this, &MainWindow::changerDePageemploye);
     connect(ui->acceuilcalmaint, &QPushButton::clicked, this, &MainWindow::changerDePagemaintenance);
+    connect(ui->acceuilstatmaintenance, &QPushButton::clicked, this, &MainWindow::changerDePagemaintenance);
 
 
     connect(ui->clientemp, &QPushButton::clicked, this, &MainWindow::changerDePageclient);
@@ -252,6 +335,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->maintenanceres, &QPushButton::clicked, this, &MainWindow::changerDePagemaintenance);
     connect(ui->maintenancestock, &QPushButton::clicked, this, &MainWindow::changerDePagemaintenance);
     connect(ui->maintenancestat, &QPushButton::clicked, this, &MainWindow::changerDePagemaintenance);
+    connect(ui->statmaintenance, &QPushButton::clicked, this, &MainWindow::changerDePagestatmaintenance);
+
 
 
 
@@ -467,6 +552,11 @@ void MainWindow::changerDePagehisclient()
     ui->tableHistorique->resizeColumnsToContents();
     ui->tableHistorique->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
+void MainWindow::changerDePagestatmaintenance()
+{
+
+    ui->stackedWidget->setCurrentIndex(16);
+}
 void MainWindow::onRechercheTextChanged(const QString &text)
 {
     bool idFound = false;
@@ -560,7 +650,7 @@ void MainWindow::on_supprimerButton_clicked() {
 
     if(employe.supprimer(id)) {
         ui->tabemp->setModel(employe.afficher());
-
+        ui->tableView_2->setModel(Mtmp.afficher());
         QMessageBox::information(this, "Suppression réussie", "L'employé a été supprimé avec succès.");
     } else {
         QMessageBox::critical(this, "Erreur", "La suppression de l'employé a échoué.");
@@ -643,102 +733,61 @@ void MainWindow::Rechercheemploye() {
 
 void MainWindow::exporterListeEmployesPDF()
 {
-
     QString filePath = QFileDialog::getSaveFileName(this, "Exporter sous PDF", "", "Fichiers PDF (*.pdf)");
 
     if (filePath.isEmpty()) {
         return;
     }
 
-
     if (!filePath.endsWith(".pdf", Qt::CaseInsensitive)) {
         filePath.append(".pdf");
     }
 
-    QPdfWriter pdfWriter(filePath);
-    pdfWriter.setPageSize(QPageSize(QPageSize::A2));
-    pdfWriter.setResolution(300);
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(filePath);
 
-    QPainter painter;
-    if (!painter.begin(&pdfWriter)) {
-        QMessageBox::critical(this, "Erreur", "Impossible de créer le fichier PDF.");
-        return;
-    }
+    QTextDocument doc;
 
+    QString html = R"(
+        <h1 style="text-align: center;">Liste des Employés</h1>
+        <table border="1" cellspacing="0" cellpadding="5" style="width: 100%; border-collapse: collapse; text-align: center;">
+            <tr style="background-color: #f2f2f2;">
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Téléphone</th>
+                <th>Poste</th>
+                <th>Salaire</th>
+                <th>Présences</th>
+                <th>Début Contrat</th>
+                <th>Fin Contrat</th>
+            </tr>
+    )";
 
-    QFont font;
-    font.setFamily("Arial");
-    font.setPointSize(10);
-    painter.setFont(font);
-
-
-    painter.drawText(2200, 50, "Liste des Employés");
-
-
-    int x = 150;
-    int y = 120;
-
-
-    int columnWidth = 500;
-
-
-    int rowHeight = 110;
-
-
-    painter.drawText(x, y, "ID");
-    painter.drawText(x + columnWidth, y, "Nom");
-    painter.drawText(x + 2 * columnWidth, y, "Prénom");
-    painter.drawText(x + 3 * columnWidth, y, "Téléphone");
-    painter.drawText(x + 4 * columnWidth, y, "Poste");
-    painter.drawText(x + 5 * columnWidth, y, "Salaire");
-    painter.drawText(x + 6 * columnWidth, y, "Presences");
-    painter.drawText(x + 7 * columnWidth, y, "Début Contrat");
-    painter.drawText(x + 8 * columnWidth, y, "Fin Contrat");
-
-
-    y += rowHeight;
-    painter.drawLine(x - 10, y, x + 8 * columnWidth, y);
-
-    y += rowHeight;
-
-
-     QSqlQuery query("SELECT ID_EMPLOYE, NOM, PRENOM, TELEPHONE, POSTE, SALAIRE, PRESENCES, D_DATE, F_DATE FROM employes");
+    QSqlQuery query("SELECT ID_EMPLOYE, NOM, PRENOM, TELEPHONE, POSTE, SALAIRE, PRESENCES, D_DATE, F_DATE FROM employes");
     while (query.next()) {
-
-        int id = query.value(0).toInt();
-        QString nom = query.value(1).toString();
-        QString prenom = query.value(2).toString();
-        float salaire = query.value(5).toFloat();
-        QString poste = query.value(4).toString();
-        QString telephone = query.value(3).toString();
-        int presences = query.value(6).toInt();
-        QDate debutContrat = query.value(7).toDate();
-        QDate finContrat = query.value(8).toDate();
-
-
-        painter.drawText(x, y, QString::number(id));
-        painter.drawText(x + columnWidth, y, nom);
-        painter.drawText(x + 2 * columnWidth, y, prenom);
-        painter.drawText(x + 5 * columnWidth, y, QString::number(salaire));
-        painter.drawText(x + 4 * columnWidth, y, poste);
-        painter.drawText(x + 3 * columnWidth, y, telephone);
-        painter.drawText(x + 6 * columnWidth, y, QString::number(presences));
-        painter.drawText(x + 7 * columnWidth, y, debutContrat.toString("dd/MM/yyyy"));
-        painter.drawText(x + 8 * columnWidth, y, finContrat.toString("dd/MM/yyyy"));
-
-
-        y += rowHeight;
-        painter.drawLine(x - 10, y, x + 8 * columnWidth, y);
-
-
+        html += "<tr>";
+        html += "<td>" + query.value("ID_EMPLOYE").toString() + "</td>";
+        html += "<td>" + query.value("NOM").toString() + "</td>";
+        html += "<td>" + query.value("PRENOM").toString() + "</td>";
+        html += "<td>" + query.value("TELEPHONE").toString() + "</td>";
+        html += "<td>" + query.value("POSTE").toString() + "</td>";
+        html += "<td>" + QString::number(query.value("SALAIRE").toFloat(), 'f', 2) + "</td>";
+        html += "<td>" + query.value("PRESENCES").toString() + "</td>";
+        html += "<td>" + query.value("D_DATE").toDate().toString("dd/MM/yyyy") + "</td>";
+        html += "<td>" + query.value("F_DATE").toDate().toString("dd/MM/yyyy") + "</td>";
+        html += "</tr>";
     }
 
+    html += "</table>";
 
-    painter.end();
-
+    doc.setHtml(html);
+    doc.print(&printer);
 
     QMessageBox::information(this, "Exportation réussie", "La liste des employés a été exportée avec succès.");
 }
+
 
 void MainWindow::afficherSalaireEtMasseSalariale() {
 
@@ -1483,9 +1532,10 @@ void MainWindow::on_validerButtonreservation_clicked()
     QString modePaiement = modePaiementComboBox->currentText();
     float montant = montantLineEdit->text().toFloat();
     int idclient = ui->idclientr->text().toInt();
+    QString uidcarte = uidcarteline->text();
 
     Reservation reservation(idReservation, dateReservation, dateArrive, dateDepart,
-                            typeChambre, statutReservation, modePaiement, montant,idclient);
+                            typeChambre, statutReservation, modePaiement, montant,idclient,uidcarte);
 
     if (reservation.ajouter()) {
         ui->tabres->setModel(reservation.afficher());
@@ -1528,14 +1578,14 @@ void MainWindow::on_modifierButtonreservation_clicked()
     QString modePaiement = modePaiementComboBox->currentText();
     float montant = montantLineEdit->text().toFloat();
     int idclient = ui->idclientr->text().toInt();
-
+     QString uidcarte = uidcarteline->text();
 
     Reservation reservation(idReservation, dateReservation, dateArrive, dateDepart,
-                            typeChambre, statutReservation, modePaiement, montant,idclient);
+                            typeChambre, statutReservation, modePaiement, montant,idclient,uidcarte);
 
 
     if (reservation.modifier(idReservation, dateReservation, dateArrive, dateDepart,
-                             typeChambre, statutReservation, modePaiement, montant,idclient)) {
+                             typeChambre, statutReservation, modePaiement, montant,idclient,uidcarte)) {
         ui->tabres->setModel(reservation.afficher());
         QMessageBox::information(this, "Modification réussie", "La réservation a été modifiée avec succès.");
     } else {
@@ -1742,7 +1792,7 @@ void MainWindow::on_sendVerificationButton_clicked() {
     }
 
     // Générer un code aléatoire
-    QString verificationCode = QString::number(QRandomGenerator::global()->bounded(100000, 999999)); // Code à 6 chiffres
+     verificationCode = QString::number(QRandomGenerator::global()->bounded(100000, 999999)); // Code à 6 chiffres
 
     // Préparer le sujet et le contenu de l'e-mail
     QString subject = "Votre code de vérification";
@@ -1818,10 +1868,9 @@ void MainWindow::on_verifyCodeButton_clicked() {
 
     if (enteredCode == verificationCode) {
         QMessageBox::information(this, "Vérification réussie", "Code vérifié avec succès !");
-        ui->stackedWidget->setCurrentIndex(3);
+        changerDePageclient();
     } else {
         QMessageBox::information(this, "Vérification échoué", "Code échoué !");
-        ui->stackedWidget->setCurrentIndex(2);
     }
 }
 void MainWindow::on_sendButton_clicked() {
@@ -1973,7 +2022,53 @@ void MainWindow::listPorts() {
     arduino.listAvailablePorts();
 }
 
+/*void MainWindow::onCardRead(QString uid)
+{
+    qDebug() << "UID reçu depuis Arduino :" << uid;
 
+    // Vérifiez si l'UID est présent dans la base de données
+    QSqlQuery query;
+    query.prepare("SELECT \"DATE_DEPART\" FROM \"RESERVATIONS\" WHERE \"UID_CARTE\" = :uid");
+    query.bindValue(":uid", uid);
+    if (!query.exec()) {
+        qDebug() << "Erreur lors de l'exécution de la requête : " << query.lastError().text();
+        return;
+    }
+
+    if (query.next()) {
+        QDateTime departureDate = query.value(0).toDateTime();
+        QDateTime currentDate = QDateTime::currentDateTime();
+
+        qDebug() << "Date de départ :" << departureDate;
+        qDebug() << "Date actuelle :" << currentDate;
+
+        if (!departureDate.isValid()) {
+            qDebug() << "Date de départ invalide.";
+
+            return;
+        }
+
+        // Comparer les dates
+        if (currentDate > departureDate) {
+            QString message= "Refuse";
+            arduinoManager->sendResponseToArduino(message);
+            qDebug() << "Accès refusé : Date dépassée.";
+            QMessageBox::information(this, "erreur", "Date dépassée");
+
+        } else {
+            QString message= "verifie";
+            arduinoManager->sendResponseToArduino(message);
+            qDebug() << "Accès vérifié.";
+            QMessageBox::information(this, "verifie", "Accès vérifié.");
+
+        }
+    } else {
+        QString message= "inconnu";
+        arduinoManager->sendResponseToArduino(message);
+        qDebug() << "UID non trouvé dans la base.";
+
+    }
+}*/
 void MainWindow::on_sushButton_23_clicked()
 {
     // Get input values from UI
@@ -2401,3 +2496,294 @@ void MainWindow::on_sushButton_25_clicked()
 {
     QMessageBox::information(this, "Information", "La SESSION EST EXPIREE");
 }
+void MainWindow::on_pushButton_39_clicked() {
+    bool ok = false;
+
+    // Récupération des valeurs des champs
+    int ID_MAINTENANCE = ui->lineEdit_85->text().toInt(&ok);
+    QString ID_EMPLOYE = ui->lineEdit_192->text();
+    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_86->text().toInt(&ok);
+    QString TYPE_MAINTENANCE = ui->comboBox_40->currentText();
+    QDate DATE_DEBUT = ui->dateEdit_11->date();
+    QDate DATE_FIN = ui->dateEdit_12->date();
+    QString ETAT_MAINTENANCE = ui->comboBox_etat->currentText();
+    QString PRIORITE = ui->comboBox_41->currentText();
+    QDateTime DATE_RAPPEL = ui->dateTimeEdit->dateTime();
+    QString DESCRIPTION_RAPPEL = ui->lineEdit_193->text();
+    if (!ok || ID_MAINTENANCE == 0) {
+        QMessageBox::warning(this, tr("ID Maintenance invalide"), tr("L'ID de maintenance doit être un entier numérique non nul."));
+        return;
+    }
+
+    if (ID_EMPLOYE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez remplir l'ID de l'employé."));
+        return;
+    }
+
+    if (NUM_CHAMBRE_CONCERNEE <= 0) {
+        QMessageBox::warning(this, tr("Numéro de chambre invalide"), tr("Le numéro de chambre doit être un entier positif."));
+        return;
+    }
+
+    if (TYPE_MAINTENANCE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez choisir un type de maintenance."));
+        return;
+    }
+
+    if (ETAT_MAINTENANCE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez choisir un état de maintenance."));
+        return;
+    }
+
+    if (PRIORITE.isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez choisir une priorité."));
+        return;
+    }
+    if (!DATE_DEBUT.isValid() || !DATE_FIN.isValid()) {
+        QMessageBox::warning(this, tr("Date invalide"), tr("Veuillez sélectionner des dates valides."));
+        return;
+    }
+    if (DATE_FIN < DATE_DEBUT) {
+        QMessageBox::warning(this, tr("Date incohérente"), tr("La date de fin ne peut pas être antérieure à la date de début."));
+        return;
+    }
+
+    if (!DATE_RAPPEL.isValid()) {
+        QMessageBox::warning(this, tr("Date de rappel invalide"), tr("Veuillez sélectionner une date de rappel valide."));
+        return;
+    }
+    Mtmp = Maintenance(ID_MAINTENANCE, ID_EMPLOYE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE, DATE_RAPPEL, DESCRIPTION_RAPPEL);
+    bool test = Mtmp.ajouter();
+
+    if (test) {
+        QMessageBox::information(this, tr("OK"), tr("Ajout effectué\nCliquez sur Annuler pour quitter."));
+        loadMaintenanceData();
+    } else {
+        QMessageBox::critical(this, tr("Not OK"), tr("L'ajout a échoué\nCliquez sur Annuler pour quitter."));
+    }
+}
+void MainWindow::loadMaintenanceData()
+{
+
+
+    QSqlQueryModel *model = Mtmp.afficher();  // Reload the model with afficher()
+
+    if (!model->query().isActive()) {
+        qDebug() << "Failed to load data:" << model->query().lastError();
+        return;
+    } else {
+        qDebug() << "Data loaded successfully in loadMaintenanceData";
+    }
+    if (ui->tableView_2->model()) {
+        ui->tableView_2->setModel(nullptr);
+    }
+
+    ui->tableView_2->setModel(model);
+
+    if (model->rowCount() == 0) {
+        qDebug() << "No data found!";
+    } else {
+        ui->tableView_2->resizeColumnsToContents();
+        ui->tableView_2->setAlternatingRowColors(true);
+    }
+}
+void MainWindow::on_pushButton_38_clicked() {
+    int id_maintenance = ui->lineEdit_85->text().toInt();
+
+    if (id_maintenance <= 0) {
+        QMessageBox::warning(this, tr("ID invalide"), tr("Veuillez entrer un ID de maintenance valide pour la suppression."));
+        return;
+    }
+    if (!Mtmp.existe(id_maintenance)) {
+        QMessageBox::warning(this, tr("ID non trouvé"), tr("L'ID de maintenance %1 n'existe pas.").arg(id_maintenance));
+        return;
+    }
+    bool test = Mtmp.supprimer(id_maintenance);
+
+    if (test) {
+         ui->tableView_2->setModel(Mtmp.afficher());
+        QMessageBox::information(this, QObject::tr("Suppression réussie"),
+                                 QObject::tr("La maintenance avec l'ID %1 a été supprimée.\n"
+                                             "Cliquez sur Annuler pour quitter.").arg(id_maintenance),
+                                 QMessageBox::Cancel);
+    } else {
+        QMessageBox::critical(this, QObject::tr("Échec de la suppression"),
+                              QObject::tr("Échec de la suppression de la maintenance avec l'ID %1.\n"
+                                          "Cliquez sur Annuler pour quitter.").arg(id_maintenance),
+                              QMessageBox::Cancel);
+    }
+}
+
+
+void MainWindow::on_pushButton_2_clicked() {
+    int ID_MAINTENANCE = ui->lineEdit_85->text().toInt();
+    QString ID_EMPLOYE = ui->lineEdit_192->text();
+
+    int NUM_CHAMBRE_CONCERNEE = ui->lineEdit_86->text().toInt();
+    QString TYPE_MAINTENANCE = ui->comboBox_40->currentText();
+    QDate DATE_DEBUT = ui->dateEdit_11->date();
+    QDate DATE_FIN = ui->dateEdit_12 ->date();
+    QString ETAT_MAINTENANCE = ui->comboBox_etat->currentText();
+    QString PRIORITE = ui->comboBox_41->currentText();
+    QDateTime DATE_RAPPEL = ui->dateTimeEdit->dateTime();
+    QString DESCRIPTION_RAPPEL =ui->lineEdit_193->text();
+    if ( NUM_CHAMBRE_CONCERNEE== 0 || TYPE_MAINTENANCE.isEmpty() || ETAT_MAINTENANCE .isEmpty() || PRIORITE .isEmpty()) {
+        QMessageBox::warning(this, tr("Champs manquants"), tr("Veuillez remplir tous les champs."));
+        return;
+    }
+
+    Mtmp= Maintenance (ID_MAINTENANCE,ID_EMPLOYE,NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT,  DATE_FIN, ETAT_MAINTENANCE,PRIORITE,DATE_RAPPEL,DESCRIPTION_RAPPEL);
+    bool test = Mtmp.modifier();
+
+    if (test) {
+        loadMaintenanceData();
+        QMessageBox::information(this, tr("Modification effectuée"), tr("Maintenance modifiée avec succès."));
+    } else {
+        QMessageBox::critical(this, tr("Erreur"), tr("Échec de la modification."));
+    }
+}
+
+void MainWindow::on_comboBox_34_currentTextChanged(const QString &priorite)
+{
+    if (priorite.isEmpty()) {
+        QMessageBox::warning(this, tr("Erreur de sélection"), tr("Veuillez sélectionner une priorité valide."));
+        return;
+    }
+    QSqlQueryModel *model = Mtmp.trierParPriorite(priorite);
+    if (model->rowCount() > 0) {
+        ui->tableView_2->setModel(model);
+        ui->tableView_2->resizeColumnsToContents();
+        QMessageBox::information(this, tr("Tri"), tr("Maintenance triée par priorité."));
+    } else {
+        QMessageBox::warning(this, tr("Non trouvé"), tr("Aucune maintenance trouvée pour cette priorité."));
+    }
+
+}
+void MainWindow::on_pushButton_40_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export PDF"), QString(), "*.pdf");
+    if (!fileName.isEmpty()) {
+        if (QFileInfo(fileName).suffix().isEmpty()) { fileName.append(".pdf"); }
+
+        QPrinter printer(QPrinter::PrinterResolution);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setOutputFileName(fileName);
+
+        QTextDocument doc;
+        QString html = "<h1>Maintenance List</h1><table border='1'><tr><th>ID_MAINTENANCE</th><th>NUM_CHAMBRE_CONCERNEE</th><th>TYPE_MAINTENANCE</th><th>DATE_DEBUT</th><th>DATE_FIN</th><th>ETAT_MAINTENANCE</th><th>PRIORITE</th></tr>";
+
+        QSqlQuery query("SELECT ID_MAINTENANCE, NUM_CHAMBRE_CONCERNEE, TYPE_MAINTENANCE, DATE_DEBUT, DATE_FIN, ETAT_MAINTENANCE, PRIORITE FROM MAINTENANCES");
+        while (query.next()) {
+            html += "<tr><td>" + query.value("ID_MAINTENANCE").toString() + "</td>";
+            html += "<td>" + query.value("NUM_CHAMBRE_CONCERNEE").toString() + "</td>";
+            html += "<td>" + query.value("TYPE_MAINTENANCE").toString() + "</td>";
+            html += "<td>" + query.value("DATE_DEBUT").toString() + "</td>";
+            html += "<td>" + query.value("DATE_FIN").toString() + "</td>";
+            html += "<td>" + query.value("ETAT_MAINTENANCE").toString() + "</td>";
+            html += "<td>" + query.value("PRIORITE").toString() + "</td></tr>";
+        }
+        html += "</table>";
+        doc.setHtml(html);
+        doc.print(&printer);
+
+        QMessageBox::information(this, "Export PDF", "MAINTENANCE exported to PDF successfully!");
+    }
+}
+void MainWindow::on_pushButton_43_clicked()
+{
+    int ID_MAINTENANCE = ui->lineEdit_87->text().toInt();
+    QString descriptionRappel = ui->lineEdit_97->text(); // Assurez-vous d'avoir un champ pour la description
+    if (ID_MAINTENANCE == 0 && descriptionRappel.isEmpty()) {
+        QMessageBox::warning(this, tr("Entrée Invalide"), tr("Veuillez entrer un ID ou une description."));
+        return;
+    }
+
+    QSqlQueryModel *model = nullptr;
+
+    if (ID_MAINTENANCE != 0) {
+        model = Mtmp.rechercherParID(ID_MAINTENANCE);
+    }
+    else if (!descriptionRappel.isEmpty()) {
+        model = Mtmp.rechercherParDescription(descriptionRappel);
+    }
+
+    if (model && model->rowCount() > 0) {
+        ui->tableView_2->setModel(model);
+        ui->tableView_2->resizeColumnsToContents();
+        QMessageBox::information(this, tr("Recherche"), tr("Maintenance(s) trouvée(s)."));
+    } else {
+        QMessageBox::warning(this, tr("Non trouvé"), tr("Aucune maintenance trouvée pour les critères spécifiés."));
+    }
+}
+void MainWindow::on_pushButton_stat_clicked()
+{
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    ui->graphicimen->setScene(scene);
+    QString queryStr = "SELECT ETAT_MAINTENANCE, COUNT(*) AS frequency "
+                       "FROM MAINTENANCES "
+                       "GROUP BY ETAT_MAINTENANCE "
+                       "ORDER BY frequency DESC";
+    QSqlQuery query;
+    if (!query.exec(queryStr)) {
+        QMessageBox::critical(this, "Erreur", "Échec de l'exécution de la requête : " + query.lastError().text());
+        return;
+    }
+
+    int barWidth = 60;
+    int spacing = 25;
+    int x = 100;
+    int maxBarHeight = 300;
+    QFont font("Helvetica", 14, QFont::Bold);
+    int maxFrequency = 1;
+    while (query.next()) {
+        int frequency = query.value("frequency").toInt();
+        if (frequency > maxFrequency) {
+            maxFrequency = frequency;
+        }
+    }
+
+    query.first();
+
+    int yAxisHeight = maxBarHeight + 50;
+    int xAxisLength = query.size() * (barWidth + spacing);
+
+    scene->addLine(100, 0, 100, -yAxisHeight, QPen(Qt::black));
+    scene->addLine(100, 0, 800 + xAxisLength, 0, QPen(Qt::black));
+
+    QGraphicsTextItem *yAxisLabel = scene->addText("Fréquence", font);
+    yAxisLabel->setPos(10, -yAxisHeight - 30);
+
+    QGraphicsTextItem *xAxisLabel = scene->addText("État de maintenance", font);
+    xAxisLabel->setPos(50 + xAxisLength / 2, 30);
+
+    do {
+        QString etat = query.value("ETAT_MAINTENANCE").toString();
+        int frequency = query.value("frequency").toInt();
+
+        int barHeight = (frequency * maxBarHeight) / maxFrequency;
+
+        QColor barColor;
+        if (etat == "En attente") {
+            barColor = Qt::gray;
+        } else if (etat == "En cours") {
+            barColor = Qt::darkBlue;
+        } else if (etat == "Terminé") {
+            barColor = QColor(238, 130, 238);
+        } else {
+            barColor = Qt::black;
+        }
+        QGraphicsRectItem *bar = scene->addRect(x, -barHeight, barWidth, barHeight, QPen(Qt::black), QBrush(barColor));
+        bar->setPos(x + 2, 0);
+        QGraphicsTextItem *textItem = scene->addText(etat, font);
+        textItem->setPos(x * 1.75 + barWidth - 10, 0);
+        QGraphicsTextItem *countText = scene->addText(QString::number(frequency), font);
+        countText->setPos(x * 2 + barWidth / 4, -barHeight - 40);
+        x += barWidth + spacing;
+    } while (query.next());
+    ui->graphicimen->setRenderHint(QPainter::Antialiasing);
+    ui->graphicimen->fitInView(scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    qDebug() << "Graphique de maintenance généré avec succès.";
+}
+
+
