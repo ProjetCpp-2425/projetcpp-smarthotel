@@ -35,20 +35,8 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralWidget;
-    QComboBox *comboBox_3;
-    QLabel *label_11;
-    QLineEdit *lineEdit_4;
-    QPushButton *pushButton_17;
-    QPushButton *pushButton_13;
-    QLabel *label_17;
-    QPushButton *pushButton_18;
-    QLabel *label_12;
-    QPushButton *pushButton_16;
-    QLabel *label_8;
-    QPushButton *pushButton_15;
-    QLabel *label_607;
     QStackedWidget *stackedWidget;
-    QWidget *page_15;
+    QWidget *page_maintenance;
     QWidget *widget_10;
     QPushButton *clientmaint;
     QPushButton *employemaint;
@@ -58,49 +46,49 @@ public:
     QPushButton *sedeconnecter9;
     QLabel *label_log;
     QLabel *label_main1;
-    QPushButton *pushButton_38;
-    QComboBox *comboBox_34;
-    QPushButton *pushButton_39;
-    QPushButton *pushButton_2;
-    QPushButton *pushButton_40;
-    QLabel *label_606;
-    QPushButton *pushButton_stat2;
-    QPushButton *pushButton_57;
+    QPushButton *pushButton_supprimer_maintenance;
+    QComboBox *comboBox_tri_maintenance;
+    QPushButton *pushButton_ajouter_maintenance;
+    QPushButton *pushButton_modifier_maintenance;
+    QPushButton *pushButton_exporter_maintenance;
+    QPushButton *pushButton_stat2_maintenance;
+    QPushButton *pushButton_calendrier;
     QWidget *widget_138;
-    QComboBox *comboBox_36;
+    QComboBox *comboBox_etat_maintenance;
     QLabel *label_621;
     QLabel *label_609;
     QLabel *label_604;
     QLabel *label_605;
     QLabel *label_613;
     QLabel *label_622;
-    QLineEdit *lineEdit_85;
-    QLineEdit *lineEdit_86;
-    QComboBox *comboBox_40;
-    QComboBox *comboBox_41;
+    QLineEdit *lineEdit_id_maintenance;
+    QLineEdit *lineEdit_num_chambre;
+    QComboBox *comboBox_type_maintenance;
+    QComboBox *comboBox_priorite;
     QLabel *label_638;
-    QLineEdit *lineEdit_192;
+    QLineEdit *lineEdit_id_emplye;
     QLabel *label_1259;
-    QDateEdit *dateEdit_11;
-    QDateEdit *dateEdit_12;
-    QLineEdit *lineEdit_193;
-    QDateTimeEdit *dateTimeEdit;
+    QDateEdit *dateEdit_date_debut;
+    QDateEdit *dateEdit_date_fin;
+    QLineEdit *lineEdit_description_rappel;
+    QDateTimeEdit *date_rappel;
     QLabel *label_624;
     QLabel *label_625;
-    QTableView *tableView_2;
-    QLineEdit *lineEdit_87;
-    QPushButton *pushButton_43;
+    QTableView *tableView_maintenance;
+    QLineEdit *lineEdit_id_maintenance_2;
+    QPushButton *pushButton_recherche_maintenance;
     QLineEdit *lineEdit_96;
-    QPushButton *pushButton_111;
+    QPushButton *pushButton_QRC;
     QLabel *qr_code;
     QLabel *label_qrc2;
     QLabel *label_ca;
     QLabel *label_sta;
     QLabel *label_pdf2;
     QLabel *label_chercher;
-    QLineEdit *lineEdit_97;
+    QLineEdit *lineEdit_description_rappel_2;
     QPushButton *btnGoToArduino;
-    QWidget *page_395;
+    QLabel *label_securite;
+    QWidget *page_statistique_maintenance;
     QWidget *widget_144;
     QPushButton *clientmaint_18;
     QPushButton *employemaint_18;
@@ -111,23 +99,21 @@ public:
     QLabel *label_logo;
     QLabel *label_main2;
     QLabel *label_620;
-    QPushButton *pushButton_stat;
+    QPushButton *pushButton_stat_maintenance;
     QPushButton *pushButton_162;
     QPushButton *pushButton_163;
-    QPushButton *acceuilcalmaint_2;
+    QPushButton *acceuilmaintenance_2;
     QPushButton *pushButton_112;
     QWidget *graphicsView_41;
-    QGraphicsView *graphic;
     QLabel *label_stat;
     QLabel *label_pdf;
     QLabel *label_stat_2;
     QLabel *label_calendrier;
     QLabel *label_qrc;
-    QWidget *page_129;
+    QGraphicsView *graphic;
+    QWidget *page_calendrier;
     QPushButton *pushButtonAfficherMaintenances_2;
-    QLabel *label_619;
     QPushButton *pushButton_45;
-    QLabel *label_628;
     QPushButton *pushButton_46;
     QPushButton *btnAjouterRappel;
     QWidget *widget_139;
@@ -140,7 +126,7 @@ public:
     QPushButton *sedeconnecter10;
     QLabel *label_main3;
     QLabel *label_616;
-    QPushButton *acceuilcalmaint;
+    QPushButton *acceuilmaintenance;
     QPushButton *pushButton_114;
     QCalendarWidget *calendarWidget;
     QLabel *label_cal;
@@ -152,11 +138,23 @@ public:
     QLabel *labelMessage;
     QTableWidget *tableRappels;
     QWidget *pageArduino;
-    QPushButton *btnExit;
-    QPushButton *btnShowAlerts;
     QPushButton *btnRetourPage15;
+    QLabel *labelNumChambre;
+    QLineEdit *lineEditNumChambre;
+    QPushButton *pushButton_afficher_arduino;
     QLabel *labelMessage_2;
-    QTableView *alertTableView;
+    QLabel *label_623;
+    QWidget *widget_11;
+    QPushButton *clientmaint_2;
+    QPushButton *employemaint_2;
+    QPushButton *reservationmaint_2;
+    QPushButton *stockmaint_2;
+    QPushButton *maintenance_2;
+    QPushButton *sedeconnecter9_2;
+    QLabel *label_log_2;
+    QLabel *label_main1_2;
+    QLabel *label_securitee;
+    QTableWidget *tableWidgetAlerts;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -168,86 +166,18 @@ public:
         MainWindow->resize(1390, 783);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName("centralWidget");
-        comboBox_3 = new QComboBox(centralWidget);
-        comboBox_3->addItem(QString());
-        comboBox_3->addItem(QString());
-        comboBox_3->addItem(QString());
-        comboBox_3->setObjectName("comboBox_3");
-        comboBox_3->setGeometry(QRect(260, 800, 191, 31));
-        label_11 = new QLabel(centralWidget);
-        label_11->setObjectName("label_11");
-        label_11->setGeometry(QRect(510, 740, 91, 71));
-        label_11->setPixmap(QPixmap(QString::fromUtf8("../../../Downloads/exporter en pdf.png")));
-        label_11->setScaledContents(true);
-        lineEdit_4 = new QLineEdit(centralWidget);
-        lineEdit_4->setObjectName("lineEdit_4");
-        lineEdit_4->setGeometry(QRect(260, 740, 191, 31));
-        pushButton_17 = new QPushButton(centralWidget);
-        pushButton_17->setObjectName("pushButton_17");
-        pushButton_17->setGeometry(QRect(780, 810, 151, 41));
-        pushButton_17->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
-"border-radius:10px;\n"
-"color: rgb(0, 0, 0);\n"
-"font: 700 10pt \"Segoe UI\";"));
-        pushButton_13 = new QPushButton(centralWidget);
-        pushButton_13->setObjectName("pushButton_13");
-        pushButton_13->setGeometry(QRect(300, 840, 141, 41));
-        pushButton_13->setStyleSheet(QString::fromUtf8("font: 700 10pt \"Segoe UI\";\n"
-"font: 700 11pt \"Segoe UI\";\n"
-"color: rgb(209, 196, 233);\n"
-"background-color: rgb(32, 52, 86);"));
-        label_17 = new QLabel(centralWidget);
-        label_17->setObjectName("label_17");
-        label_17->setGeometry(QRect(800, 750, 91, 61));
-        label_17->setPixmap(QPixmap(QString::fromUtf8("../../../Downloads/1111-removebg-preview.png")));
-        label_17->setScaledContents(true);
-        pushButton_18 = new QPushButton(centralWidget);
-        pushButton_18->setObjectName("pushButton_18");
-        pushButton_18->setGeometry(QRect(960, 810, 161, 41));
-        pushButton_18->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
-"border-radius:10px;\n"
-"color: rgb(0, 0, 0);\n"
-"font: 700 10pt \"Segoe UI\";"));
-        label_12 = new QLabel(centralWidget);
-        label_12->setObjectName("label_12");
-        label_12->setGeometry(QRect(980, 750, 121, 51));
-        label_12->setPixmap(QPixmap(QString::fromUtf8("../../../Downloads/suivi .png")));
-        label_12->setScaledContents(true);
-        pushButton_16 = new QPushButton(centralWidget);
-        pushButton_16->setObjectName("pushButton_16");
-        pushButton_16->setGeometry(QRect(1150, 810, 151, 41));
-        pushButton_16->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
-"border-radius:10px;\n"
-"color: rgb(0, 0, 0);\n"
-"font: 700 10pt \"Segoe UI\";"));
-        label_8 = new QLabel(centralWidget);
-        label_8->setObjectName("label_8");
-        label_8->setGeometry(QRect(260, 780, 131, 20));
-        label_8->setStyleSheet(QString::fromUtf8("font: 11pt \"Segoe UI\";"));
-        pushButton_15 = new QPushButton(centralWidget);
-        pushButton_15->setObjectName("pushButton_15");
-        pushButton_15->setGeometry(QRect(490, 810, 151, 41));
-        pushButton_15->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
-"border-radius:10px;\n"
-"color: rgb(0, 0, 0);\n"
-"font: 700 10pt \"Segoe UI\";"));
-        label_607 = new QLabel(centralWidget);
-        label_607->setObjectName("label_607");
-        label_607->setGeometry(QRect(1160, 370, 31, 31));
-        label_607->setPixmap(QPixmap(QString::fromUtf8("../../../../../Downloads/maintenance.png")));
-        label_607->setScaledContents(true);
         stackedWidget = new QStackedWidget(centralWidget);
         stackedWidget->setObjectName("stackedWidget");
         stackedWidget->setEnabled(true);
-        stackedWidget->setGeometry(QRect(0, 30, 1371, 741));
+        stackedWidget->setGeometry(QRect(10, 0, 1371, 741));
         QFont font;
         font.setPointSize(12);
         stackedWidget->setFont(font);
         stackedWidget->setStyleSheet(QString::fromUtf8(" \n"
 "background-color: rgb(255, 255, 255);"));
-        page_15 = new QWidget();
-        page_15->setObjectName("page_15");
-        widget_10 = new QWidget(page_15);
+        page_maintenance = new QWidget();
+        page_maintenance->setObjectName("page_maintenance");
+        widget_10 = new QWidget(page_maintenance);
         widget_10->setObjectName("widget_10");
         widget_10->setGeometry(QRect(-40, 0, 1411, 91));
         widget_10->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 80);"));
@@ -310,62 +240,58 @@ public:
         label_main1 = new QLabel(widget_10);
         label_main1->setObjectName("label_main1");
         label_main1->setGeometry(QRect(930, 30, 41, 31));
-        pushButton_38 = new QPushButton(page_15);
-        pushButton_38->setObjectName("pushButton_38");
-        pushButton_38->setGeometry(QRect(1230, 110, 121, 41));
-        pushButton_38->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
+        label_main1->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
+        pushButton_supprimer_maintenance = new QPushButton(page_maintenance);
+        pushButton_supprimer_maintenance->setObjectName("pushButton_supprimer_maintenance");
+        pushButton_supprimer_maintenance->setGeometry(QRect(1230, 110, 121, 41));
+        pushButton_supprimer_maintenance->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
 "text-decoration: underline;\n"
 "font: 10pt \"Segoe UI\";\n"
 "background-color: rgb(172, 44, 103);"));
-        comboBox_34 = new QComboBox(page_15);
-        comboBox_34->addItem(QString());
-        comboBox_34->addItem(QString());
-        comboBox_34->addItem(QString());
-        comboBox_34->setObjectName("comboBox_34");
-        comboBox_34->setGeometry(QRect(650, 130, 131, 26));
-        comboBox_34->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        comboBox_tri_maintenance = new QComboBox(page_maintenance);
+        comboBox_tri_maintenance->addItem(QString());
+        comboBox_tri_maintenance->addItem(QString());
+        comboBox_tri_maintenance->addItem(QString());
+        comboBox_tri_maintenance->setObjectName("comboBox_tri_maintenance");
+        comboBox_tri_maintenance->setGeometry(QRect(650, 130, 131, 26));
+        comboBox_tri_maintenance->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 ""));
-        pushButton_39 = new QPushButton(page_15);
-        pushButton_39->setObjectName("pushButton_39");
-        pushButton_39->setGeometry(QRect(40, 90, 241, 41));
-        pushButton_39->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
+        pushButton_ajouter_maintenance = new QPushButton(page_maintenance);
+        pushButton_ajouter_maintenance->setObjectName("pushButton_ajouter_maintenance");
+        pushButton_ajouter_maintenance->setGeometry(QRect(40, 90, 241, 41));
+        pushButton_ajouter_maintenance->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
 "background-color: rgb(83, 89, 86);\n"
 "color: rgb(209, 196, 233);\n"
 "font: 12pt \"Segoe UI\";"));
-        pushButton_2 = new QPushButton(page_15);
-        pushButton_2->setObjectName("pushButton_2");
-        pushButton_2->setGeometry(QRect(1100, 110, 121, 41));
-        pushButton_2->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
+        pushButton_modifier_maintenance = new QPushButton(page_maintenance);
+        pushButton_modifier_maintenance->setObjectName("pushButton_modifier_maintenance");
+        pushButton_modifier_maintenance->setGeometry(QRect(1100, 110, 121, 41));
+        pushButton_modifier_maintenance->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
 "text-decoration: underline;\n"
 "font: 10pt \"Segoe UI\";\n"
 "background-color: rgb(172, 44, 103);"));
-        pushButton_40 = new QPushButton(page_15);
-        pushButton_40->setObjectName("pushButton_40");
-        pushButton_40->setGeometry(QRect(1210, 660, 141, 41));
-        pushButton_40->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        pushButton_exporter_maintenance = new QPushButton(page_maintenance);
+        pushButton_exporter_maintenance->setObjectName("pushButton_exporter_maintenance");
+        pushButton_exporter_maintenance->setGeometry(QRect(1220, 660, 141, 41));
+        pushButton_exporter_maintenance->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        label_606 = new QLabel(page_15);
-        label_606->setObjectName("label_606");
-        label_606->setGeometry(QRect(380, 290, 63, 20));
-        label_606->setPixmap(QPixmap(QString::fromUtf8("../../../../../Downloads/chercher.png")));
-        label_606->setScaledContents(true);
-        pushButton_stat2 = new QPushButton(page_15);
-        pushButton_stat2->setObjectName("pushButton_stat2");
-        pushButton_stat2->setGeometry(QRect(1070, 660, 121, 41));
-        pushButton_stat2->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        pushButton_stat2_maintenance = new QPushButton(page_maintenance);
+        pushButton_stat2_maintenance->setObjectName("pushButton_stat2_maintenance");
+        pushButton_stat2_maintenance->setGeometry(QRect(1090, 660, 121, 41));
+        pushButton_stat2_maintenance->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        pushButton_57 = new QPushButton(page_15);
-        pushButton_57->setObjectName("pushButton_57");
-        pushButton_57->setGeometry(QRect(940, 660, 111, 41));
-        pushButton_57->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        pushButton_calendrier = new QPushButton(page_maintenance);
+        pushButton_calendrier->setObjectName("pushButton_calendrier");
+        pushButton_calendrier->setGeometry(QRect(970, 660, 111, 41));
+        pushButton_calendrier->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        widget_138 = new QWidget(page_15);
+        widget_138 = new QWidget(page_maintenance);
         widget_138->setObjectName("widget_138");
         widget_138->setGeometry(QRect(30, 130, 291, 581));
         QFont font1;
@@ -373,13 +299,13 @@ public:
         widget_138->setFont(font1);
         widget_138->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:20px;"));
-        comboBox_36 = new QComboBox(widget_138);
-        comboBox_36->addItem(QString());
-        comboBox_36->addItem(QString());
-        comboBox_36->addItem(QString());
-        comboBox_36->setObjectName("comboBox_36");
-        comboBox_36->setGeometry(QRect(40, 370, 211, 31));
-        comboBox_36->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
+        comboBox_etat_maintenance = new QComboBox(widget_138);
+        comboBox_etat_maintenance->addItem(QString());
+        comboBox_etat_maintenance->addItem(QString());
+        comboBox_etat_maintenance->addItem(QString());
+        comboBox_etat_maintenance->setObjectName("comboBox_etat_maintenance");
+        comboBox_etat_maintenance->setGeometry(QRect(40, 370, 211, 31));
+        comboBox_etat_maintenance->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
         label_621 = new QLabel(widget_138);
         label_621->setObjectName("label_621");
         label_621->setGeometry(QRect(40, 350, 181, 20));
@@ -406,38 +332,38 @@ public:
         label_622->setObjectName("label_622");
         label_622->setGeometry(QRect(40, 230, 191, 20));
         label_622->setStyleSheet(QString::fromUtf8("font: 11pt \"Segoe UI\";color: rgb(0, 0, 81); background-color:transparent;"));
-        lineEdit_85 = new QLineEdit(widget_138);
-        lineEdit_85->setObjectName("lineEdit_85");
-        lineEdit_85->setGeometry(QRect(40, 30, 211, 26));
-        lineEdit_85->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
+        lineEdit_id_maintenance = new QLineEdit(widget_138);
+        lineEdit_id_maintenance->setObjectName("lineEdit_id_maintenance");
+        lineEdit_id_maintenance->setGeometry(QRect(40, 30, 211, 26));
+        lineEdit_id_maintenance->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
 ""));
-        lineEdit_86 = new QLineEdit(widget_138);
-        lineEdit_86->setObjectName("lineEdit_86");
-        lineEdit_86->setGeometry(QRect(40, 130, 211, 26));
-        lineEdit_86->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
+        lineEdit_num_chambre = new QLineEdit(widget_138);
+        lineEdit_num_chambre->setObjectName("lineEdit_num_chambre");
+        lineEdit_num_chambre->setGeometry(QRect(40, 130, 211, 26));
+        lineEdit_num_chambre->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
 ""));
-        comboBox_40 = new QComboBox(widget_138);
-        comboBox_40->addItem(QString());
-        comboBox_40->addItem(QString());
-        comboBox_40->addItem(QString());
-        comboBox_40->setObjectName("comboBox_40");
-        comboBox_40->setGeometry(QRect(40, 190, 211, 31));
-        comboBox_40->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
-        comboBox_41 = new QComboBox(widget_138);
-        comboBox_41->addItem(QString());
-        comboBox_41->addItem(QString());
-        comboBox_41->addItem(QString());
-        comboBox_41->setObjectName("comboBox_41");
-        comboBox_41->setGeometry(QRect(40, 430, 211, 31));
-        comboBox_41->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
+        comboBox_type_maintenance = new QComboBox(widget_138);
+        comboBox_type_maintenance->addItem(QString());
+        comboBox_type_maintenance->addItem(QString());
+        comboBox_type_maintenance->addItem(QString());
+        comboBox_type_maintenance->setObjectName("comboBox_type_maintenance");
+        comboBox_type_maintenance->setGeometry(QRect(40, 190, 211, 31));
+        comboBox_type_maintenance->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
+        comboBox_priorite = new QComboBox(widget_138);
+        comboBox_priorite->addItem(QString());
+        comboBox_priorite->addItem(QString());
+        comboBox_priorite->addItem(QString());
+        comboBox_priorite->setObjectName("comboBox_priorite");
+        comboBox_priorite->setGeometry(QRect(40, 430, 211, 31));
+        comboBox_priorite->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
         label_638 = new QLabel(widget_138);
         label_638->setObjectName("label_638");
         label_638->setGeometry(QRect(40, 410, 181, 20));
         label_638->setStyleSheet(QString::fromUtf8("font: 11pt \"Segoe UI\";color: rgb(0, 0, 81); background-color:transparent;"));
-        lineEdit_192 = new QLineEdit(widget_138);
-        lineEdit_192->setObjectName("lineEdit_192");
-        lineEdit_192->setGeometry(QRect(40, 80, 211, 26));
-        lineEdit_192->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
+        lineEdit_id_emplye = new QLineEdit(widget_138);
+        lineEdit_id_emplye->setObjectName("lineEdit_id_emplye");
+        lineEdit_id_emplye->setGeometry(QRect(40, 80, 211, 26));
+        lineEdit_id_emplye->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
 ""));
         label_1259 = new QLabel(widget_138);
         label_1259->setObjectName("label_1259");
@@ -450,23 +376,23 @@ public:
         label_1259->setFont(font2);
         label_1259->setStyleSheet(QString::fromUtf8("font: 11pt \"Segoe UI\";\n"
 ""));
-        dateEdit_11 = new QDateEdit(widget_138);
-        dateEdit_11->setObjectName("dateEdit_11");
-        dateEdit_11->setGeometry(QRect(40, 250, 211, 26));
-        dateEdit_11->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
-        dateEdit_12 = new QDateEdit(widget_138);
-        dateEdit_12->setObjectName("dateEdit_12");
-        dateEdit_12->setGeometry(QRect(40, 310, 211, 26));
-        dateEdit_12->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
-        lineEdit_193 = new QLineEdit(widget_138);
-        lineEdit_193->setObjectName("lineEdit_193");
-        lineEdit_193->setGeometry(QRect(40, 540, 211, 26));
-        lineEdit_193->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
+        dateEdit_date_debut = new QDateEdit(widget_138);
+        dateEdit_date_debut->setObjectName("dateEdit_date_debut");
+        dateEdit_date_debut->setGeometry(QRect(40, 250, 211, 26));
+        dateEdit_date_debut->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
+        dateEdit_date_fin = new QDateEdit(widget_138);
+        dateEdit_date_fin->setObjectName("dateEdit_date_fin");
+        dateEdit_date_fin->setGeometry(QRect(40, 310, 211, 26));
+        dateEdit_date_fin->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
+        lineEdit_description_rappel = new QLineEdit(widget_138);
+        lineEdit_description_rappel->setObjectName("lineEdit_description_rappel");
+        lineEdit_description_rappel->setGeometry(QRect(40, 540, 211, 26));
+        lineEdit_description_rappel->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 81);\n"
 ""));
-        dateTimeEdit = new QDateTimeEdit(widget_138);
-        dateTimeEdit->setObjectName("dateTimeEdit");
-        dateTimeEdit->setGeometry(QRect(40, 490, 211, 26));
-        dateTimeEdit->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
+        date_rappel = new QDateTimeEdit(widget_138);
+        date_rappel->setObjectName("date_rappel");
+        date_rappel->setGeometry(QRect(40, 490, 211, 26));
+        date_rappel->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255); background-color:rgb(0,0,80);"));
         label_624 = new QLabel(widget_138);
         label_624->setObjectName("label_624");
         label_624->setGeometry(QRect(40, 470, 191, 20));
@@ -479,23 +405,23 @@ public:
         label_625->setStyleSheet(QString::fromUtf8("font: 11pt \"Segoe UI\";\n"
 "color: rgb(0, 0, 81);\n"
 "background-color:transparent;"));
-        tableView_2 = new QTableView(page_15);
-        tableView_2->setObjectName("tableView_2");
-        tableView_2->setGeometry(QRect(340, 200, 1021, 201));
-        lineEdit_87 = new QLineEdit(page_15);
-        lineEdit_87->setObjectName("lineEdit_87");
-        lineEdit_87->setGeometry(QRect(660, 100, 121, 26));
-        lineEdit_87->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        tableView_maintenance = new QTableView(page_maintenance);
+        tableView_maintenance->setObjectName("tableView_maintenance");
+        tableView_maintenance->setGeometry(QRect(350, 220, 1021, 201));
+        lineEdit_id_maintenance_2 = new QLineEdit(page_maintenance);
+        lineEdit_id_maintenance_2->setObjectName("lineEdit_id_maintenance_2");
+        lineEdit_id_maintenance_2->setGeometry(QRect(660, 100, 121, 26));
+        lineEdit_id_maintenance_2->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "\n"
 ""));
-        pushButton_43 = new QPushButton(page_15);
-        pushButton_43->setObjectName("pushButton_43");
-        pushButton_43->setGeometry(QRect(400, 100, 251, 29));
-        pushButton_43->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
+        pushButton_recherche_maintenance = new QPushButton(page_maintenance);
+        pushButton_recherche_maintenance->setObjectName("pushButton_recherche_maintenance");
+        pushButton_recherche_maintenance->setGeometry(QRect(400, 100, 251, 29));
+        pushButton_recherche_maintenance->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
 "background-color: rgb(83, 89, 86);\n"
 "color: rgb(209, 196, 233);\n"
 "font: 12pt \"Segoe UI\";"));
-        lineEdit_96 = new QLineEdit(page_15);
+        lineEdit_96 = new QLineEdit(page_maintenance);
         lineEdit_96->setObjectName("lineEdit_96");
         lineEdit_96->setGeometry(QRect(530, 130, 111, 31));
         lineEdit_96->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
@@ -503,76 +429,79 @@ public:
 "background-color: rgb(83, 89, 86);\n"
 "color: rgb(209, 196, 233);\n"
 "font: 12pt \"Segoe UI\";"));
-        pushButton_111 = new QPushButton(page_15);
-        pushButton_111->setObjectName("pushButton_111");
-        pushButton_111->setGeometry(QRect(800, 660, 121, 41));
-        pushButton_111->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        pushButton_QRC = new QPushButton(page_maintenance);
+        pushButton_QRC->setObjectName("pushButton_QRC");
+        pushButton_QRC->setGeometry(QRect(740, 660, 121, 41));
+        pushButton_QRC->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        qr_code = new QLabel(page_15);
+        qr_code = new QLabel(page_maintenance);
         qr_code->setObjectName("qr_code");
-        qr_code->setGeometry(QRect(370, 410, 381, 281));
-        label_qrc2 = new QLabel(page_15);
+        qr_code->setGeometry(QRect(340, 390, 381, 281));
+        label_qrc2 = new QLabel(page_maintenance);
         label_qrc2->setObjectName("label_qrc2");
-        label_qrc2->setGeometry(QRect(810, 600, 101, 51));
+        label_qrc2->setGeometry(QRect(740, 580, 121, 81));
         label_qrc2->setScaledContents(true);
-        label_ca = new QLabel(page_15);
+        label_ca = new QLabel(page_maintenance);
         label_ca->setObjectName("label_ca");
-        label_ca->setGeometry(QRect(950, 590, 91, 61));
+        label_ca->setGeometry(QRect(980, 590, 91, 61));
         label_ca->setScaledContents(true);
-        label_sta = new QLabel(page_15);
+        label_sta = new QLabel(page_maintenance);
         label_sta->setObjectName("label_sta");
-        label_sta->setGeometry(QRect(1080, 590, 111, 61));
+        label_sta->setGeometry(QRect(1100, 590, 111, 61));
         label_sta->setScaledContents(true);
-        label_pdf2 = new QLabel(page_15);
+        label_pdf2 = new QLabel(page_maintenance);
         label_pdf2->setObjectName("label_pdf2");
-        label_pdf2->setGeometry(QRect(1220, 590, 121, 61));
+        label_pdf2->setGeometry(QRect(1230, 590, 121, 61));
         label_pdf2->setScaledContents(true);
-        label_chercher = new QLabel(page_15);
+        label_chercher = new QLabel(page_maintenance);
         label_chercher->setObjectName("label_chercher");
         label_chercher->setGeometry(QRect(350, 100, 51, 31));
         label_chercher->setScaledContents(true);
-        lineEdit_97 = new QLineEdit(page_15);
-        lineEdit_97->setObjectName("lineEdit_97");
-        lineEdit_97->setGeometry(QRect(790, 100, 121, 26));
-        lineEdit_97->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        lineEdit_description_rappel_2 = new QLineEdit(page_maintenance);
+        lineEdit_description_rappel_2->setObjectName("lineEdit_description_rappel_2");
+        lineEdit_description_rappel_2->setGeometry(QRect(790, 100, 121, 26));
+        lineEdit_description_rappel_2->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "\n"
 ""));
-        btnGoToArduino = new QPushButton(page_15);
+        btnGoToArduino = new QPushButton(page_maintenance);
         btnGoToArduino->setObjectName("btnGoToArduino");
-        btnGoToArduino->setGeometry(QRect(1150, 470, 121, 41));
+        btnGoToArduino->setGeometry(QRect(870, 660, 91, 41));
         btnGoToArduino->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        stackedWidget->addWidget(page_15);
-        pushButton_38->raise();
-        comboBox_34->raise();
-        pushButton_stat2->raise();
+        label_securite = new QLabel(page_maintenance);
+        label_securite->setObjectName("label_securite");
+        label_securite->setGeometry(QRect(870, 599, 91, 61));
+        stackedWidget->addWidget(page_maintenance);
+        pushButton_supprimer_maintenance->raise();
+        comboBox_tri_maintenance->raise();
+        pushButton_stat2_maintenance->raise();
         widget_138->raise();
         widget_10->raise();
-        pushButton_2->raise();
-        pushButton_39->raise();
-        pushButton_40->raise();
-        label_606->raise();
-        pushButton_57->raise();
-        tableView_2->raise();
-        lineEdit_87->raise();
-        pushButton_43->raise();
+        pushButton_modifier_maintenance->raise();
+        pushButton_ajouter_maintenance->raise();
+        pushButton_exporter_maintenance->raise();
+        pushButton_calendrier->raise();
+        tableView_maintenance->raise();
+        lineEdit_id_maintenance_2->raise();
+        pushButton_recherche_maintenance->raise();
         lineEdit_96->raise();
-        pushButton_111->raise();
+        pushButton_QRC->raise();
         qr_code->raise();
         label_qrc2->raise();
         label_ca->raise();
         label_sta->raise();
         label_pdf2->raise();
         label_chercher->raise();
-        lineEdit_97->raise();
+        lineEdit_description_rappel_2->raise();
         btnGoToArduino->raise();
-        page_395 = new QWidget();
-        page_395->setObjectName("page_395");
-        widget_144 = new QWidget(page_395);
+        label_securite->raise();
+        page_statistique_maintenance = new QWidget();
+        page_statistique_maintenance->setObjectName("page_statistique_maintenance");
+        widget_144 = new QWidget(page_statistique_maintenance);
         widget_144->setObjectName("widget_144");
         widget_144->setGeometry(QRect(-20, 0, 1391, 91));
         widget_144->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 80);"));
@@ -635,23 +564,24 @@ public:
         label_main2 = new QLabel(widget_144);
         label_main2->setObjectName("label_main2");
         label_main2->setGeometry(QRect(930, 30, 31, 31));
-        label_620 = new QLabel(page_395);
+        label_main2->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
+        label_620 = new QLabel(page_statistique_maintenance);
         label_620->setObjectName("label_620");
         label_620->setGeometry(QRect(20, 120, 221, 511));
         label_620->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "color: transparent;\n"
 "border-radius:20px;"));
-        pushButton_stat = new QPushButton(page_395);
-        pushButton_stat->setObjectName("pushButton_stat");
-        pushButton_stat->setGeometry(QRect(1010, 640, 151, 41));
-        pushButton_stat->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+        pushButton_stat_maintenance = new QPushButton(page_statistique_maintenance);
+        pushButton_stat_maintenance->setObjectName("pushButton_stat_maintenance");
+        pushButton_stat_maintenance->setGeometry(QRect(1010, 640, 151, 41));
+        pushButton_stat_maintenance->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "text-decoration: underline;\n"
 "color: rgb(255, 255, 255);\n"
 "font: 9pt \"Segoe UI\";\n"
 "background-color: rgb(83, 89, 86);\n"
 "border-radius:10px;\n"
 "font: 700 10pt \"Segoe UI\";"));
-        pushButton_162 = new QPushButton(page_395);
+        pushButton_162 = new QPushButton(page_statistique_maintenance);
         pushButton_162->setObjectName("pushButton_162");
         pushButton_162->setGeometry(QRect(840, 640, 151, 41));
         pushButton_162->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
@@ -660,7 +590,7 @@ public:
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        pushButton_163 = new QPushButton(page_395);
+        pushButton_163 = new QPushButton(page_statistique_maintenance);
         pushButton_163->setObjectName("pushButton_163");
         pushButton_163->setGeometry(QRect(1180, 640, 151, 41));
         pushButton_163->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
@@ -669,48 +599,49 @@ public:
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        acceuilcalmaint_2 = new QPushButton(page_395);
-        acceuilcalmaint_2->setObjectName("acceuilcalmaint_2");
-        acceuilcalmaint_2->setGeometry(QRect(1090, 140, 181, 41));
-        acceuilcalmaint_2->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
+        acceuilmaintenance_2 = new QPushButton(page_statistique_maintenance);
+        acceuilmaintenance_2->setObjectName("acceuilmaintenance_2");
+        acceuilmaintenance_2->setGeometry(QRect(1090, 140, 181, 41));
+        acceuilmaintenance_2->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
 "font: 700 11pt \"Segoe UI\";\n"
 "text-decoration: underline;\n"
 "background-color: rgb(172, 44, 103);\n"
 "border-radius:10px;"));
-        pushButton_112 = new QPushButton(page_395);
+        pushButton_112 = new QPushButton(page_statistique_maintenance);
         pushButton_112->setObjectName("pushButton_112");
         pushButton_112->setGeometry(QRect(670, 640, 151, 41));
         pushButton_112->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        graphicsView_41 = new QWidget(page_395);
+        graphicsView_41 = new QWidget(page_statistique_maintenance);
         graphicsView_41->setObjectName("graphicsView_41");
-        graphicsView_41->setGeometry(QRect(320, 140, 671, 361));
-        graphic = new QGraphicsView(graphicsView_41);
-        graphic->setObjectName("graphic");
-        graphic->setGeometry(QRect(5, 1, 661, 341));
-        label_stat = new QLabel(page_395);
+        graphicsView_41->setGeometry(QRect(1330, 140, 20, 221));
+        label_stat = new QLabel(page_statistique_maintenance);
         label_stat->setObjectName("label_stat");
         label_stat->setGeometry(QRect(30, 260, 201, 191));
+        label_stat->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
         label_stat->setScaledContents(true);
-        label_pdf = new QLabel(page_395);
+        label_pdf = new QLabel(page_statistique_maintenance);
         label_pdf->setObjectName("label_pdf");
         label_pdf->setGeometry(QRect(1200, 550, 121, 81));
-        label_stat_2 = new QLabel(page_395);
+        label_stat_2 = new QLabel(page_statistique_maintenance);
         label_stat_2->setObjectName("label_stat_2");
         label_stat_2->setGeometry(QRect(1020, 550, 141, 81));
-        label_calendrier = new QLabel(page_395);
+        label_calendrier = new QLabel(page_statistique_maintenance);
         label_calendrier->setObjectName("label_calendrier");
         label_calendrier->setGeometry(QRect(850, 560, 131, 81));
-        label_qrc = new QLabel(page_395);
+        label_qrc = new QLabel(page_statistique_maintenance);
         label_qrc->setObjectName("label_qrc");
         label_qrc->setGeometry(QRect(680, 550, 131, 81));
         label_qrc->setScaledContents(true);
-        stackedWidget->addWidget(page_395);
-        page_129 = new QWidget();
-        page_129->setObjectName("page_129");
-        pushButtonAfficherMaintenances_2 = new QPushButton(page_129);
+        graphic = new QGraphicsView(page_statistique_maintenance);
+        graphic->setObjectName("graphic");
+        graphic->setGeometry(QRect(380, 140, 571, 361));
+        stackedWidget->addWidget(page_statistique_maintenance);
+        page_calendrier = new QWidget();
+        page_calendrier->setObjectName("page_calendrier");
+        pushButtonAfficherMaintenances_2 = new QPushButton(page_calendrier);
         pushButtonAfficherMaintenances_2->setObjectName("pushButtonAfficherMaintenances_2");
         pushButtonAfficherMaintenances_2->setGeometry(QRect(870, 650, 151, 41));
         pushButtonAfficherMaintenances_2->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
@@ -720,15 +651,7 @@ public:
 "background-color: rgb(83, 89, 86);\n"
 "border-radius:10px;\n"
 "font: 700 10pt \"Segoe UI\";"));
-        label_619 = new QLabel(page_129);
-        label_619->setObjectName("label_619");
-        label_619->setGeometry(QRect(1080, 50, 121, 20));
-        label_619->setStyleSheet(QString::fromUtf8("color: rgb(172, 44, 103);\n"
-"font: 700 9pt \"Segoe UI\";\n"
-"font: 700 10pt \"Segoe UI\";\n"
-"text-decoration: underline;\n"
-"text-decoration: underline;"));
-        pushButton_45 = new QPushButton(page_129);
+        pushButton_45 = new QPushButton(page_calendrier);
         pushButton_45->setObjectName("pushButton_45");
         pushButton_45->setGeometry(QRect(1040, 650, 151, 41));
         pushButton_45->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
@@ -738,13 +661,7 @@ public:
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        label_628 = new QLabel(page_129);
-        label_628->setObjectName("label_628");
-        label_628->setGeometry(QRect(1090, -20, 101, 71));
-        label_628->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
-        label_628->setPixmap(QPixmap(QString::fromUtf8("../../../../../Downloads/logo.png")));
-        label_628->setScaledContents(true);
-        pushButton_46 = new QPushButton(page_129);
+        pushButton_46 = new QPushButton(page_calendrier);
         pushButton_46->setObjectName("pushButton_46");
         pushButton_46->setGeometry(QRect(1200, 650, 151, 41));
         pushButton_46->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
@@ -753,14 +670,14 @@ public:
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        btnAjouterRappel = new QPushButton(page_129);
+        btnAjouterRappel = new QPushButton(page_calendrier);
         btnAjouterRappel->setObjectName("btnAjouterRappel");
         btnAjouterRappel->setGeometry(QRect(290, 460, 241, 41));
         btnAjouterRappel->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "color: rgb(255, 255, 255);\n"
 "font: 700 12pt \"Segoe UI\";\n"
 "border-radius:10px;"));
-        widget_139 = new QWidget(page_129);
+        widget_139 = new QWidget(page_calendrier);
         widget_139->setObjectName("widget_139");
         widget_139->setGeometry(QRect(-50, 0, 1431, 91));
         widget_139->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 80);"));
@@ -823,48 +740,50 @@ public:
         label_main3 = new QLabel(widget_139);
         label_main3->setObjectName("label_main3");
         label_main3->setGeometry(QRect(930, 30, 31, 31));
-        label_616 = new QLabel(page_129);
+        label_main3->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
+        label_616 = new QLabel(page_calendrier);
         label_616->setObjectName("label_616");
         label_616->setGeometry(QRect(10, 110, 221, 511));
         label_616->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "color: transparent;\n"
 "border-radius:20px;"));
-        acceuilcalmaint = new QPushButton(page_129);
-        acceuilcalmaint->setObjectName("acceuilcalmaint");
-        acceuilcalmaint->setGeometry(QRect(1130, 110, 181, 41));
-        acceuilcalmaint->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
+        acceuilmaintenance = new QPushButton(page_calendrier);
+        acceuilmaintenance->setObjectName("acceuilmaintenance");
+        acceuilmaintenance->setGeometry(QRect(1130, 110, 181, 41));
+        acceuilmaintenance->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
 "font: 700 11pt \"Segoe UI\";\n"
 "text-decoration: underline;\n"
 "background-color: rgb(172, 44, 103);\n"
 "border-radius:10px;"));
-        pushButton_114 = new QPushButton(page_129);
+        pushButton_114 = new QPushButton(page_calendrier);
         pushButton_114->setObjectName("pushButton_114");
         pushButton_114->setGeometry(QRect(700, 650, 151, 41));
         pushButton_114->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
 "border-radius:10px;\n"
 "color: rgb(0, 0, 0);\n"
 "font: 700 10pt \"Segoe UI\";"));
-        calendarWidget = new QCalendarWidget(page_129);
+        calendarWidget = new QCalendarWidget(page_calendrier);
         calendarWidget->setObjectName("calendarWidget");
         calendarWidget->setGeometry(QRect(260, 90, 571, 231));
-        label_cal = new QLabel(page_129);
+        label_cal = new QLabel(page_calendrier);
         label_cal->setObjectName("label_cal");
         label_cal->setGeometry(QRect(20, 240, 201, 211));
+        label_cal->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
         label_cal->setScaledContents(true);
-        label_qrc1 = new QLabel(page_129);
+        label_qrc1 = new QLabel(page_calendrier);
         label_qrc1->setObjectName("label_qrc1");
         label_qrc1->setGeometry(QRect(720, 580, 121, 71));
         label_qrc1->setScaledContents(true);
-        label_call = new QLabel(page_129);
+        label_call = new QLabel(page_calendrier);
         label_call->setObjectName("label_call");
         label_call->setGeometry(QRect(880, 580, 131, 71));
-        label_state = new QLabel(page_129);
+        label_state = new QLabel(page_calendrier);
         label_state->setObjectName("label_state");
         label_state->setGeometry(QRect(1070, 580, 121, 71));
-        label_pdf1 = new QLabel(page_129);
+        label_pdf1 = new QLabel(page_calendrier);
         label_pdf1->setObjectName("label_pdf1");
         label_pdf1->setGeometry(QRect(1220, 560, 121, 81));
-        commandesTableWidget = new QTableWidget(page_129);
+        commandesTableWidget = new QTableWidget(page_calendrier);
         if (commandesTableWidget->columnCount() < 8)
             commandesTableWidget->setColumnCount(8);
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
@@ -887,10 +806,10 @@ public:
             commandesTableWidget->setRowCount(2);
         commandesTableWidget->setObjectName("commandesTableWidget");
         commandesTableWidget->setGeometry(QRect(240, 340, 1031, 111));
-        labelMessage = new QLabel(page_129);
+        labelMessage = new QLabel(page_calendrier);
         labelMessage->setObjectName("labelMessage");
         labelMessage->setGeometry(QRect(1040, 180, 291, 121));
-        tableRappels = new QTableWidget(page_129);
+        tableRappels = new QTableWidget(page_calendrier);
         if (tableRappels->columnCount() < 3)
             tableRappels->setColumnCount(3);
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
@@ -903,34 +822,130 @@ public:
             tableRappels->setRowCount(2);
         tableRappels->setObjectName("tableRappels");
         tableRappels->setGeometry(QRect(270, 510, 401, 151));
-        stackedWidget->addWidget(page_129);
+        stackedWidget->addWidget(page_calendrier);
         pageArduino = new QWidget();
         pageArduino->setObjectName("pageArduino");
-        btnExit = new QPushButton(pageArduino);
-        btnExit->setObjectName("btnExit");
-        btnExit->setGeometry(QRect(210, 140, 93, 29));
-        btnShowAlerts = new QPushButton(pageArduino);
-        btnShowAlerts->setObjectName("btnShowAlerts");
-        btnShowAlerts->setGeometry(QRect(210, 190, 93, 29));
         btnRetourPage15 = new QPushButton(pageArduino);
         btnRetourPage15->setObjectName("btnRetourPage15");
-        btnRetourPage15->setGeometry(QRect(1170, 80, 181, 41));
+        btnRetourPage15->setGeometry(QRect(1100, 180, 181, 41));
         btnRetourPage15->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
 "font: 700 11pt \"Segoe UI\";\n"
 "text-decoration: underline;\n"
 "background-color: rgb(172, 44, 103);\n"
 "border-radius:10px;"));
+        labelNumChambre = new QLabel(pageArduino);
+        labelNumChambre->setObjectName("labelNumChambre");
+        labelNumChambre->setGeometry(QRect(450, 190, 431, 51));
+        lineEditNumChambre = new QLineEdit(pageArduino);
+        lineEditNumChambre->setObjectName("lineEditNumChambre");
+        lineEditNumChambre->setGeometry(QRect(490, 290, 301, 31));
+        lineEditNumChambre->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+""));
+        pushButton_afficher_arduino = new QPushButton(pageArduino);
+        pushButton_afficher_arduino->setObjectName("pushButton_afficher_arduino");
+        pushButton_afficher_arduino->setGeometry(QRect(540, 370, 181, 41));
+        pushButton_afficher_arduino->setStyleSheet(QString::fromUtf8("border-radius:10px;\n"
+"background-color: rgb(83, 89, 86);\n"
+"color: rgb(209, 196, 233);\n"
+"font: 16pt \"Segoe UI\";\n"
+""));
         labelMessage_2 = new QLabel(pageArduino);
         labelMessage_2->setObjectName("labelMessage_2");
-        labelMessage_2->setGeometry(QRect(170, 70, 271, 51));
-        alertTableView = new QTableView(pageArduino);
-        alertTableView->setObjectName("alertTableView");
-        alertTableView->setGeometry(QRect(320, 190, 256, 192));
+        labelMessage_2->setGeometry(QRect(410, 470, 441, 51));
+        labelMessage_2->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+""));
+        label_623 = new QLabel(pageArduino);
+        label_623->setObjectName("label_623");
+        label_623->setGeometry(QRect(90, 130, 221, 511));
+        label_623->setStyleSheet(QString::fromUtf8("background-color: rgb(209, 196, 233);\n"
+"color: transparent;\n"
+"border-radius:20px;"));
+        widget_11 = new QWidget(pageArduino);
+        widget_11->setObjectName("widget_11");
+        widget_11->setGeometry(QRect(0, 0, 1411, 91));
+        widget_11->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 80);"));
+        clientmaint_2 = new QPushButton(widget_11);
+        clientmaint_2->setObjectName("clientmaint_2");
+        clientmaint_2->setGeometry(QRect(100, 20, 151, 51));
+        clientmaint_2->setStyleSheet(QString::fromUtf8(" font: 700 10pt \"Segoe UI\";\n"
+"color: rgb(255, 255, 255);\n"
+"background-color: rgb(179, 170, 255);\n"
+" \n"
+" \n"
+"border-radius:10px;"));
+        employemaint_2 = new QPushButton(widget_11);
+        employemaint_2->setObjectName("employemaint_2");
+        employemaint_2->setGeometry(QRect(310, 20, 161, 51));
+        employemaint_2->setStyleSheet(QString::fromUtf8(" font: 700 10pt \"Segoe UI\";\n"
+"color: rgb(255, 255, 255);\n"
+"background-color: rgb(179, 170, 255);\n"
+" \n"
+" \n"
+"border-radius:10px;"));
+        reservationmaint_2 = new QPushButton(widget_11);
+        reservationmaint_2->setObjectName("reservationmaint_2");
+        reservationmaint_2->setGeometry(QRect(510, 20, 161, 51));
+        reservationmaint_2->setStyleSheet(QString::fromUtf8("font: 700 10pt \"Segoe UI\";\n"
+"color: rgb(255, 255, 255);\n"
+"background-color: rgb(179, 170, 255);\n"
+" \n"
+" \n"
+"border-radius:10px;"));
+        stockmaint_2 = new QPushButton(widget_11);
+        stockmaint_2->setObjectName("stockmaint_2");
+        stockmaint_2->setGeometry(QRect(710, 20, 171, 51));
+        stockmaint_2->setStyleSheet(QString::fromUtf8(" font: 700 10pt \"Segoe UI\";\n"
+"color: rgb(255, 255, 255);\n"
+"background-color: rgb(179, 170, 255);\n"
+" \n"
+" \n"
+"border-radius:10px;"));
+        maintenance_2 = new QPushButton(widget_11);
+        maintenance_2->setObjectName("maintenance_2");
+        maintenance_2->setGeometry(QRect(920, 20, 201, 51));
+        maintenance_2->setStyleSheet(QString::fromUtf8(" color: rgb(255, 255, 255);\n"
+"font: 700 10pt \"Segoe UI\";\n"
+"background-color: rgb(83, 89, 86);\n"
+" \n"
+" \n"
+"border-radius:10px;"));
+        sedeconnecter9_2 = new QPushButton(widget_11);
+        sedeconnecter9_2->setObjectName("sedeconnecter9_2");
+        sedeconnecter9_2->setGeometry(QRect(1190, 70, 131, 21));
+        sedeconnecter9_2->setStyleSheet(QString::fromUtf8("color: rgb(172, 44, 103);\n"
+"text-decoration: underline;\n"
+"font: 700 9pt \"Segoe UI\";\n"
+"background-color:transparent;"));
+        label_log_2 = new QLabel(widget_11);
+        label_log_2->setObjectName("label_log_2");
+        label_log_2->setGeometry(QRect(1200, 0, 101, 71));
+        label_log_2->setScaledContents(true);
+        label_main1_2 = new QLabel(widget_11);
+        label_main1_2->setObjectName("label_main1_2");
+        label_main1_2->setGeometry(QRect(930, 30, 41, 31));
+        label_main1_2->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
+        label_securitee = new QLabel(pageArduino);
+        label_securitee->setObjectName("label_securitee");
+        label_securitee->setGeometry(QRect(100, 270, 201, 181));
+        label_securitee->setStyleSheet(QString::fromUtf8("background-color:transparent;"));
+        tableWidgetAlerts = new QTableWidget(pageArduino);
+        if (tableWidgetAlerts->columnCount() < 3)
+            tableWidgetAlerts->setColumnCount(3);
+        QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
+        tableWidgetAlerts->setHorizontalHeaderItem(0, __qtablewidgetitem11);
+        QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
+        tableWidgetAlerts->setHorizontalHeaderItem(1, __qtablewidgetitem12);
+        QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
+        tableWidgetAlerts->setHorizontalHeaderItem(2, __qtablewidgetitem13);
+        if (tableWidgetAlerts->rowCount() < 5)
+            tableWidgetAlerts->setRowCount(5);
+        tableWidgetAlerts->setObjectName("tableWidgetAlerts");
+        tableWidgetAlerts->setGeometry(QRect(930, 340, 401, 331));
         stackedWidget->addWidget(pageArduino);
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName("menuBar");
-        menuBar->setGeometry(QRect(0, 0, 1390, 22));
+        menuBar->setGeometry(QRect(0, 0, 1390, 26));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName("mainToolBar");
@@ -950,20 +965,6 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Gestion des Clients", nullptr));
-        comboBox_3->setItemText(0, QCoreApplication::translate("MainWindow", "en cours", nullptr));
-        comboBox_3->setItemText(1, QCoreApplication::translate("MainWindow", "en attente", nullptr));
-        comboBox_3->setItemText(2, QCoreApplication::translate("MainWindow", "termin\303\251", nullptr));
-
-        label_11->setText(QString());
-        pushButton_17->setText(QCoreApplication::translate("MainWindow", "calendrier", nullptr));
-        pushButton_13->setText(QCoreApplication::translate("MainWindow", "valider", nullptr));
-        label_17->setText(QString());
-        pushButton_18->setText(QCoreApplication::translate("MainWindow", "suivi des co\303\271ts ", nullptr));
-        label_12->setText(QString());
-        pushButton_16->setText(QCoreApplication::translate("MainWindow", "statistiques", nullptr));
-        label_8->setText(QCoreApplication::translate("MainWindow", "Statut", nullptr));
-        pushButton_15->setText(QCoreApplication::translate("MainWindow", "exporter en PDF", nullptr));
-        label_607->setText(QString());
         clientmaint->setText(QCoreApplication::translate("MainWindow", "client", nullptr));
         employemaint->setText(QCoreApplication::translate("MainWindow", "employ\303\251", nullptr));
         reservationmaint->setText(QCoreApplication::translate("MainWindow", "reservation", nullptr));
@@ -972,20 +973,19 @@ public:
         sedeconnecter9->setText(QCoreApplication::translate("MainWindow", "se d\303\251connecter", nullptr));
         label_log->setText(QString());
         label_main1->setText(QString());
-        pushButton_38->setText(QCoreApplication::translate("MainWindow", "supprimer", nullptr));
-        comboBox_34->setItemText(0, QCoreApplication::translate("MainWindow", "urgente", nullptr));
-        comboBox_34->setItemText(1, QCoreApplication::translate("MainWindow", "normale", nullptr));
-        comboBox_34->setItemText(2, QCoreApplication::translate("MainWindow", "basse", nullptr));
+        pushButton_supprimer_maintenance->setText(QCoreApplication::translate("MainWindow", "supprimer", nullptr));
+        comboBox_tri_maintenance->setItemText(0, QCoreApplication::translate("MainWindow", "urgente", nullptr));
+        comboBox_tri_maintenance->setItemText(1, QCoreApplication::translate("MainWindow", "normale", nullptr));
+        comboBox_tri_maintenance->setItemText(2, QCoreApplication::translate("MainWindow", "basse", nullptr));
 
-        pushButton_39->setText(QCoreApplication::translate("MainWindow", "Ajouter une demande", nullptr));
-        pushButton_2->setText(QCoreApplication::translate("MainWindow", "modifier", nullptr));
-        pushButton_40->setText(QCoreApplication::translate("MainWindow", "exporter en PDF", nullptr));
-        label_606->setText(QString());
-        pushButton_stat2->setText(QCoreApplication::translate("MainWindow", "statistiques", nullptr));
-        pushButton_57->setText(QCoreApplication::translate("MainWindow", "calendrier", nullptr));
-        comboBox_36->setItemText(0, QCoreApplication::translate("MainWindow", "en cours", nullptr));
-        comboBox_36->setItemText(1, QCoreApplication::translate("MainWindow", "en attente", nullptr));
-        comboBox_36->setItemText(2, QCoreApplication::translate("MainWindow", "termin\303\251", nullptr));
+        pushButton_ajouter_maintenance->setText(QCoreApplication::translate("MainWindow", "Ajouter une demande", nullptr));
+        pushButton_modifier_maintenance->setText(QCoreApplication::translate("MainWindow", "modifier", nullptr));
+        pushButton_exporter_maintenance->setText(QCoreApplication::translate("MainWindow", "exporter en PDF", nullptr));
+        pushButton_stat2_maintenance->setText(QCoreApplication::translate("MainWindow", "statistiques", nullptr));
+        pushButton_calendrier->setText(QCoreApplication::translate("MainWindow", "calendrier", nullptr));
+        comboBox_etat_maintenance->setItemText(0, QCoreApplication::translate("MainWindow", "en cours", nullptr));
+        comboBox_etat_maintenance->setItemText(1, QCoreApplication::translate("MainWindow", "en attente", nullptr));
+        comboBox_etat_maintenance->setItemText(2, QCoreApplication::translate("MainWindow", "termin\303\251", nullptr));
 
         label_621->setText(QCoreApplication::translate("MainWindow", "Etat de maintenance", nullptr));
         label_609->setText(QCoreApplication::translate("MainWindow", "Date pr\303\251vue de fin", nullptr));
@@ -993,28 +993,29 @@ public:
         label_605->setText(QCoreApplication::translate("MainWindow", "Num Chambre concern\303\251e", nullptr));
         label_613->setText(QCoreApplication::translate("MainWindow", "Type de maintenance", nullptr));
         label_622->setText(QCoreApplication::translate("MainWindow", "Date de d\303\251but", nullptr));
-        comboBox_40->setItemText(0, QCoreApplication::translate("MainWindow", "corrective", nullptr));
-        comboBox_40->setItemText(1, QCoreApplication::translate("MainWindow", "esth\303\251tique", nullptr));
-        comboBox_40->setItemText(2, QCoreApplication::translate("MainWindow", "pr\303\251ventive", nullptr));
+        comboBox_type_maintenance->setItemText(0, QCoreApplication::translate("MainWindow", "corrective", nullptr));
+        comboBox_type_maintenance->setItemText(1, QCoreApplication::translate("MainWindow", "esth\303\251tique", nullptr));
+        comboBox_type_maintenance->setItemText(2, QCoreApplication::translate("MainWindow", "pr\303\251ventive", nullptr));
 
-        comboBox_41->setItemText(0, QCoreApplication::translate("MainWindow", "urgente", nullptr));
-        comboBox_41->setItemText(1, QCoreApplication::translate("MainWindow", "normale", nullptr));
-        comboBox_41->setItemText(2, QCoreApplication::translate("MainWindow", "basse", nullptr));
+        comboBox_priorite->setItemText(0, QCoreApplication::translate("MainWindow", "urgente", nullptr));
+        comboBox_priorite->setItemText(1, QCoreApplication::translate("MainWindow", "normale", nullptr));
+        comboBox_priorite->setItemText(2, QCoreApplication::translate("MainWindow", "basse", nullptr));
 
         label_638->setText(QCoreApplication::translate("MainWindow", "Priorite", nullptr));
         label_1259->setText(QCoreApplication::translate("MainWindow", "ID de employe", nullptr));
         label_624->setText(QCoreApplication::translate("MainWindow", "Date de rappel", nullptr));
         label_625->setText(QCoreApplication::translate("MainWindow", "Description de rappel", nullptr));
-        pushButton_43->setText(QCoreApplication::translate("MainWindow", "Rechercher une demande:", nullptr));
+        pushButton_recherche_maintenance->setText(QCoreApplication::translate("MainWindow", "Rechercher une demande:", nullptr));
         lineEdit_96->setText(QCoreApplication::translate("MainWindow", "    Tri par:", nullptr));
-        pushButton_111->setText(QCoreApplication::translate("MainWindow", "QRC", nullptr));
+        pushButton_QRC->setText(QCoreApplication::translate("MainWindow", "QRC", nullptr));
         qr_code->setText(QString());
         label_qrc2->setText(QString());
         label_ca->setText(QString());
         label_sta->setText(QString());
         label_pdf2->setText(QString());
         label_chercher->setText(QString());
-        btnGoToArduino->setText(QString());
+        btnGoToArduino->setText(QCoreApplication::translate("MainWindow", "s\303\251curit\303\251", nullptr));
+        label_securite->setText(QString());
         clientmaint_18->setText(QCoreApplication::translate("MainWindow", "client", nullptr));
         employemaint_18->setText(QCoreApplication::translate("MainWindow", "employ\303\251", nullptr));
         reservationmaint_18->setText(QCoreApplication::translate("MainWindow", "reservation", nullptr));
@@ -1024,10 +1025,10 @@ public:
         label_logo->setText(QString());
         label_main2->setText(QString());
         label_620->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        pushButton_stat->setText(QCoreApplication::translate("MainWindow", "statistiques", nullptr));
+        pushButton_stat_maintenance->setText(QCoreApplication::translate("MainWindow", "statistiques", nullptr));
         pushButton_162->setText(QCoreApplication::translate("MainWindow", "calendrier", nullptr));
         pushButton_163->setText(QCoreApplication::translate("MainWindow", "exporter en PDF", nullptr));
-        acceuilcalmaint_2->setText(QCoreApplication::translate("MainWindow", "Acceuil", nullptr));
+        acceuilmaintenance_2->setText(QCoreApplication::translate("MainWindow", "Acceuil", nullptr));
         pushButton_112->setText(QCoreApplication::translate("MainWindow", "QRC", nullptr));
         label_stat->setText(QString());
         label_pdf->setText(QString());
@@ -1035,9 +1036,7 @@ public:
         label_calendrier->setText(QString());
         label_qrc->setText(QString());
         pushButtonAfficherMaintenances_2->setText(QCoreApplication::translate("MainWindow", "calendrier", nullptr));
-        label_619->setText(QCoreApplication::translate("MainWindow", "se deconnecter", nullptr));
         pushButton_45->setText(QCoreApplication::translate("MainWindow", "statistiques", nullptr));
-        label_628->setText(QString());
         pushButton_46->setText(QCoreApplication::translate("MainWindow", "exporter en PDF", nullptr));
         btnAjouterRappel->setText(QCoreApplication::translate("MainWindow", "Rappels et notifications", nullptr));
         clientmaint_17->setText(QCoreApplication::translate("MainWindow", "client", nullptr));
@@ -1049,7 +1048,7 @@ public:
         sedeconnecter10->setText(QCoreApplication::translate("MainWindow", "se d\303\251connecter", nullptr));
         label_main3->setText(QString());
         label_616->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
-        acceuilcalmaint->setText(QCoreApplication::translate("MainWindow", "Acceuil", nullptr));
+        acceuilmaintenance->setText(QCoreApplication::translate("MainWindow", "Acceuil", nullptr));
         pushButton_114->setText(QCoreApplication::translate("MainWindow", "QRC", nullptr));
         label_cal->setText(QString());
         label_qrc1->setText(QString());
@@ -1079,10 +1078,26 @@ public:
         ___qtablewidgetitem9->setText(QCoreApplication::translate("MainWindow", "DATE_RAPPEL", nullptr));
         QTableWidgetItem *___qtablewidgetitem10 = tableRappels->horizontalHeaderItem(2);
         ___qtablewidgetitem10->setText(QCoreApplication::translate("MainWindow", "DESCRIPTION_RAPPEL", nullptr));
-        btnExit->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        btnShowAlerts->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
         btnRetourPage15->setText(QCoreApplication::translate("MainWindow", "Acceuil", nullptr));
-        labelMessage_2->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        labelNumChambre->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:18pt; font-weight:700;\">Entrerz le num\303\251ro de chambre</span></p></body></html>", nullptr));
+        pushButton_afficher_arduino->setText(QCoreApplication::translate("MainWindow", "Afficher", nullptr));
+        labelMessage_2->setText(QString());
+        label_623->setText(QString());
+        clientmaint_2->setText(QCoreApplication::translate("MainWindow", "client", nullptr));
+        employemaint_2->setText(QCoreApplication::translate("MainWindow", "employ\303\251", nullptr));
+        reservationmaint_2->setText(QCoreApplication::translate("MainWindow", "reservation", nullptr));
+        stockmaint_2->setText(QCoreApplication::translate("MainWindow", "stock", nullptr));
+        maintenance_2->setText(QCoreApplication::translate("MainWindow", "   maintenance", nullptr));
+        sedeconnecter9_2->setText(QCoreApplication::translate("MainWindow", "se d\303\251connecter", nullptr));
+        label_log_2->setText(QString());
+        label_main1_2->setText(QString());
+        label_securitee->setText(QString());
+        QTableWidgetItem *___qtablewidgetitem11 = tableWidgetAlerts->horizontalHeaderItem(0);
+        ___qtablewidgetitem11->setText(QCoreApplication::translate("MainWindow", "NUM_CHAMBRE_CONCERNEE", nullptr));
+        QTableWidgetItem *___qtablewidgetitem12 = tableWidgetAlerts->horizontalHeaderItem(1);
+        ___qtablewidgetitem12->setText(QCoreApplication::translate("MainWindow", "ALERT_FLAME", nullptr));
+        QTableWidgetItem *___qtablewidgetitem13 = tableWidgetAlerts->horizontalHeaderItem(2);
+        ___qtablewidgetitem13->setText(QCoreApplication::translate("MainWindow", "ALERT_DESCRIPTION", nullptr));
     } // retranslateUi
 
 };

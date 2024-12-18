@@ -1,0 +1,10 @@
+[user]
+	name = ghamlouli
+	email = imenghamlouli0000@gmail.com
+[core]
+	autocrlf = true
+	compression = 0
+[http]
+	postBuffer = 524288000
+	maxRequestBuffer = 1048576000
+	sslVerify = true
